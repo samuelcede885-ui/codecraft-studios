@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CodeCraft Studio — Webs y apps a medida</title>
+  <meta name="description" content="CodeCraft Studio diseña y desarrolla páginas web y aplicaciones móviles a medida: rápidas, cuidadas y pensadas para crecer.">
+  <meta name="theme-color" content="#19587B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="page">
+
+    <!-- ============ HERO ============ -->
+    <header class="hero" id="inicio">
+      <nav class="nav">
+        <a class="wordmark" href="#inicio" aria-label="CodeCraft Studio, inicio">
+          <span class="wordmark__code">CODECRAFT</span>
+          <span class="wordmark__studio">Studio</span>
+        </a>
+        <div class="nav__right">
+          <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu">
+            <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+            Menú
+          </button>
+          <a class="btn btn--light" href="#contacto">Empezar proyecto</a>
+        </div>
+      </nav>
+
+      <div class="menu" id="menu" hidden>
+        <a href="#servicios">Servicios</a>
+        <a href="#proyectos">Proyectos</a>
+        <a href="#proceso">Proceso</a>
+        <a href="identidad.html">Identidad de marca</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+
+      <div class="hero__clouds" aria-hidden="true">
+        <span class="cloud cloud--1"></span>
+        <span class="cloud cloud--2"></span>
+        <span class="cloud cloud--3"></span>
+        <span class="cloud cloud--4"></span>
+      </div>
+
+      <div class="hero__watermark" aria-hidden="true">CODECRAFT</div>
+
+      <div class="hero__copy">
+        <p class="eyebrow reveal-in" style="--i:0">Estudio de webs y apps</p>
+        <h1 class="hero__title reveal-in" style="--i:1">
+          <span class="muted">Diseña más claro,</span>
+          <span>Llega más lejos.</span>
+        </h1>
+        <p class="hero__lead reveal-in" style="--i:2">
+          Creamos páginas web y aplicaciones a medida que cargan rápido, se ven impecables
+          y convierten visitas en clientes.
+        </p>
+        <a class="btn btn--light reveal-in" style="--i:3" href="#contacto">Pide tu presupuesto</a>
+      </div>
+
+      <!-- Floating thumbnails (like the reference) -->
+      <div class="thumbs" aria-hidden="true">
+        <span class="thumb thumb--a"><i class="mini mini--web"></i></span>
+        <span class="thumb thumb--b"><i class="mini mini--app"></i></span>
+        <span class="thumb thumb--c"><i class="mini mini--shop"></i></span>
+        <span class="thumb thumb--d"><i class="mini mini--chart"></i></span>
+      </div>
+
+      <!-- Hero device: the "jet" of this site -->
+      <div class="stage reveal-in" style="--i:4">
+        <div class="browser" role="img" aria-label="Vista previa de un proyecto web de CodeCraft Studio">
+          <div class="browser__bar">
+            <span></span><span></span><span></span>
+            <div class="browser__url" data-slide-url>aurora-cafe.com</div>
+          </div>
+          <div class="browser__screen">
+            <div class="slides" data-slides>
+              <!-- slides filled by JS -->
+            </div>
+          </div>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone__notch"></div>
+          <div class="phone__screen" data-phone></div>
+        </div>
+      </div>
+
+      <div class="hero__foot">
+        <div class="trust">
+          <div class="avatars" aria-hidden="true">
+            <span style="--c:#85B2CF">LM</span>
+            <span style="--c:#F6EEDE">AR</span>
+            <span style="--c:#19587B;color:#F6EEDE">JP</span>
+          </div>
+          <p><strong>+120 marcas confían en nosotros</strong><br>Hecho a medida, sin plantillas.</p>
+        </div>
+        <div class="slider-ctrl">
+          <button class="circle-btn" type="button" data-prev aria-label="Proyecto anterior">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <span class="slider-ctrl__count"><b data-count>01</b> / <span data-total>04</span></span>
+          <button class="circle-btn" type="button" data-next aria-label="Proyecto siguiente">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <a class="scroll-down" href="#servicios" aria-label="Bajar a servicios">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </header>
+
+    <main>
+      <!-- ============ SERVICIOS / BUSCADOR ============ -->
+      <section class="section" id="servicios">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Nuestros servicios</p>
+            <h2 class="title">
+              <span class="muted">Explora nuevas ideas,</span>
+              <span>un producto a la vez.</span>
+            </h2>
+          </div>
+          <div class="chips" role="tablist" aria-label="Filtrar proyectos">
+            <button class="chip is-active" role="tab" aria-selected="true" data-filter="all">
+              <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" fill="currentColor"/></svg>Todo
+            </button>
+            <button class="chip" role="tab" aria-selected="false" data-filter="web">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.8"/></svg>Webs
+            </button>
+            <button class="chip" role="tab" aria-selected="false" data-filter="app">
+              <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M11 18.5h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Apps
+            </button>
+            <button class="chip" role="tab" aria-selected="false" data-filter="shop">
+              <svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>E‑commerce
+            </button>
+          </div>
+        </div>
+
+        <form class="quote" id="contacto" novalidate>
+          <label class="field">
+            <span class="field__label">Proyecto</span>
+            <select name="tipo" aria-label="Tipo de proyecto">
+              <option>Página web</option>
+              <option>App móvil</option>
+              <option>Tienda online</option>
+              <option>Web + App</option>
+            </select>
+          </label>
+          <span class="quote__swap" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="12" height="12"><path d="M7 7h11l-3-3M17 17H6l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <label class="field">
+            <span class="field__label">Objetivo</span>
+            <input name="objetivo" type="text" placeholder="Vender más, captar clientes…" autocomplete="off">
+          </label>
+          <label class="field field--icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <span class="field__label">Lanzamiento</span>
+            <input name="fecha" type="month" aria-label="Fecha de lanzamiento deseada">
+          </label>
+          <label class="field field--icon field--num">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <span class="field__label">Pantallas</span>
+            <input name="pantallas" type="number" min="1" max="99" value="5" inputmode="numeric">
+          </label>
+          <button class="btn btn--dark" type="submit">Pedir presupuesto</button>
+          <p class="quote__msg" role="status" aria-live="polite"></p>
+        </form>
+
+        <!-- ============ PROYECTOS ============ -->
+        <div class="grid" id="proyectos" data-grid></div>
+
+        <!-- ============ STATS ============ -->
+        <div class="stats">
+          <div class="stat"><p class="stat__num"><span data-to="150">0</span>+</p><p class="stat__label">Proyectos lanzados</p></div>
+          <div class="stat"><p class="stat__num"><span data-to="4.9" data-dec="1">0</span><small>/5</small></p><p class="stat__label">Valoración media de clientes</p></div>
+          <div class="stat"><p class="stat__num"><span data-to="98">0</span>%</p><p class="stat__label">Clientes que repiten</p></div>
+          <div class="stat"><p class="stat__num"><span data-to="12">0</span>+</p><p class="stat__label">Especialistas en el equipo</p></div>
+        </div>
+      </section>
+
+      <!-- ============ PROCESO ============ -->
+      <section class="section section--process" id="proceso">
+        <div class="section__head">
+          <div>
+            <p class="eyebrow">Cómo trabajamos</p>
+            <h2 class="title">
+              <span class="muted">De la idea al lanzamiento,</span>
+              <span>en cuatro pasos.</span>
+            </h2>
+          </div>
+        </div>
+        <ol class="steps">
+          <li class="step"><span class="step__n">01</span><h3>Descubrir</h3><p>Entendemos tu negocio, tus usuarios y qué tiene que conseguir el producto.</p></li>
+          <li class="step"><span class="step__n">02</span><h3>Diseñar</h3><p>Prototipos navegables y una interfaz con tu identidad, validada antes de programar.</p></li>
+          <li class="step"><span class="step__n">03</span><h3>Construir</h3><p>Código limpio, rápido y accesible. Webs que vuelan y apps nativas para iOS y Android.</p></li>
+          <li class="step"><span class="step__n">04</span><h3>Crecer</h3><p>Lanzamos, medimos y mejoramos. Seguimos a tu lado después de publicar.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <!-- ============ FOOTER / CTA ============ -->
+    <footer class="footer">
+      <picture class="footer__logo">
+        <source srcset="assets/logo-codecraft.webp" type="image/webp">
+        <img src="assets/logo-codecraft.png" alt="CodeCraft Studio" width="1050" height="503" loading="lazy">
+      </picture>
+      <p class="footer__claim">Hacemos <em>a mano</em> lo que otros hacen con plantillas.</p>
+      <a class="btn btn--light" href="mailto:hola@codecraftstudio.com">hola@codecraftstudio.com</a>
+      <div class="footer__bottom">
+        <span>© <span data-year>2026</span> CodeCraft Studio</span>
+        <nav aria-label="Pie de página">
+          <a href="#servicios">Servicios</a>
+          <a href="#proyectos">Proyectos</a>
+          <a href="identidad.html">Identidad de marca</a>
+        </nav>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>

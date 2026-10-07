@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Identidad de marca — CodeCraft Studio</title>
+  <meta name="description" content="Guía de identidad de CodeCraft Studio: logotipo, colores, tipografía y tono de voz.">
+  <meta name="theme-color" content="#19587B">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter+Tight:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .brand-hero { background: var(--oceano); color: var(--crema); padding: 22px var(--gutter) 64px; }
+    .brand-hero .nav .wordmark__code { color: var(--crema); text-shadow: 1.5px -1.5px 0 var(--tinta); }
+    .brand-hero .nav .wordmark__studio { color: var(--crema); }
+    .brand-hero .nav__menu { color: var(--crema); }
+    .brand-hero .eyebrow { color: var(--cielo); margin-top: 56px; }
+    .brand-hero h1 { margin: 0; max-width: 760px; font-weight: 400; font-size: clamp(36px, 5.6vw, 64px); line-height: 1; letter-spacing: -0.05em; }
+    .brand-hero h1 em { font-family: var(--font-script); font-style: normal; font-size: 1.25em; color: var(--cielo); letter-spacing: 0; }
+    .brand-hero .logo { margin: 48px auto 0; width: min(640px, 100%); }
+
+    .b-section { padding: 72px var(--gutter); border-top: 1px solid var(--line); }
+    .b-grid { display: grid; grid-template-columns: 280px 1fr; gap: 40px; }
+    .b-grid > div:first-child p:not(.eyebrow) { color: var(--ink-soft); font-size: 14px; margin: 12px 0 0; }
+    .b-grid h2 { margin: 0; font-size: 28px; font-weight: 400; letter-spacing: -0.04em; }
+
+    .essence { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .essence div { padding: 24px; border-radius: var(--radius-lg); background: rgba(255,255,255,.6); border: 1px solid var(--line); }
+    .essence h3 { margin: 0 0 6px; font-size: 17px; font-weight: 500; letter-spacing: -0.02em; }
+    .essence p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+    .swatches { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 14px; }
+    .swatch { display: flex; flex-direction: column; justify-content: flex-end; min-height: 240px; padding: 18px; border: 0; border-radius: var(--radius-lg); text-align: left; transition: transform 140ms var(--ease-out); }
+    .swatch:active { transform: scale(0.98); }
+    .swatch b { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; }
+    .swatch span { font-size: 12px; opacity: .8; }
+    .swatch code { margin-top: 10px; font: 500 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .ratio { display: flex; height: 14px; margin-top: 14px; border-radius: 99px; overflow: hidden; }
+
+    .types { display: grid; gap: 14px; }
+    .type { display: grid; grid-template-columns: 1fr 220px; gap: 24px; align-items: center; padding: 26px; border-radius: var(--radius-lg); background: rgba(255,255,255,.6); border: 1px solid var(--line); }
+    .type__sample { margin: 0; line-height: 1; color: var(--ink); }
+    .type__meta { font-size: 12.5px; color: var(--ink-soft); }
+    .type__meta b { display: block; color: var(--ink); font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+
+    .logo-uses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .logo-use { display: grid; place-items: center; aspect-ratio: 4/3; border-radius: var(--radius-lg); }
+    .logo-use .wordmark__code { font-size: clamp(30px, 4vw, 46px); }
+    .logo-use .wordmark__studio { font-size: clamp(26px, 3.4vw, 40px); bottom: -14px; }
+    .logo-use figcaption { display: none; }
+
+    .voice { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .voice div { padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--line); background: rgba(255,255,255,.6); }
+    .voice h3 { margin: 0 0 12px; font-size: 15px; font-weight: 500; }
+    .voice ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-soft); display: grid; gap: 8px; }
+    .voice .yes h3 { color: var(--oceano); }
+    .voice .no h3 { color: #A0463C; }
+
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); opacity: 0; padding: 10px 18px; border-radius: 99px; background: var(--tinta); color: var(--crema); font-size: 13px; pointer-events: none; transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+    .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 900px) {
+      .b-grid { grid-template-columns: 1fr; gap: 24px; }
+      .swatches { grid-template-columns: 1fr 1fr; }
+      .swatch { min-height: 160px; }
+      .essence, .logo-uses { grid-template-columns: 1fr; }
+      .type { grid-template-columns: 1fr; }
+      .voice { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="brand-hero">
+      <nav class="nav">
+        <a class="wordmark" href="index.html" aria-label="Volver a la web de CodeCraft Studio">
+          <span class="wordmark__code">CODECRAFT</span>
+          <span class="wordmark__studio">Studio</span>
+        </a>
+        <a class="btn btn--light" href="index.html">Ver la web</a>
+      </nav>
+      <p class="eyebrow">Guía de identidad · v1.0</p>
+      <h1>Código con oficio. Webs y apps hechas <em>a mano.</em></h1>
+      <picture>
+        <source srcset="assets/logo-codecraft.webp" type="image/webp">
+        <img class="logo" src="assets/logo-codecraft.png" alt="Logotipo de CodeCraft Studio" width="1050" height="503">
+      </picture>
+    </header>
+
+    <main>
+      <section class="b-section">
+        <div class="b-grid">
+          <div>
+            <p class="eyebrow">01 · Esencia</p>
+            <h2>Quiénes somos</h2>
+            <p>El logo une dos mundos: la precisión del código (CODECRAFT, condensada y firme) y el cuidado artesanal (<em>Studio</em>, caligrafía a mano).</p>
+          </div>
+          <div class="essence">
+            <div><h3>Misión</h3><p>Diseñar y construir webs y apps a medida que ayuden a pequeñas y medianas marcas a crecer en digital.</p></div>
+            <div><h3>Promesa</h3><p>Nada de plantillas: cada producto se diseña para su negocio, se entrega a tiempo y se mantiene después del lanzamiento.</p></div>
+            <div><h3>Personalidad</h3><p>Cercana, clara y detallista. Hablamos como un buen artesano: con seguridad, sin tecnicismos innecesarios.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="b-section">
+        <div class="b-grid">
+          <div>
+            <p class="eyebrow">02 · Color</p>
+            <h2>Paleta</h2>
+            <p>Océano manda; Crema da aire; Cielo acompaña; Tinta aporta profundidad y es el color de los botones principales. Toca un color para copiar su código.</p>
+          </div>
+          <div>
+            <div class="swatches">
+              <button class="swatch" data-copy="#19587B" style="background:#19587B;color:#F6EEDE"><b>Océano</b><span>Principal · fondos de marca</span><code>#19587B</code></button>
+              <button class="swatch" data-copy="#F6EEDE" style="background:#F6EEDE;color:#061C4B"><b>Crema</b><span>Logo · textos sobre azul</span><code>#F6EEDE</code></button>
+              <button class="swatch" data-copy="#85B2CF" style="background:#85B2CF;color:#061C4B"><b>Cielo</b><span>Acentos · detalles</span><code>#85B2CF</code></button>
+              <button class="swatch" data-copy="#061C4B" style="background:#061C4B;color:#F6EEDE"><b>Tinta</b><span>Botones · sombras</span><code>#061C4B</code></button>
+            </div>
+            <div class="ratio" aria-label="Proporción de uso: 50% Océano, 25% Crema, 15% Cielo, 10% Tinta">
+              <span style="flex:50;background:#19587B"></span><span style="flex:25;background:#F6EEDE"></span><span style="flex:15;background:#85B2CF"></span><span style="flex:10;background:#061C4B"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="b-section">
+        <div class="b-grid">
+          <div>
+            <p class="eyebrow">03 · Tipografía</p>
+            <h2>Tres voces</h2>
+            <p>Todas gratuitas en Google Fonts. La caligráfica se usa con moderación: una palabra, nunca frases largas.</p>
+          </div>
+          <div class="types">
+            <div class="type">
+              <p class="type__sample" style="font-family:var(--font-brand);font-size:clamp(44px,6vw,72px)">CODECRAFT 2026</p>
+              <div class="type__meta"><b>Bebas Neue</b>Logotipo, cifras grandes y numeración. Siempre en mayúsculas.</div>
+            </div>
+            <div class="type">
+              <p class="type__sample" style="font-family:var(--font-script);font-size:clamp(48px,6vw,76px)">Studio</p>
+              <div class="type__meta"><b>Pinyon Script</b>Acento artesanal. Una palabra por pieza como máximo.</div>
+            </div>
+            <div class="type">
+              <p class="type__sample" style="font-size:clamp(28px,3.6vw,42px);letter-spacing:-0.05em"><span style="color:#6C8EA6">Diseña más claro,</span><br>Llega más lejos.</p>
+              <div class="type__meta"><b>Inter Tight</b>Titulares en dos tonos y todo el texto de lectura. Pesos 300–600.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="b-section">
+        <div class="b-grid">
+          <div>
+            <p class="eyebrow">04 · Logotipo</p>
+            <h2>Versiones</h2>
+            <p>Respeta un margen libre igual a la altura de la "C". Sobre fotos, usa la versión crema con un velo azul.</p>
+          </div>
+          <div class="logo-uses">
+            <figure class="logo-use" style="background:#19587B;margin:0">
+              <span class="wordmark"><span class="wordmark__code" style="color:#F6EEDE;text-shadow:3px -3px 0 #061C4B">CODECRAFT</span><span class="wordmark__studio" style="color:#F6EEDE">Studio</span></span>
+              <figcaption>Principal</figcaption>
+            </figure>
+            <figure class="logo-use" style="background:#F6EEDE;margin:0">
+              <span class="wordmark"><span class="wordmark__code" style="color:#19587B;text-shadow:3px -3px 0 #85B2CF">CODECRAFT</span><span class="wordmark__studio" style="color:#061C4B">Studio</span></span>
+              <figcaption>Sobre claro</figcaption>
+            </figure>
+            <figure class="logo-use" style="background:#061C4B;margin:0">
+              <span class="wordmark"><span class="wordmark__code" style="color:#85B2CF;text-shadow:3px -3px 0 #19587B">CODECRAFT</span><span class="wordmark__studio" style="color:#F6EEDE">Studio</span></span>
+              <figcaption>Nocturna</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="b-section">
+        <div class="b-grid">
+          <div>
+            <p class="eyebrow">05 · Voz</p>
+            <h2>Cómo hablamos</h2>
+            <p>Lema: <strong>"Diseña más claro, llega más lejos."</strong></p>
+          </div>
+          <div class="voice">
+            <div class="yes"><h3>Sí</h3><ul>
+              <li>"Tu web estará lista en 4 semanas."</li>
+              <li>Frases cortas, verbos de acción.</li>
+              <li>Tutear al cliente, con respeto.</li>
+              <li>Hablar de resultados: ventas, reservas, tiempo ahorrado.</li>
+            </ul></div>
+            <div class="no"><h3>No</h3><ul>
+              <li>"Soluciones sinérgicas 360º disruptivas."</li>
+              <li>Tecnicismos sin explicar (SSR, CI/CD…).</li>
+              <li>Promesas vagas ("lo mejor del mercado").</li>
+              <li>Mayúsculas y exclamaciones en exceso.</li>
+            </ul></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__bottom" style="margin-top:0;border-top:0;padding-top:0">
+        <span>© 2026 CodeCraft Studio · Guía de identidad</span>
+        <nav aria-label="Pie de página"><a href="index.html">Volver a la web</a></nav>
+      </div>
+    </footer>
+  </div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script>
+    const toast = document.querySelector('.toast');
+    let t;
+    document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy); toast.textContent = `Copiado ${b.dataset.copy}`; }
+      catch { toast.textContent = b.dataset.copy; }
+      toast.classList.add('is-on'); clearTimeout(t); t = setTimeout(() => toast.classList.remove('is-on'), 1600);
+    }));
+  </script>
+</body>
+</html>

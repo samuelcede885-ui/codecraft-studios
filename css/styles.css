@@ -29,6 +29,7 @@
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
   --gutter: clamp(16px, 3vw, 28px);
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -637,8 +638,8 @@ button { cursor: pointer; }
 .stage.reveal-in { animation-duration: 1000ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
-.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out); }
-.js .reveal.is-visible { opacity: 1; transform: none; }
+.js .reveal { transform: translateY(14px); transition: transform 700ms var(--ease-out); }
+.js .reveal.is-visible { transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

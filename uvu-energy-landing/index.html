@@ -1,0 +1,476 @@
+<title>UVU Energy</title>
+<meta name="description" content="UVU Energy: paneles, inversores y baterías de litio para que tu casa no se apague. Kits de 1,5 kW a 18 kW con financiamiento en cuotas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Lilita+One&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a framed site on a brand-colored ground (like a showcase), the hero color shifts with each product;
+   cream waves stitch the sections together. Single committed brand look, same in light and dark. */
+:root{
+  color-scheme: light;
+  --uvu: #910599;          /* banner purple */
+  --uvu-deep: #5e0366;
+  --cream: #ffebdb;        /* banner cream */
+  --cream-2: #fff6ee;
+  --ink: #2a0830;          /* purple-biased near-black */
+  --ink-soft: #6b4a70;
+  --sun: #ffb21c;
+  --card: #ffffff;
+  --hero: var(--uvu);
+  --hero-deep: var(--uvu-deep);
+  --f-display: "League Gothic", "Oswald", "Arial Narrow", Impact, sans-serif;
+  --f-round: "Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  --f-body: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --radius-frame: 28px;
+  --ease: cubic-bezier(.65,.05,.25,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--hero);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-inline:16px;padding-block:clamp(16px,4vw,48px);
+  transition:background-color .9s var(--ease);
+}
+.frame{max-width:1240px;margin:0 auto;border-radius:var(--radius-frame);overflow:hidden;background:var(--cream);
+  box-shadow:0 30px 80px -30px rgba(20,0,30,.55),0 0 0 1px rgba(255,255,255,.08)}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:8px}
+img{max-width:100%;display:block}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+/* ---------- NAV ---------- */
+.nav{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px clamp(18px,4vw,48px)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--cream)}
+.brand img{width:52px;height:auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.brand b{font-family:var(--f-display);font-size:30px;letter-spacing:.06em;line-height:1}
+.brand small{display:block;font-size:10px;letter-spacing:.32em;opacity:.8;font-weight:600}
+.pill{display:flex;gap:4px;background:var(--cream);border-radius:999px;padding:5px}
+.pill a{font-family:var(--f-display);font-size:22px;letter-spacing:.02em;text-decoration:none;color:var(--hero);padding:4px 18px;border-radius:999px;transition:background .3s,color .3s}
+.pill a[aria-current]{background:var(--hero);color:var(--cream)}
+.pill a:hover:not([aria-current]){background:rgba(0,0,0,.06)}
+.tools{display:flex;gap:8px}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1.5px solid rgba(255,235,219,.45);background:transparent;color:var(--cream);text-decoration:none;transition:background .25s}
+.icon-btn:hover{background:rgba(255,235,219,.15)}
+.icon-btn svg{width:20px;height:20px}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;background:var(--hero);color:var(--cream);transition:background-color .9s var(--ease);overflow:hidden}
+.hero::before{content:"";position:absolute;right:8%;top:10%;width:min(620px,70vw);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 35%,transparent 65%);pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;align-items:center;
+  padding:10px clamp(18px,4vw,48px) 0;min-height:540px}
+.hero-copy{position:relative;z-index:3;padding-bottom:150px}
+.hero h1{font-family:var(--f-display);font-weight:400;text-transform:uppercase;line-height:.86;font-size:clamp(64px,9vw,128px);letter-spacing:.005em}
+.hero .sub{font-family:var(--f-display);text-transform:uppercase;font-size:clamp(34px,4.4vw,60px);line-height:.95;margin-top:10px}
+.hero .sub2{font-family:var(--f-display);text-transform:uppercase;font-size:clamp(28px,3.4vw,46px);line-height:1;margin-top:18px;opacity:.95}
+.lede{max-width:40ch;margin:16px 0 0;font-size:15px;opacity:.9}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 26px;font-family:var(--f-display);font-size:28px;line-height:1.1;text-decoration:none;border:2px solid transparent;transition:transform .25s var(--ease),background .25s,color .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn-cream{background:var(--cream);color:var(--hero);box-shadow:0 10px 24px -10px rgba(0,0,0,.45)}
+.btn-ghost{border-color:rgba(255,235,219,.6);color:var(--cream)}
+.btn-ghost:hover{background:rgba(255,235,219,.12)}
+
+/* product stage */
+.stage{position:relative;z-index:2;height:520px}
+.prod{position:absolute;left:0;bottom:70px;width:78%;transform-origin:50% 100%;
+  transition:transform 1s var(--ease),filter 1s var(--ease),opacity .8s var(--ease);will-change:transform}
+.prod img,.prod svg{width:100%;height:auto;filter:drop-shadow(0 30px 30px rgba(0,0,0,.35))}
+.prod[data-pos="0"]{transform:translate(0,0) scale(1);z-index:3;opacity:1}
+.prod[data-pos="1"]{transform:translate(64%,-30%) scale(.34);z-index:2;filter:blur(2px);opacity:.95}
+.prod[data-pos="2"]{transform:translate(78%,-74%) scale(.18);z-index:1;filter:blur(4px);opacity:.85}
+.prod[data-pos="3"]{transform:translate(-40%,30%) scale(.5) rotate(-12deg);z-index:0;opacity:0}
+
+.thumbs{position:absolute;top:6px;right:0;display:flex;gap:8px;z-index:4}
+.thumbs button{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,235,219,.55);background:rgba(255,235,219,.12);padding:6px;transition:background .3s,transform .3s}
+.thumbs button[aria-pressed="true"]{background:var(--cream);transform:scale(1.08)}
+.thumbs svg,.thumbs img{width:100%;height:100%;object-fit:contain}
+
+.tag{position:absolute;z-index:4;left:6%;bottom:180px;background:var(--cream);color:var(--hero);border-radius:16px;padding:10px 16px;
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.5);transition:color .9s var(--ease)}
+.tag b{display:block;font-family:var(--f-display);font-size:30px;line-height:1;letter-spacing:.01em}
+.tag span{font-size:13px;font-weight:600;color:var(--ink-soft)}
+
+/* wave + bottom bar */
+.wave{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:190px;z-index:1;color:var(--cream)}
+.hero-bar{position:absolute;z-index:4;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 clamp(18px,4vw,48px) 22px;color:var(--ink)}
+.social-proof{display:flex;align-items:center;gap:10px}
+.avatars{display:flex}
+.avatars span{width:36px;height:36px;border-radius:50%;border:2px solid var(--cream);margin-left:-10px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff}
+.avatars span:first-child{margin-left:0}
+.social-proof b{display:block;font-size:15px;line-height:1.1}
+.social-proof small{font-size:12px;color:var(--ink-soft)}
+.arrows{display:flex;gap:8px}
+.arrow{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(42,8,48,.25);background:transparent;display:grid;place-items:center;transition:background .25s}
+.arrow:hover{background:rgba(42,8,48,.08)}
+.arrow svg{width:18px;height:18px}
+.dots{display:flex;gap:8px}
+.dots span{width:9px;height:9px;border-radius:50%;background:rgba(42,8,48,.25);transition:width .4s var(--ease),background .4s}
+.dots span.on{width:24px;border-radius:9px;background:var(--hero)}
+
+/* ---------- MANIFESTO ---------- */
+.manifesto{position:relative;background:var(--cream);padding:90px clamp(18px,6vw,90px) 150px;text-align:center;overflow:hidden}
+.manifesto p{position:relative;z-index:2;font-family:var(--f-round);color:var(--uvu);font-size:clamp(26px,3.6vw,46px);line-height:1.18;max-width:24ch;margin:0 auto;
+  text-shadow:0 2px 0 var(--cream-2),0 5px 0 rgba(94,3,102,.18)}
+.manifesto p em{font-style:normal;color:var(--sun);-webkit-text-stroke:1.5px var(--uvu-deep);paint-order:stroke fill}
+.float{position:absolute;z-index:1;width:var(--s,60px);animation:bob 6s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes bob{50%{transform:translateY(-14px) rotate(8deg)}}
+.manifesto .wave2{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:110px;color:var(--uvu)}
+.facts{position:relative;z-index:2;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:34px}
+.facts span{border:1.5px solid rgba(145,5,153,.3);border-radius:999px;padding:6px 16px;font-weight:600;font-size:14px;color:var(--uvu-deep)}
+
+/* ---------- KITS ---------- */
+.kits{position:relative;background:var(--uvu);color:var(--cream);padding:40px clamp(18px,4vw,48px) 70px;overflow:hidden}
+.kits .swirl{position:absolute;inset:auto -5% 60px -5%;width:110%;height:260px;opacity:.35;color:var(--cream);pointer-events:none}
+.kits-head{position:relative;display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.kits-head h2{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:clamp(46px,6vw,76px);line-height:.9}
+.kits-head p{max-width:34ch;margin:0;font-size:14px;opacity:.85}
+.promo{display:inline-flex;align-items:baseline;gap:8px;background:var(--sun);color:var(--ink);border-radius:14px;padding:6px 14px;margin-top:12px;font-weight:600;font-size:14px}
+.promo b{font-family:var(--f-display);font-size:30px;font-weight:400;line-height:1}
+.kit-row{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:110px}
+.kit{position:relative;background:var(--card);color:var(--ink);border-radius:26px;padding:104px 18px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:transform .35s var(--ease)}
+.kit:hover{transform:translateY(-6px)}
+.kit .pic{position:absolute;left:50%;top:-96px;height:190px;display:flex;justify-content:center;align-items:flex-end;transform:translateX(-50%);transition:transform .45s var(--ease)}
+.kit:hover .pic{transform:translateX(-50%) translateY(-8px) rotate(-3deg)}
+.kit .pic img,.kit .pic svg{height:100%;width:auto;max-width:none;filter:drop-shadow(0 18px 16px rgba(42,8,48,.3))}
+.kit .kw{font-family:var(--f-display);font-size:46px;line-height:1;color:var(--uvu);font-variant-numeric:tabular-nums}
+.kit h3{font-size:15px;font-weight:700}
+.kit p{margin:0;font-size:13px;color:var(--ink-soft);min-height:3.2em}
+.kit .use{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--uvu-deep);background:var(--cream);border-radius:999px;padding:3px 12px;margin-top:6px}
+.kit a{margin-top:12px;background:var(--ink);color:#fff;text-decoration:none;border-radius:999px;padding:8px 22px;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.kit a:hover{background:var(--uvu-deep)}
+
+/* ---------- FAQ ---------- */
+.faq-wrap{background:var(--cream);padding:70px clamp(18px,4vw,48px)}
+.faq{position:relative;background:var(--uvu-deep);color:var(--cream);border-radius:34px;padding:clamp(28px,4vw,50px);display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:36px;overflow:hidden}
+.faq::after{content:"";position:absolute;right:-120px;bottom:-160px;width:420px;height:420px;border-radius:50%;border:40px solid rgba(255,235,219,.06);pointer-events:none}
+.faq h2{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:clamp(48px,6vw,80px);line-height:.9}
+.faq-intro p{max-width:34ch;opacity:.85;font-size:15px}
+.socials{display:flex;gap:10px;margin-top:22px}
+.socials a{width:42px;height:42px;border-radius:50%;background:rgba(255,235,219,.12);display:grid;place-items:center;transition:background .25s}
+.socials a:hover{background:rgba(255,235,219,.25)}
+.socials svg{width:20px;height:20px}
+.qs{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+details{background:var(--cream);color:var(--ink);border-radius:20px;transition:background .3s}
+summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 14px 14px 20px;font-weight:700;font-size:16px}
+summary::-webkit-details-marker{display:none}
+summary .plus{flex:none;width:32px;height:32px;border-radius:50%;background:var(--uvu-deep);color:var(--cream);display:grid;place-items:center;transition:transform .35s var(--ease)}
+summary .plus svg{width:14px;height:14px}
+details[open] summary .plus{transform:rotate(45deg)}
+details p{margin:0;padding:0 20px 16px;font-size:15px;color:var(--ink-soft);max-width:60ch}
+summary .q{display:flex;align-items:center;gap:10px}
+summary .q i{font-style:normal;width:26px;height:26px;flex:none;border-radius:8px;background:var(--uvu);color:var(--cream);display:grid;place-items:center;font-size:12px}
+
+/* ---------- FOOTER ---------- */
+.foot{background:var(--cream);padding:0 clamp(18px,4vw,48px) 34px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;font-size:14px;color:var(--ink-soft)}
+.foot b{color:var(--ink)}
+.foot .contact{display:flex;flex-wrap:wrap;gap:8px 22px}
+.under{max-width:1240px;margin:18px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:rgba(255,235,219,.8)}
+.under span{border:1px solid rgba(255,235,219,.4);border-radius:999px;padding:3px 12px}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:980px){
+  .pill a{font-size:19px;padding:4px 12px}
+  .kit-row{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:120px}
+}
+@media (max-width:820px){
+  .nav{flex-wrap:wrap}
+  .pill{order:3;width:100%;justify-content:center}
+  .hero-grid{grid-template-columns:minmax(0,1fr);min-height:0}
+  .hero-copy{padding-bottom:0}
+  .stage{height:430px;margin-top:-10px}
+  .prod{width:70%;left:4%;bottom:100px}
+  .tag{bottom:130px;left:auto;right:0}
+  .faq{grid-template-columns:minmax(0,1fr)}
+  .hero-bar{position:relative;padding-top:56px}
+  .wave{height:190px}
+  .float:nth-of-type(2),.float:nth-of-type(3){display:none}
+  .float{--s:40px!important}
+}
+@media (max-width:520px){
+  body{padding-block:16px}
+  .brand b{font-size:24px}
+  .stage{height:360px}
+  .thumbs button{width:38px;height:38px}
+  .hero-bar{flex-wrap:wrap;justify-content:center;row-gap:10px}
+  .social-proof{width:100%;justify-content:center}
+  .wave{height:210px}
+  .tag b{font-size:24px}
+  .kit-row{grid-template-columns:minmax(0,1fr)}
+  .pill a{font-size:18px;padding:4px 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
+  html{scroll-behavior:auto}
+}
+</style>
+
+<!-- product art, drawn once and reused -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gBody" x1="0" x2="1"><stop offset="0" stop-color="#f4f1f6"/><stop offset=".55" stop-color="#ffffff"/><stop offset="1" stop-color="#d9d3de"/></linearGradient>
+    <linearGradient id="gBat" x1="0" x2="1"><stop offset="0" stop-color="#26222b"/><stop offset=".5" stop-color="#3b3542"/><stop offset="1" stop-color="#1a171e"/></linearGradient>
+    <linearGradient id="gScreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2a4a"/><stop offset="1" stop-color="#0d1426"/></linearGradient>
+  </defs>
+  <symbol id="inverter" viewBox="0 0 240 300">
+    <rect x="30" y="14" width="180" height="272" rx="22" fill="url(#gBody)" stroke="#c9c1cf" stroke-width="2"/>
+    <rect x="30" y="14" width="180" height="56" rx="22" fill="#910599"/>
+    <rect x="30" y="48" width="180" height="22" fill="#910599"/>
+    <text x="120" y="52" text-anchor="middle" font-family="League Gothic, Impact, sans-serif" font-size="34" fill="#ffebdb" letter-spacing="3">UVU</text>
+    <rect x="62" y="92" width="116" height="66" rx="10" fill="url(#gScreen)"/>
+    <text x="120" y="122" text-anchor="middle" font-family="League Gothic, Impact, sans-serif" font-size="26" fill="#7cf5c4">5.2 kW</text>
+    <text x="120" y="146" text-anchor="middle" font-family="Outfit, sans-serif" font-size="11" fill="#9fb3d9">SOLAR · RED · BAT</text>
+    <circle cx="88" cy="182" r="6" fill="#2ecc71"/><circle cx="110" cy="182" r="6" fill="#ffb21c"/><circle cx="132" cy="182" r="6" fill="#d9d3de"/><circle cx="154" cy="182" r="6" fill="#d9d3de"/>
+    <g fill="#d6cfdc">
+      <rect x="62" y="208" width="116" height="6" rx="3"/><rect x="62" y="222" width="116" height="6" rx="3"/><rect x="62" y="236" width="116" height="6" rx="3"/>
+    </g>
+    <rect x="60" y="286" width="22" height="10" rx="3" fill="#8a8292"/><rect x="158" y="286" width="22" height="10" rx="3" fill="#8a8292"/>
+    <text x="120" y="268" text-anchor="middle" font-family="Outfit, sans-serif" font-weight="700" font-size="11" fill="#8a7f93" letter-spacing="2">INVERSOR HÍBRIDO</text>
+  </symbol>
+  <symbol id="battery" viewBox="0 0 240 300">
+    <rect x="44" y="4" width="152" height="16" rx="6" fill="#4a4352"/>
+    <rect x="34" y="16" width="172" height="276" rx="20" fill="url(#gBat)"/>
+    <rect x="34" y="16" width="172" height="40" rx="20" fill="#910599"/>
+    <rect x="34" y="40" width="172" height="16" fill="#910599"/>
+    <text x="120" y="47" text-anchor="middle" font-family="League Gothic, Impact, sans-serif" font-size="28" fill="#ffebdb" letter-spacing="3">UVU</text>
+    <text x="120" y="110" text-anchor="middle" font-family="League Gothic, Impact, sans-serif" font-size="40" fill="#ffffff">LiFePO4</text>
+    <text x="120" y="134" text-anchor="middle" font-family="Outfit, sans-serif" font-size="13" fill="#bdb3c7" letter-spacing="1">51.2 V · 100 Ah</text>
+    <g>
+      <rect x="66" y="160" width="108" height="70" rx="10" fill="#15121a" stroke="#4a4352"/>
+      <rect x="76" y="172" width="18" height="46" rx="3" fill="#2ecc71"/><rect x="99" y="172" width="18" height="46" rx="3" fill="#2ecc71"/>
+      <rect x="122" y="172" width="18" height="46" rx="3" fill="#2ecc71"/><rect x="145" y="172" width="18" height="46" rx="3" fill="#2a3a30"/>
+    </g>
+    <text x="120" y="262" text-anchor="middle" font-family="Outfit, sans-serif" font-weight="700" font-size="11" fill="#8a7f93" letter-spacing="2">+6000 CICLOS</text>
+  </symbol>
+</svg>
+
+<div class="frame">
+  <!-- HERO -->
+  <header class="hero" id="inicio">
+    <nav class="nav" aria-label="Principal">
+      <a class="brand" href="#inicio" aria-label="UVU Energy, inicio">
+        <img src="assets/logo.webp" alt="" width="122" height="111">
+        <span><b>UVU</b><small>ENERGY</small></span>
+      </a>
+      <div class="pill">
+        <a href="#inicio" aria-current="page">Principal</a>
+        <a href="#kits">Productos</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div class="tools">
+        <a class="icon-btn" href="#faq" aria-label="Preguntas frecuentes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </a>
+        <a class="icon-btn" href="#kits" aria-label="Ver kits">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+        </a>
+      </div>
+    </nav>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>Energía que<br>no se apaga</h1>
+        <p class="sub">El sol de Venezuela</p>
+        <p class="sub2">Trabajando para ti</p>
+        <p class="lede">Paneles, inversores y baterías de litio instalados en tu casa o negocio. Cuando se va la luz, tú sigues.</p>
+        <div class="ctas">
+          <a class="btn btn-cream" href="#kits">Ver kits</a>
+          <a class="btn btn-ghost" href="#nosotros">Información</a>
+        </div>
+      </div>
+
+      <div class="stage" id="stage" aria-roledescription="carrusel" aria-label="Productos UVU">
+        <div class="thumbs" role="group" aria-label="Elegir producto"></div>
+        <div class="prod" data-i="0"><img src="assets/panel.webp" alt="Panel solar monocristalino sobre poste" width="757" height="670"></div>
+        <div class="prod" data-i="1"><svg viewBox="0 0 240 300" role="img" aria-label="Inversor híbrido UVU"><use href="#inverter"/></svg></div>
+        <div class="prod" data-i="2"><svg viewBox="0 0 240 300" role="img" aria-label="Batería de litio LiFePO4 UVU"><use href="#battery"/></svg></div>
+        <div class="prod" data-i="3"><svg viewBox="0 0 440 300" role="img" aria-label="Kit solar: inversor y batería"><use href="#inverter" x="0" width="240" height="300"/><use href="#battery" x="190" y="30" width="240" height="270"/></svg></div>
+        <div class="tag" aria-live="polite"><b id="tagName">Panel solar</b><span id="tagSub">Monocristalino de alta eficiencia</span></div>
+      </div>
+    </div>
+
+    <svg class="wave" viewBox="0 0 1240 190" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="currentColor" d="M0 112 C140 70 260 70 380 104 C470 130 520 136 600 96 C690 50 760 8 840 30 C930 56 960 120 1060 118 C1140 116 1190 92 1240 84 V190 H0Z"/>
+    </svg>
+    <div class="hero-bar">
+      <div class="social-proof">
+        <div class="avatars" aria-hidden="true">
+          <span style="background:#c2185b">M</span><span style="background:#5e35b1">J</span><span style="background:#00897b">A</span>
+        </div>
+        <div><b>44,9 mil seguidores</b><small>en Instagram @uvuenergyve</small></div>
+      </div>
+      <div class="arrows">
+        <button class="arrow" id="prev" aria-label="Producto anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m6-6-6 6 6 6"/></svg></button>
+        <button class="arrow" id="next" aria-label="Producto siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
+      </div>
+      <div class="dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto" id="nosotros" aria-label="Nuestra misión">
+    <svg class="float" style="--s:64px;left:7%;top:22%" viewBox="0 0 64 64" aria-hidden="true"><g fill="#ffb21c"><circle cx="32" cy="32" r="13"/><g stroke="#ffb21c" stroke-width="4" stroke-linecap="round"><path d="M32 4v9M32 51v9M4 32h9M51 32h9M12 12l6 6M46 46l6 6M52 12l-6 6M18 46l-6 6"/></g></g></svg>
+    <svg class="float" style="--s:44px;right:9%;top:16%;--d:-2s" viewBox="0 0 64 64" aria-hidden="true"><path fill="#910599" d="M36 4 12 38h16l-4 22 26-36H34z"/></svg>
+    <svg class="float" style="--s:38px;left:16%;bottom:30%;--d:-4s" viewBox="0 0 64 64" aria-hidden="true"><path fill="#910599" d="M36 4 12 38h16l-4 22 26-36H34z"/></svg>
+    <svg class="float" style="--s:78px;right:12%;bottom:26%;--d:-1s" viewBox="0 0 64 64" aria-hidden="true"><g fill="#ffb21c"><circle cx="32" cy="32" r="13"/><g stroke="#ffb21c" stroke-width="4" stroke-linecap="round"><path d="M32 4v9M32 51v9M4 32h9M51 32h9M12 12l6 6M46 46l6 6M52 12l-6 6M18 46l-6 6"/></g></g></svg>
+    <p>Creemos que el <em>sol</em> de Venezuela alcanza para todos. Por eso llevamos paneles, inversores y baterías de litio a cada casa, para que los cortes de luz no detengan tu día.</p>
+    <div class="facts">
+      <span>Kits de 1,5 a 18 kW</span><span>Baterías LiFePO4</span><span>Garantía de 6 años</span><span>Sede en San Diego, Carabobo</span>
+    </div>
+    <svg class="wave2" viewBox="0 0 1240 110" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="currentColor" d="M0 60 C80 20 150 20 210 58 C260 90 300 96 350 60 C420 10 500 10 560 60 C610 100 660 100 720 62 C790 18 860 18 920 60 C970 94 1020 96 1070 62 C1130 22 1190 26 1240 50 V110 H0Z"/>
+    </svg>
+  </section>
+
+  <!-- KITS -->
+  <section class="kits" id="kits" aria-labelledby="kits-title">
+    <svg class="swirl" viewBox="0 0 1300 260" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 200 C200 60 360 240 560 140 S900 20 1080 120 1300 180 1300 180" fill="none" stroke="currentColor" stroke-width="26" stroke-linecap="round"/>
+    </svg>
+    <div class="kits-head">
+      <div>
+        <h2 id="kits-title">Explora nuestros<br>kits solares</h2>
+        <span class="promo">Paga en <b>4 cuotas de 325 $</b></span>
+      </div>
+      <p>Cada kit incluye inversor, batería de litio y paneles, con instalación. Elige según lo que necesitas mantener encendido cuando se va la luz.</p>
+    </div>
+    <div class="kit-row">
+      <article class="kit">
+        <div class="pic"><svg viewBox="0 0 240 300" aria-hidden="true"><use href="#battery"/></svg></div>
+        <span class="kw">1,5 kW</span>
+        <h3>Kit Esencial</h3>
+        <p>Nevera, luces, router y cargadores.</p>
+        <span class="use">Apartamento</span>
+        <a href="#contacto">Cotizar</a>
+      </article>
+      <article class="kit">
+        <div class="pic"><svg viewBox="0 0 240 300" aria-hidden="true"><use href="#inverter"/></svg></div>
+        <span class="kw">5 kW</span>
+        <h3>Kit Hogar</h3>
+        <p>Toda la casa, incluido un aire acondicionado.</p>
+        <span class="use">Casa</span>
+        <a href="#contacto">Cotizar</a>
+      </article>
+      <article class="kit">
+        <div class="pic"><img src="assets/panel.webp" alt="" width="757" height="670"></div>
+        <span class="kw">10 kW</span>
+        <h3>Kit Plus</h3>
+        <p>Casas grandes con varios aires y bomba de agua.</p>
+        <span class="use">Quinta</span>
+        <a href="#contacto">Cotizar</a>
+      </article>
+      <article class="kit">
+        <div class="pic"><svg viewBox="0 0 440 300" aria-hidden="true"><use href="#inverter" x="0" width="240" height="300"/><use href="#battery" x="190" y="30" width="240" height="270"/></svg></div>
+        <span class="kw">18 kW</span>
+        <h3>Kit Comercio</h3>
+        <p>Locales, oficinas y consultorios sin interrupciones.</p>
+        <span class="use">Negocio</span>
+        <a href="#contacto">Cotizar</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-wrap" id="faq" aria-labelledby="faq-title">
+    <div class="faq">
+      <div class="faq-intro">
+        <h2 id="faq-title">Preguntas<br>frecuentes</h2>
+        <p>Lo que más nos preguntan antes de instalar. Si te queda una duda, escríbenos por Instagram o WhatsApp.</p>
+        <div class="socials">
+          <a href="https://www.instagram.com/uvuenergyve/" aria-label="Instagram de UVU Energy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+          <a href="https://www.tiktok.com/discover/uvu-energy-venezuela" aria-label="TikTok de UVU Energy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 3c.3 2.2 1.7 3.7 4 3.9v3.1c-1.5 0-2.8-.4-4-1.2v6.4A6.2 6.2 0 1 1 11 9.1v3.2a3.1 3.1 0 1 0 2.4 3V3z"/></svg></a>
+          <a href="https://linktr.ee/VentasUVU" aria-label="Enlaces de ventas UVU"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></a>
+        </div>
+      </div>
+      <div class="qs">
+        <details open>
+          <summary><span class="q"><i>⚡</i>¿Qué pasa cuando se va la luz?</span><span class="plus"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></summary>
+          <p>El inversor híbrido cambia a la batería en milisegundos. Tus equipos siguen encendidos y ni siquiera notas el corte.</p>
+        </details>
+        <details>
+          <summary><span class="q"><i>$</i>¿Puedo pagar en cuotas?</span><span class="plus"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></summary>
+          <p>Sí. Tenemos planes de financiamiento, como 4 cuotas de 325 $. Te explicamos el plan para cada kit al cotizar.</p>
+        </details>
+        <details>
+          <summary><span class="q"><i>6</i>¿Cuánto dura la garantía?</span><span class="plus"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></summary>
+          <p>Nuestros equipos tienen 6 años de garantía. Te la entregamos por escrito con el detalle de cobertura.</p>
+        </details>
+        <details>
+          <summary><span class="q"><i>⌂</i>¿Instalan en mi ciudad?</span><span class="plus"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></summary>
+          <p>Estamos en Carabobo y recorremos Zulia, Aragua, Lara, Táchira, Trujillo y Anzoátegui. Escríbenos tu zona y coordinamos la visita.</p>
+        </details>
+        <details>
+          <summary><span class="q"><i>☀</i>¿Necesito paneles para empezar?</span><span class="plus"><svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 1v12M1 7h12"/></svg></span></summary>
+          <p>No. Puedes empezar con inversor y batería cargados desde la red, y sumar paneles después para ahorrar y tener más autonomía.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot" id="contacto">
+    <div><b>UVU Energy</b> · Energía solar en Venezuela</div>
+    <div class="contact">
+      <span>Instagram: <b>@uvuenergyve</b></span>
+      <span>Ventas: <b>linktr.ee/VentasUVU</b></span>
+      <span>San Diego, Carabobo</span>
+    </div>
+  </footer>
+</div>
+<div class="under"><span>© 2026 UVU Energy</span><span>@uvuenergyve</span></div>
+
+<script>
+(() => {
+  const slides = [
+    { name: "Panel solar",      sub: "Monocristalino de alta eficiencia", c: "#910599", d: "#5e0366" },
+    { name: "Inversor híbrido", sub: "Cambia a batería sin cortes",       c: "#3a2bb0", d: "#221878" },
+    { name: "Batería LiFePO4",  sub: "Litio seguro, más de 6000 ciclos",  c: "#0f7f63", d: "#08533f" },
+    { name: "Kit completo",     sub: "De 1,5 kW a 18 kW, instalado",      c: "#c9531c", d: "#7f300b" }
+  ];
+  const root = document.documentElement;
+  const prods = [...document.querySelectorAll(".prod")];
+  const dots = [...document.querySelectorAll(".dots span")];
+  const thumbsBox = document.querySelector(".thumbs");
+  const tagName = document.getElementById("tagName"), tagSub = document.getElementById("tagSub");
+  const n = slides.length;
+  let cur = 0, timer;
+
+  const thumbs = prods.map((p, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-label", slides[i].name);
+    b.innerHTML = p.innerHTML;
+    b.querySelectorAll("[role],[aria-label]").forEach(e => { e.removeAttribute("role"); e.removeAttribute("aria-label"); });
+    const img = b.querySelector("img"); if (img) img.alt = "";
+    b.addEventListener("click", () => { go(i); restart(); });
+    thumbsBox.appendChild(b);
+    return b;
+  });
+
+  function go(i) {
+    cur = (i + n) % n;
+    prods.forEach((p, k) => {
+      const pos = (k - cur + n) % n;
+      p.dataset.pos = pos;
+      p.setAttribute("aria-hidden", pos !== 0);
+    });
+    dots.forEach((d, k) => d.classList.toggle("on", k === cur));
+    thumbs.forEach((t, k) => t.setAttribute("aria-pressed", k === cur));
+    root.style.setProperty("--hero", slides[cur].c);
+    root.style.setProperty("--hero-deep", slides[cur].d);
+    tagName.textContent = slides[cur].name;
+    tagSub.textContent = slides[cur].sub;
+  }
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function restart() { clearInterval(timer); if (!reduce) timer = setInterval(() => go(cur + 1), 4500); }
+
+  document.getElementById("next").addEventListener("click", () => { go(cur + 1); restart(); });
+  document.getElementById("prev").addEventListener("click", () => { go(cur - 1); restart(); });
+  const stage = document.getElementById("stage");
+  stage.addEventListener("mouseenter", () => clearInterval(timer));
+  stage.addEventListener("mouseleave", restart);
+
+  go(0); restart();
+})();
+</script>

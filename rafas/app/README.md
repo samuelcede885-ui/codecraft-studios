@@ -1,0 +1,36 @@
+# Rafa's — Tienda + Panel del dueño
+
+Un solo archivo (`index.html`) con dos caras:
+
+- **Tienda** (`index.html`): menú, carrito y checkout con datos de entrega, zona, método de pago y foto del comprobante. Después de pagar, el cliente ve el estado de su pedido en vivo.
+- **Panel del dueño** (`index.html#panel`): lo que usa el local.
+
+## Qué trae el panel
+
+| Sección | Para qué sirve |
+|---|---|
+| **Pedidos** | Lista en vivo con filtros por estado, búsqueda y resumen del día (ventas, pedidos, por verificar, en camino). |
+| **Detalle del pedido** | Foto del comprobante (se amplía al tocarla), botones *Pago correcto* / *Rechazar*, datos del cliente, dirección con mapa, productos, total en REF y Bs, repartidor e historial. |
+| **Cocina** | Tarjetas grandes con lo que hay que preparar y cronómetro; se pone en rojo si pasa la meta de minutos. |
+| **Delivery** | Pedidos listos para despachar, asignación de repartidor, pedidos en la calle y estado de cada repartidor. |
+| **Alertas** | Cada pedido nuevo y cada comprobante llega como notificación con sonido y vibración, más un aviso arriba de la pantalla. |
+| **Etiquetas** | Etiqueta para el paquete (58 u 80 mm) con número de pedido, cliente, teléfono, dirección, referencia, productos, total, si se cobra o ya está pagado y un QR que abre la dirección en Google Maps. Se pueden imprimir una o todas las listas. |
+| **Reportes** | Ventas, ticket promedio, ventas por hora, más vendidos, métodos de pago y zonas. Exporta la tabla para Excel. |
+| **Menú** | Marcar productos como agotados y cambiar precios; la tienda se actualiza sola. |
+| **Clientes** | Quién compra más, cuántos pedidos lleva y acceso directo a WhatsApp. |
+| **Ajustes** | Abrir/cerrar el local, tasa del día, meta de cocina, ancho de etiqueta, zonas con su costo, repartidores y datos de pago que ve el cliente. |
+
+Desde el pedido también se manda un **WhatsApp al cliente** con el mensaje según el estado, y al **repartidor** con la dirección y el link del mapa.
+
+## Cómo se conecta hoy
+
+`Backend` (dentro del `<script>`) guarda en `localStorage` y sincroniza entre pestañas: abre la tienda en una pestaña y `#panel` en otra para probarlo. Si no hay pedidos, carga 6 de ejemplo.
+
+## Para dárselo al dueño (producción)
+
+1. **Servidor**: cambiar los métodos de `Backend` (`addOrder`, `updateOrder`, `setReceipt`, `onOrders`, `onSettings`…) por Firebase Firestore o Supabase. La interfaz no cambia.
+2. **Comprobantes**: guardarlos en Firebase Storage / Supabase Storage en vez de dentro del pedido.
+3. **Acceso**: el panel debe ir detrás de un login (solo el dueño y su personal).
+4. **App instalable**: agregar `manifest.json` y un service worker para instalarla como app (PWA) en el teléfono o tablet del local. Si la quieren en Play Store, se empaqueta con Capacitor.
+5. **Notificaciones push**: Firebase Cloud Messaging, para que suene aunque la app esté cerrada.
+6. **Impresora térmica**: el botón *Imprimir* ya usa el diálogo del sistema (sirve con impresoras USB/Wi-Fi). Para Bluetooth en Android, la app RawBT recibe la etiqueta directo.

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rafa's Casual Food</title>
+<meta name="description" content="Rafa's Casual Food — hamburguesas y sándwiches. Pide en línea.">
+<meta name="theme-color" content="#7457b0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Kaushan+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="icon-btn" id="menuBtn" aria-label="Abrir menú">
+    <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/></svg>
+  </button>
+  <a href="#" class="logo" aria-label="Rafa's inicio">Rafa's</a>
+  <button class="icon-btn cart-btn" id="cartBtn" aria-label="Ver carrito">
+    <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 10h20l-1.5 18h-17z"/><path d="M11.5 13V8a4.5 4.5 0 0 1 9 0v5"/></svg>
+    <span class="badge" id="cartCount" hidden>0</span>
+  </button>
+</header>
+
+<nav class="drawer" id="navDrawer" aria-hidden="true">
+  <div class="drawer-panel">
+    <button class="close" data-close aria-label="Cerrar">×</button>
+    <p class="drawer-logo">Rafa's</p>
+    <ul>
+      <li><a href="#menu" data-cat="todos">Todos</a></li>
+      <li><a href="#menu" data-cat="A Lo Que Se Vino">A Lo Que Se Vino</a></li>
+      <li><a href="#menu" data-cat="Promo">Promo</a></li>
+      <li><a href="#menu" data-cat="Por Aquí Sandwich">Por Aquí Sandwich</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <img class="hero-img" src="img/bacon-cloud.webp" alt="Bacon Cloud Burger" width="637" height="488">
+  </section>
+  <article class="hero-card" id="heroCard">
+    <p class="eyebrow">La favorita</p>
+    <h1>Bacon Cloud Burger</h1>
+    <p class="desc">Carne de 130g, queso americano, queso crema aliñado, tocineta glaseada, wanton frito, rúcula, sirope de piña y aderezo Chicago.</p>
+    <div class="row">
+      <span class="price">REF 11.99</span>
+      <button class="btn" data-open="bacon-cloud">Pedir</button>
+    </div>
+  </article>
+
+  <!-- PROMO BANNER -->
+  <section class="banner">
+    <img src="img/la-mentirosa.webp" alt="La Mentirosa" width="720" height="525">
+    <div class="banner-card">
+      <p class="eyebrow">Todas mienten</p>
+      <h2>La Mentirosa</h2>
+      <p>Pan de cerveza y malta, molienda de res especial y patty cremoso de parmigiano.</p>
+      <div class="row">
+        <span class="price">REF 10.99</span>
+        <button class="btn sm" data-open="la-mentirosa">Pedir</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section class="menu" id="menu">
+    <h2 class="menu-title">MENU</h2>
+    <div class="chips" id="chips" role="tablist"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer class="footer">
+    <p class="logo">Rafa's</p>
+    <p>Casual Food · Est. 2022</p>
+  </footer>
+</main>
+
+<!-- PRODUCT SHEET -->
+<div class="sheet" id="sheet" aria-hidden="true">
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button class="close" data-close aria-label="Cerrar">×</button>
+    <div class="sheet-media"><img id="sheetImg" alt=""></div>
+    <div class="sheet-body">
+      <p class="crumb" id="sheetCat"></p>
+      <h3 id="sheetTitle"></h3>
+      <p class="desc" id="sheetDesc"></p>
+      <p class="price big" id="sheetPrice"></p>
+      <form id="sheetForm"></form>
+    </div>
+    <div class="sheet-foot">
+      <div class="qty">
+        <button type="button" id="qtyMinus" aria-label="Menos">−</button>
+        <span id="qtyVal">1</span>
+        <button type="button" id="qtyPlus" aria-label="Más">+</button>
+      </div>
+      <button class="btn wide" id="addBtn">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="sheet" id="cart" aria-hidden="true">
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <button class="close" data-close aria-label="Cerrar">×</button>
+    <div class="sheet-body">
+      <h3 id="cartTitle">Tu pedido</h3>
+      <ul class="cart-list" id="cartList"></ul>
+      <p class="empty" id="cartEmpty">Tu carrito está vacío.</p>
+    </div>
+    <div class="sheet-foot">
+      <div class="total"><span>Total</span><strong id="cartTotal">REF 0.00</strong></div>
+      <button class="btn wide" id="checkoutBtn" disabled>Finalizar pedido</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

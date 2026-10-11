@@ -13,71 +13,124 @@
 </head>
 <body>
 
-<header class="topbar">
-  <button class="icon-btn" id="menuBtn" aria-label="Abrir menú">
-    <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9h24M4 16h24M4 23h24"/></svg>
-  </button>
-  <a href="#" class="logo" aria-label="Rafa's inicio">Rafa's</a>
-  <button class="icon-btn cart-btn" id="cartBtn" aria-label="Ver carrito">
-    <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 10h20l-1.5 18h-17z"/><path d="M11.5 13V8a4.5 4.5 0 0 1 9 0v5"/></svg>
-    <span class="badge" id="cartCount" hidden>0</span>
-  </button>
-</header>
+<div class="app">
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8h18M3 16h18"/></svg>
+      <span>MENÚ</span>
+    </button>
+    <a href="#top" class="logo" aria-label="Rafa's inicio">Rafa's</a>
+    <div class="top-actions">
+      <button class="icon-btn" id="searchBtn" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+      <button class="icon-btn" data-cart aria-label="Ver carrito">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 8h14l-1.2 13H6.2z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></svg>
+        <span class="badge" data-count hidden>0</span>
+      </button>
+    </div>
+  </header>
 
+  <main id="top">
+    <!-- HERO CAROUSEL -->
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Siente.<br>Vive. Come.</h1>
+        <p>Hamburguesas de autor para cada antojo</p>
+      </div>
+      <div class="slides" id="slides"></div>
+      <div class="dots" id="dots"></div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" aria-label="Lo que nos hace distintos">
+      <div class="feature">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 17h22M6 17a10 6 0 0 1 20 0"/><path d="M5 21h22l-1 3a2 2 0 0 1-2 1.5H8A2 2 0 0 1 6 24z"/><path d="M12 12.5h.01M16 11h.01M20 12.5h.01"/></svg>
+        <span>Carne<br>de res especial</span>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M6 15a10 7 0 0 1 20 0v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M11 12l1 1M16 10.5v1.5M21 12l-1 1M8 23h16"/></svg>
+        <span>Pan<br>artesanal</span>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M16 27V9"/><path d="M16 13c-3 0-5-2-5-5 3 0 5 2 5 5zM16 13c3 0 5-2 5-5-3 0-5 2-5 5zM16 19c-3 0-5-2-5-5 3 0 5 2 5 5zM16 19c3 0 5-2 5-5-3 0-5 2-5 5z"/><path d="M6 6l20 20"/></svg>
+        <span>Opción<br>sin gluten</span>
+      </div>
+      <div class="feature">
+        <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 13h16l-2 14H10z"/><path d="M11 13l-1-8M14 13V4M18 13V4M21 13l1-8"/></svg>
+        <span>Papas<br>o aros</span>
+      </div>
+    </section>
+
+    <!-- FEATURED -->
+    <section class="featured" id="featured"></section>
+
+    <!-- COLLECTIONS -->
+    <section class="collections">
+      <div class="section-head">
+        <h2>Explora por categoría</h2>
+        <a href="#menu" data-cat="Todos">Ver todo <span aria-hidden="true">›</span></a>
+      </div>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <!-- MENU -->
+    <section class="menu" id="menu">
+      <div class="menu-head">
+        <h2 class="menu-title">MENU</h2>
+        <p class="menu-sub" id="menuSub">Todos</p>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="gridEmpty" hidden>Aún no tienes favoritos. Toca el ♡ en un producto.</p>
+    </section>
+
+    <footer class="footer">
+      <p class="logo">Rafa's</p>
+      <p>Casual Food · Est. 2022</p>
+    </footer>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="tabbar" aria-label="Navegación">
+    <button class="tab active" data-tab="home">
+      <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="tab" data-tab="menu">
+      <svg viewBox="0 0 24 24"><path d="M5 11a7 5 0 0 1 14 0zM4 14h16M5 17h14l-.6 1.8a2 2 0 0 1-1.9 1.2H7.5a2 2 0 0 1-1.9-1.2z"/></svg>
+      <span>Menú</span>
+    </button>
+    <button class="tab" data-tab="favs">
+      <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+      <span>Favoritos</span>
+    </button>
+    <button class="tab" data-tab="cart" data-cart>
+      <svg viewBox="0 0 24 24"><path d="M3 4h2l2 11h11l2-8H6.5"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>
+      <span>Carrito</span>
+      <span class="badge" data-count hidden>0</span>
+    </button>
+  </nav>
+</div>
+
+<!-- SIDE MENU -->
 <nav class="drawer" id="navDrawer" aria-hidden="true">
   <div class="drawer-panel">
     <button class="close" data-close aria-label="Cerrar">×</button>
     <p class="drawer-logo">Rafa's</p>
-    <ul>
-      <li><a href="#menu" data-cat="todos">Todos</a></li>
-      <li><a href="#menu" data-cat="A Lo Que Se Vino">A Lo Que Se Vino</a></li>
-      <li><a href="#menu" data-cat="Promo">Promo</a></li>
-      <li><a href="#menu" data-cat="Por Aquí Sandwich">Por Aquí Sandwich</a></li>
-    </ul>
+    <ul id="drawerList"></ul>
   </div>
 </nav>
 
-<main>
-  <!-- HERO -->
-  <section class="hero">
-    <img class="hero-img" src="img/bacon-cloud.webp" alt="Bacon Cloud Burger" width="637" height="488">
-  </section>
-  <article class="hero-card" id="heroCard">
-    <p class="eyebrow">La favorita</p>
-    <h1>Bacon Cloud Burger</h1>
-    <p class="desc">Carne de 130g, queso americano, queso crema aliñado, tocineta glaseada, wanton frito, rúcula, sirope de piña y aderezo Chicago.</p>
-    <div class="row">
-      <span class="price">REF 11.99</span>
-      <button class="btn" data-open="bacon-cloud">Pedir</button>
+<!-- SEARCH -->
+<div class="sheet" id="search" aria-hidden="true">
+  <div class="sheet-panel search-panel" role="dialog" aria-modal="true" aria-label="Buscar">
+    <button class="close" data-close aria-label="Cerrar">×</button>
+    <div class="sheet-body">
+      <input type="search" id="searchInput" placeholder="Busca tu burger…" autocomplete="off">
+      <ul class="search-list" id="searchList"></ul>
     </div>
-  </article>
-
-  <!-- PROMO BANNER -->
-  <section class="banner">
-    <img src="img/la-mentirosa.webp" alt="La Mentirosa" width="720" height="525">
-    <div class="banner-card">
-      <p class="eyebrow">Todas mienten</p>
-      <h2>La Mentirosa</h2>
-      <p>Pan de cerveza y malta, molienda de res especial y patty cremoso de parmigiano.</p>
-      <div class="row">
-        <span class="price">REF 10.99</span>
-        <button class="btn sm" data-open="la-mentirosa">Pedir</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- MENU -->
-  <section class="menu" id="menu">
-    <h2 class="menu-title">MENU</h2>
-    <div class="chips" id="chips" role="tablist"></div>
-    <div class="grid" id="grid"></div>
-  </section>
-
-  <footer class="footer">
-    <p class="logo">Rafa's</p>
-    <p>Casual Food · Est. 2022</p>
-  </footer>
-</main>
+  </div>
+</div>
 
 <!-- PRODUCT SHEET -->
 <div class="sheet" id="sheet" aria-hidden="true">

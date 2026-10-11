@@ -54,42 +54,165 @@ const PRODUCTS = [
   },
 ];
 
-const CATEGORIES = ["Todos", "A Lo Que Se Vino", "Promo", "Por Aquí Sandwich"];
+const HERO_IDS = ["bacon-cloud", "la-cabrona", "la-mentirosa"];
+const FEATURED_ID = "la-cabrona";
+const CATEGORIES = [
+  { name: "Todos", img: "img/bacon-cloud.webp", cutout: true },
+  { name: "A Lo Que Se Vino", img: "img/la-mentirosa.webp", cutout: true },
+  { name: "Promo", img: "img/la-cabrona.webp", cutout: true },
+  { name: "Por Aquí Sandwich", img: "img/trufalina-chicken.webp", cutout: false },
+];
+
 const $ = (s) => document.querySelector(s);
 const fmt = (n) => `REF ${n.toFixed(2)}`;
 const byId = (id) => PRODUCTS.find((p) => p.id === id);
+const ARROW = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+const PLUS = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
+const HEART = `<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>`;
 
-/* ---------- Menu grid ---------- */
+function store(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+function save(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+/* ---------- Hero carousel ---------- */
+const slides = $("#slides");
+slides.innerHTML = HERO_IDS.map((id) => {
+  const p = byId(id);
+  return `<button class="slide" data-open="${p.id}" aria-label="${p.name}">
+    <img src="${p.img}" alt="${p.name}">
+    <span class="slide-tag">${p.name}<b>${fmt(p.price)}</b></span>
+  </button>`;
+}).join("");
+$("#dots").innerHTML = HERO_IDS.map((_, i) => `<button aria-label="Ir a la imagen ${i + 1}" data-dot="${i}"></button>`).join("");
+
+let slideIdx = 0;
+function markDot() {
+  slideIdx = Math.round(slides.scrollLeft / slides.clientWidth);
+  document.querySelectorAll("[data-dot]").forEach((d, i) => d.classList.toggle("on", i === slideIdx));
+}
+function goSlide(i) {
+  slides.scrollTo({ left: i * slides.clientWidth, behavior: "smooth" });
+}
+slides.addEventListener("scroll", () => requestAnimationFrame(markDot), { passive: true });
+$("#dots").addEventListener("click", (e) => {
+  const d = e.target.closest("[data-dot]");
+  if (d) goSlide(Number(d.dataset.dot));
+});
+let autoplay = setInterval(() => goSlide((slideIdx + 1) % HERO_IDS.length), 4500);
+slides.addEventListener("pointerdown", () => clearInterval(autoplay), { once: true });
+markDot();
+
+/* ---------- Featured ---------- */
+(() => {
+  const p = byId(FEATURED_ID);
+  $("#featured").innerHTML = `
+    <div class="featured-media"><img src="${p.img}" alt="${p.name}"></div>
+    <div class="featured-info">
+      <span class="kicker">${p.category}</span>
+      <h3>${p.name}</h3>
+      <p>Carne de 200g, queso de cabra con yerbas y compota bourbon.</p>
+      <div class="featured-foot">
+        <strong>${fmt(p.price)}</strong>
+        <button class="round-btn" data-open="${p.id}" aria-label="Ver ${p.name}">${ARROW}</button>
+      </div>
+    </div>`;
+})();
+
+/* ---------- Categories + grid ---------- */
 let activeCat = "Todos";
+let favsOnly = false;
+let favs = new Set(store("rafas-favs", []));
 
-function renderChips() {
-  $("#chips").innerHTML = CATEGORIES.map(
-    (c) => `<button class="chip" role="tab" aria-selected="${c === activeCat}" data-cat="${c}">${c}</button>`
+function renderTiles() {
+  $("#tiles").innerHTML = CATEGORIES.map(
+    (c) => `<button class="tile ${!favsOnly && c.name === activeCat ? "active" : ""}" data-cat="${c.name}">
+      <div class="tile-img ${c.cutout ? "" : "photo"}"><img src="${c.img}" alt="" loading="lazy"></div>
+      <span>${c.name}</span>
+    </button>`
+  ).join("");
+  $("#drawerList").innerHTML = CATEGORIES.map(
+    (c) => `<li><a href="#menu" data-cat="${c.name}">${c.name}<span aria-hidden="true">›</span></a></li>`
   ).join("");
 }
 
 function renderGrid() {
-  const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter((p) => p.category === activeCat);
+  let list = favsOnly ? PRODUCTS.filter((p) => favs.has(p.id)) : PRODUCTS;
+  if (!favsOnly && activeCat !== "Todos") list = list.filter((p) => p.category === activeCat);
+  $("#menuSub").textContent = favsOnly ? "Tus favoritos" : activeCat;
+  $("#gridEmpty").hidden = list.length > 0;
   $("#grid").innerHTML = list
     .map(
       (p) => `
-      <button class="card" data-open="${p.id}" aria-label="${p.name}, ${fmt(p.price)}">
-        <div class="card-media ${p.cutout ? "" : "photo"}"><img src="${p.img}" alt="" loading="lazy"></div>
-        <div class="card-info"><h3>${p.name}</h3><span>${fmt(p.price)}</span></div>
-      </button>`
+      <article class="card">
+        <button class="card-open" data-open="${p.id}">
+          <div class="card-media ${p.cutout ? "" : "photo"}"><img src="${p.img}" alt="${p.name}" loading="lazy"></div>
+          <div class="card-body">
+            <span class="card-cat">${p.category}</span>
+            <h3>${p.name}</h3>
+            <span class="card-price">${fmt(p.price)}</span>
+          </div>
+        </button>
+        <button class="fav" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}" aria-label="Favorito">${HEART}</button>
+        <span class="round-btn" aria-hidden="true">${PLUS}</span>
+      </article>`
     )
     .join("");
 }
 
-function setCategory(cat) {
-  activeCat = cat === "todos" ? "Todos" : cat;
-  renderChips();
+function showCategory(cat) {
+  activeCat = cat;
+  favsOnly = false;
+  setTab("menu");
+  renderTiles();
   renderGrid();
+  $("#menu").scrollIntoView({ behavior: "smooth" });
 }
 
-$("#chips").addEventListener("click", (e) => {
-  const chip = e.target.closest(".chip");
-  if (chip) setCategory(chip.dataset.cat);
+document.addEventListener("click", (e) => {
+  const catEl = e.target.closest("[data-cat]");
+  if (catEl) {
+    e.preventDefault();
+    close($("#navDrawer"));
+    showCategory(catEl.dataset.cat);
+    return;
+  }
+  const favEl = e.target.closest("[data-fav]");
+  if (favEl) {
+    const id = favEl.dataset.fav;
+    favs.has(id) ? favs.delete(id) : favs.add(id);
+    save("rafas-favs", [...favs]);
+    renderGrid();
+    return;
+  }
+  const openEl = e.target.closest("[data-open]");
+  if (openEl) {
+    close($("#search"));
+    openProduct(openEl.dataset.open);
+    return;
+  }
+  if (e.target.closest("[data-cart]")) open($("#cart"));
+});
+
+/* ---------- Tab bar ---------- */
+function setTab(name) {
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+}
+document.querySelector(".tabbar").addEventListener("click", (e) => {
+  const tab = e.target.closest(".tab");
+  if (!tab || tab.dataset.tab === "cart") return;
+  setTab(tab.dataset.tab);
+  if (tab.dataset.tab === "home") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else {
+    favsOnly = tab.dataset.tab === "favs";
+    if (!favsOnly) activeCat = "Todos";
+    renderTiles();
+    renderGrid();
+    $("#menu").scrollIntoView({ behavior: "smooth" });
+  }
 });
 
 /* ---------- Overlays ---------- */
@@ -111,14 +234,26 @@ document.querySelectorAll(".sheet, .drawer").forEach((el) => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") document.querySelectorAll(".sheet.open, .drawer.open").forEach(close);
 });
-
 $("#menuBtn").addEventListener("click", () => open($("#navDrawer")));
-$("#navDrawer").addEventListener("click", (e) => {
-  const link = e.target.closest("[data-cat]");
-  if (!link) return;
-  setCategory(link.dataset.cat);
-  close($("#navDrawer"));
+
+/* ---------- Search ---------- */
+function thumb(p) {
+  return `<img class="thumb ${p.cutout ? "" : "photo"}" src="${p.img}" alt="">`;
+}
+function renderSearch() {
+  const q = $("#searchInput").value.trim().toLowerCase();
+  const list = PRODUCTS.filter((p) => !q || (p.name + " " + p.desc + " " + p.category).toLowerCase().includes(q));
+  $("#searchList").innerHTML = list.length
+    ? list.map((p) => `<li><button data-open="${p.id}">${thumb(p)}<span><b>${p.name}</b><small>${p.category}</small></span><b>${fmt(p.price)}</b></button></li>`).join("")
+    : `<li class="empty">Nada por aquí. Prueba con “tocineta” o “queso”.</li>`;
+}
+$("#searchBtn").addEventListener("click", () => {
+  $("#searchInput").value = "";
+  renderSearch();
+  open($("#search"));
+  setTimeout(() => $("#searchInput").focus(), 300);
 });
+$("#searchInput").addEventListener("input", renderSearch);
 
 /* ---------- Product sheet ---------- */
 let current = null;
@@ -128,26 +263,23 @@ function openProduct(id) {
   current = byId(id);
   qty = 1;
   $("#qtyVal").textContent = qty;
-  const media = $("#sheetImg").parentElement;
-  media.classList.toggle("photo", !current.cutout);
+  $("#sheetImg").parentElement.classList.toggle("photo", !current.cutout);
   $("#sheetImg").src = current.img;
   $("#sheetImg").alt = current.name;
-  $("#sheetCat").innerHTML = `Todos &gt; <b>${current.category}</b>`;
+  $("#sheetCat").innerHTML = `Todos › <b>${current.category}</b>`;
   $("#sheetTitle").textContent = current.name;
   $("#sheetDesc").textContent = current.desc;
   $("#sheetPrice").textContent = fmt(current.price);
   $("#sheetForm").innerHTML = current.options
     .map(
       (o) => `
-      <fieldset class="opt" data-opt="${o.id}">
+      <fieldset class="opt">
         <div class="opt-head">
           <strong>${o.title} <small>(<span class="n">0</span>/1)</small></strong>
           <span class="tag">Obligatorio</span>
         </div>
         <div class="opt-box">
-          ${o.choices
-            .map((c) => `<label>${c}<input type="radio" name="${o.id}" value="${c}"></label>`)
-            .join("")}
+          ${o.choices.map((c) => `<label>${c}<input type="radio" name="${o.id}" value="${c}"></label>`).join("")}
         </div>
       </fieldset>`
     )
@@ -157,9 +289,8 @@ function openProduct(id) {
 }
 
 function updateAddBtn() {
-  const form = $("#sheetForm");
   let complete = true;
-  form.querySelectorAll(".opt").forEach((fs) => {
+  $("#sheetForm").querySelectorAll(".opt").forEach((fs) => {
     const chosen = fs.querySelector("input:checked");
     fs.querySelector(".n").textContent = chosen ? 1 : 0;
     const tag = fs.querySelector(".tag");
@@ -184,13 +315,8 @@ $("#qtyPlus").addEventListener("click", () => {
   updateAddBtn();
 });
 
-document.addEventListener("click", (e) => {
-  const trigger = e.target.closest("[data-open]");
-  if (trigger) openProduct(trigger.dataset.open);
-});
-
 /* ---------- Cart ---------- */
-const cart = [];
+const cart = store("rafas-cart", []).filter((l) => byId(l.id));
 
 $("#addBtn").addEventListener("click", () => {
   const choices = [...$("#sheetForm").querySelectorAll("input:checked")].map((i) => i.value);
@@ -204,11 +330,13 @@ $("#addBtn").addEventListener("click", () => {
 });
 
 function renderCart() {
+  save("rafas-cart", cart);
   const count = cart.reduce((n, l) => n + l.qty, 0);
   const total = cart.reduce((n, l) => n + l.qty * byId(l.id).price, 0);
-  const badge = $("#cartCount");
-  badge.hidden = count === 0;
-  badge.textContent = count;
+  document.querySelectorAll("[data-count]").forEach((b) => {
+    b.hidden = count === 0;
+    b.textContent = count;
+  });
   $("#cartEmpty").hidden = cart.length > 0;
   $("#cartTotal").textContent = fmt(total);
   $("#checkoutBtn").disabled = cart.length === 0;
@@ -216,7 +344,7 @@ function renderCart() {
     .map((l, i) => {
       const p = byId(l.id);
       return `<li>
-        <img src="${p.img}" alt="" class="${p.cutout ? "" : "photo-thumb"}">
+        ${thumb(p)}
         <div><b>${l.qty} × ${p.name}</b><small>${l.choices.join(" · ") || "&nbsp;"}</small>
           <button class="remove" data-remove="${i}">Quitar</button></div>
         <span class="line-price">${fmt(l.qty * p.price)}</span>
@@ -231,7 +359,6 @@ $("#cartList").addEventListener("click", (e) => {
   cart.splice(Number(btn.dataset.remove), 1);
   renderCart();
 });
-$("#cartBtn").addEventListener("click", () => open($("#cart")));
 $("#checkoutBtn").addEventListener("click", () => {
   cart.length = 0;
   renderCart();
@@ -248,6 +375,6 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
 }
 
-renderChips();
+renderTiles();
 renderGrid();
 renderCart();

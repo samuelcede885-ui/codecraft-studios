@@ -135,12 +135,18 @@ function fetchBcv() {
   });
 }
 async function updateRates(onlySid) {
-  const rate = parseBcvRate(await fetchBcv());
-  if (!rate) throw new Error("No se encontró la tasa en bcv.org.ve");
+  const html = await fetchBcv();
   const snap = await db.collectionGroup("config").where("autoRate", "==", true).get();
   const targets = snap.docs.filter((d) => d.id === "public" && (!onlySid || d.ref.parent.parent.id === onlySid));
-  await Promise.all(targets.map((d) => d.ref.set({ rate, rateUpdatedAt: Date.now(), rateSource: "BCV" }, { merge: true })));
-  return rate;
+  let last = null;
+  for (const d of targets) {
+    const currency = d.data().rateCurrency === "EUR" ? "EUR" : "USD";
+    const rate = parseBcvRate(html, currency);
+    if (!rate) throw new Error(`No se encontró la tasa ${currency} en bcv.org.ve`);
+    await d.ref.set({ rate, rateUpdatedAt: Date.now(), rateSource: "BCV " + currency }, { merge: true });
+    last = rate;
+  }
+  return last;
 }
 exports.bcvRateDaily = onSchedule({ schedule: "0 7,13,17 * * *", timeZone: "America/Caracas" }, async () => {
   const rate = await updateRates();

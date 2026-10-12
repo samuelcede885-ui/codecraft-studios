@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// Reglas de la base de datos.
+// - Los clientes NO pueden crear pedidos directo: solo a través de la función createOrder,
+//   que calcula precios, stock e IGTF en el servidor.
+// - Cada cliente ve solo sus propios pedidos.
+// - El equipo del local (staff) ve y actualiza pedidos; solo dueño y administradores cambian ajustes.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function staffDoc(sid) { return /databases/$(database)/documents/stores/$(sid)/staff/$(request.auth.uid); }
+    function isStaff(sid) { return signedIn() && exists(staffDoc(sid)); }
+    function role(sid) { return get(staffDoc(sid)).data.role; }
+    function isAdmin(sid) { return isStaff(sid) && role(sid) in ['owner', 'admin']; }
+    function isOwner(sid) { return isStaff(sid) && role(sid) == 'owner'; }
+
+    match /stores/{sid} {
+
+      // Menú, precios, stock, zonas, horario, datos de pago: lo lee la tienda.
+      match /config/public {
+        allow read: if true;
+        allow write: if isAdmin(sid);
+      }
+      // Catálogo de productos que usa el servidor para validar precios.
+      match /config/catalog {
+        allow read: if true;
+        allow write: if isAdmin(sid);
+      }
+
+      match /orders/{oid} {
+        allow read: if isStaff(sid) || (signedIn() && resource.data.customerUid == request.auth.uid);
+        allow create: if false;
+        // El equipo cambia estado, pago, repartidor, historial… pero no montos, productos ni cliente.
+        allow update: if isStaff(sid)
+          && !request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['customerUid', 'items', 'subtotal', 'fee', 'igtf', 'total', 'createdAt', 'code', 'customer', 'receiptPath']);
+        allow delete: if isOwner(sid);
+      }
+
+      match /staff/{uid} {
+        allow read: if signedIn() && (request.auth.uid == uid || isAdmin(sid));
+        // Cada miembro solo puede guardar sus teléfonos para avisos push.
+        allow update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tokens', 'lastSeen']);
+        allow create, delete: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Burger Shack Panel",
+  "short_name": "Burger Shack",
+  "description": "Pedidos, comprobantes, cocina, delivery, inventario y métricas de Burger Shack.",
+  "id": "./#panel",
+  "start_url": "./#panel",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#B45F00",
+  "theme_color": "#E8820C",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Pedidos", "url": "./#panel" },
+    { "name": "Tienda", "url": "./" }
+  ]
+}

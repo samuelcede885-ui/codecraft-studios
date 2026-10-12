@@ -1,0 +1,21 @@
+rules_version = '2';
+
+// Comprobantes de pago: cada cliente sube solo a su carpeta, imágenes de hasta 3 MB.
+// Los ve el propio cliente y el equipo del local. Nadie los puede borrar ni reemplazar desde la app.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /stores/{sid}/uploads/{uid}/{file} {
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size < 3 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow read: if request.auth != null
+        && (request.auth.uid == uid
+            || firestore.exists(/databases/(default)/documents/stores/$(sid)/staff/$(request.auth.uid)));
+      allow update, delete: if false;
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

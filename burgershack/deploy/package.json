@@ -1,0 +1,10 @@
+{
+  "name": "burgershack-deploy",
+  "private": true,
+  "description": "Herramientas para configurar y publicar el proyecto de Firebase desde GitHub Actions",
+  "type": "module",
+  "dependencies": {
+    "firebase-tools": "^13.35.1",
+    "google-auth-library": "^9.15.1"
+  }
+}

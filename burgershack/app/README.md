@@ -1,0 +1,41 @@
+# Burger Shack — Tienda + Panel del dueño
+
+Un solo archivo (`index.html`) con dos caras:
+
+- **Tienda** (`index.html`): menú, carrito y checkout con datos de entrega, zona, método de pago y foto del comprobante. Después de pagar, el cliente ve el estado de su pedido en vivo.
+- **Panel del dueño** (`index.html#panel`): lo que usa el local.
+
+## Qué trae el panel
+
+| Sección | Para qué sirve |
+|---|---|
+| **Pedidos** | Lista en vivo con filtros por estado, búsqueda y resumen del día (ventas, pedidos, por verificar, en camino). |
+| **Detalle del pedido** | Foto del comprobante (se amplía al tocarla), botones *Pago correcto* / *Rechazar*, datos del cliente, dirección con mapa, productos, total en € y Bs, repartidor e historial. |
+| **Cocina** | Tarjetas grandes con lo que hay que preparar y cronómetro; se pone en rojo si pasa la meta de minutos. |
+| **Delivery** | Pedidos listos para despachar, asignación de repartidor, pedidos en la calle y estado de cada repartidor. |
+| **Alertas** (campana o Más › Alertas) | Al abrir el panel aparece “Activar notificaciones” (el navegador exige un toque). Desde ahí cada pedido y cada comprobante suena, vibra y muestra un aviso arriba; puede repetir el sonido cada 15 s hasta que se abra el pedido, mantener la pantalla encendida y, en la app instalada, mandar el aviso del sistema aunque estés en otra app. |
+| **Etiquetas** | Etiqueta para el paquete (58 u 80 mm) con número de pedido, cliente, teléfono, dirección, referencia, productos, total, si se cobra o ya está pagado y un QR que abre la dirección en Google Maps. Se pueden imprimir una o todas las listas. |
+| **Métricas** | Pestaña propia con rangos Hoy, Ayer, 7 días, 30 días y Todo: ventas, pedidos, ticket promedio y clientes (nuevos y que repiten) comparados con el periodo anterior; tiempo en cocina, de entrega y total; cancelaciones y pagos rechazados; ventas por hora o por día; productos (y cuáles no se vendieron), métodos de pago, zonas, días de la semana y repartidores. Exporta la tabla para Excel. |
+| **Inventario** | Stock por producto con botones −/+/+10, “Sin límite” para lo que no se cuenta, aviso de poco stock (umbral configurable), pausar un producto y cambiar precios. Cada pedido descuenta el stock, cada cancelación lo devuelve, y en 0 la tienda lo muestra “Agotado” y no deja comprarlo. |
+| **Clientes** | Quién compra más, cuántos pedidos lleva y acceso directo a WhatsApp. |
+| **Automático** | Aceptar solos los pedidos en efectivo (van directo a cocina aunque el panel esté cerrado), abrir y cerrar la tienda por horario, e imprimir la etiqueta sola al marcar listo. |
+| **Ajustes** | Abrir/cerrar el local, tasa del día, meta de cocina, ancho de etiqueta, zonas con su costo, repartidores y datos de pago que ve el cliente. |
+
+Desde el pedido también se manda un **WhatsApp al cliente** con el mensaje según el estado, y al **repartidor** con la dirección y el link del mapa.
+
+## Instalar la app en el teléfono
+
+El panel es una app instalable (PWA): `manifest.webmanifest`, `sw.js` e `icons/`.
+
+1. La carpeta `burgershack/` tiene que estar en un sitio con `https://` (las apps instalables no funcionan desde un archivo local).
+2. Abre `https://<tu-sitio>/app/#panel` en el teléfono del local.
+3. **Android (Chrome):** Más › Ajustes › *Instalar app*, o el menú ⋮ › *Instalar app*.
+   **iPhone (Safari):** Compartir › *Agregar a inicio*.
+4. Queda el ícono “Burger Shack” en la pantalla de inicio; abre directo en el panel, a pantalla completa y sin barra del navegador.
+
+Cada vez que publiques cambios, sube el número de `CACHE` en `sw.js` (`burgershack-panel-v2`, `v3`…) para que los teléfonos descarguen la versión nueva.
+
+## Cómo se conecta
+
+- **Con Firebase** (cuando `firebase-config.js` tiene la configuración): la tienda y el panel comparten pedidos, comprobantes y stock en tiempo real desde cualquier teléfono. El servidor calcula precios, stock e IGTF; el panel pide inicio de sesión y cada empleado tiene su rol. Los pasos para publicarlo están en [`../PUBLICAR.md`](../PUBLICAR.md).
+- **Sin configuración** (modo local): guarda en `localStorage` y sincroniza entre pestañas del mismo navegador. Sirve para ver y probar el diseño.

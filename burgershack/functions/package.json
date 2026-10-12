@@ -1,0 +1,14 @@
+{
+  "name": "burgershack-functions",
+  "description": "Funciones del servidor: pedidos, stock, avisos, tasa BCV y equipo",
+  "private": true,
+  "main": "index.js",
+  "engines": { "node": "22" },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  }
+}

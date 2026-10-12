@@ -86,4 +86,7 @@ test("lee la tasa del HTML del BCV", () => {
   const html = '<div id="dolar" class="col"><div class="row"><span> USD</span><strong> 182,42190000 </strong></div></div>';
   assert.equal(parseBcvRate(html), 182.4219);
   assert.equal(parseBcvRate("<html></html>"), null);
+  const both = html + '<div id="euro" class="col"><span> EUR </span><strong> 214,07530000 </strong></div>';
+  assert.equal(parseBcvRate(both, "EUR"), 214.0753);
+  assert.equal(parseBcvRate(both, "USD"), 182.4219);
 });

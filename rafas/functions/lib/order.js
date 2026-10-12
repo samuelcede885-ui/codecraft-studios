@@ -163,9 +163,10 @@ function restoreStock(stock, items) {
   return next;
 }
 
-// Extrae la tasa oficial del dólar del HTML de bcv.org.ve.
-function parseBcvRate(html) {
-  const m = /id=["']dolar["'][\s\S]*?<strong>\s*([\d.,]+)\s*<\/strong>/i.exec(html || "");
+// Extrae la tasa oficial del HTML de bcv.org.ve ("USD" → bloque "dolar", "EUR" → bloque "euro").
+function parseBcvRate(html, currency = "USD") {
+  const id = currency === "EUR" ? "euro" : "dolar";
+  const m = new RegExp(`id=["']${id}["'][\\s\\S]*?<strong>\\s*([\\d.,]+)\\s*<\\/strong>`, "i").exec(html || "");
   if (!m) return null;
   const n = Number(m[1].replace(/\s/g, "").replace(/\./g, "").replace(",", "."));
   return n > 0 && n < 1e7 ? Math.round(n * 1e4) / 1e4 : null;

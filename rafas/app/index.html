@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#7457b0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rafa's Panel">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Rafa's Casual Food</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -159,6 +166,7 @@ body.lock { overflow: hidden; }
 .card-media { position: relative; aspect-ratio: 1 / .9; max-width: 100%; margin: 8px 8px 0; border-radius: 16px; overflow: hidden; background: radial-gradient(circle at 50% 60%, var(--purple-glow) 0%, var(--purple) 80%); }
 .card-media img { position: absolute; inset: 8%; width: 84%; height: 84%; object-fit: contain; filter: drop-shadow(0 10px 10px rgba(25,8,55,.35)); }
 .card.soldout .card-media img { filter: grayscale(1) opacity(.55); }
+.soldout-tag.low { background: var(--st-pay-bg); color: var(--st-pay); }
 .soldout-tag { position: absolute; left: 14px; top: 14px; background: var(--btn-bg); color: var(--btn-fg); font-size: .66rem; font-weight: 800; letter-spacing: .08em; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
 .card-body { padding: 10px 12px 14px; }
 .card-cat { font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
@@ -354,6 +362,26 @@ textarea.input { resize: vertical; min-height: 70px; }
 .s-camino { --st: var(--st-road); --st-bg: var(--st-road-bg); }
 .s-entregado { --st: var(--st-done); --st-bg: var(--st-done-bg); }
 .s-cancelado { --st: var(--st-cancel); --st-bg: var(--st-cancel-bg); }
+.stock-alert { width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; text-align: left; background: var(--surface); border-radius: 18px; padding: 10px 12px; box-shadow: inset 3px 0 0 var(--st-pay), var(--shadow); margin-bottom: 12px; }
+.stock-alert b { display: block; font-size: .88rem; }
+.stock-alert small { color: var(--muted); font-size: .76rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inv { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+.inv:last-child { border-bottom: 0; }
+.inv-top { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.inv-top b { font-size: .92rem; display: block; }
+.inv-top small { color: var(--muted); font-size: .74rem; }
+.inv-ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.stepper-ctl { display: flex; align-items: center; background: var(--bg); border-radius: 999px; padding: 3px; }
+.stepper-ctl button { width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; font-weight: 800; }
+.stepper-ctl button:disabled { opacity: .3; }
+.stepper-ctl input { width: 56px; text-align: center; border: 0; background: transparent; font-weight: 800; font-size: 1rem; -moz-appearance: textfield; }
+.stepper-ctl input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.price-in { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); margin-left: auto; }
+.price-in .input { width: 84px; padding: 8px 10px; font-size: .88rem; }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); cursor: pointer; }
+.chk input { width: 18px; height: 18px; accent-color: var(--purple); }
+.stock-state { font-size: .72rem; font-weight: 800; }
+.inv-sum { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .a-empty { background: var(--surface); border-radius: 20px; padding: 30px 20px; text-align: center; color: var(--muted); font-size: .9rem; box-shadow: var(--shadow); grid-column: 1 / -1; }
 .a-empty b { display: block; color: var(--ink); font-size: 1rem; margin-bottom: 4px; }
 
@@ -621,6 +649,7 @@ textarea.input { resize: vertical; min-height: 70px; }
       <h3 id="sheetTitle"></h3>
       <p class="desc" id="sheetDesc"></p>
       <p class="price-big" id="sheetPrice"></p>
+      <p class="crumb" id="sheetStock" hidden></p>
       <form id="sheetForm"></form>
     </div>
     <div class="sheet-foot">
@@ -725,6 +754,7 @@ textarea.input { resize: vertical; min-height: 70px; }
     <section data-pane="orders">
       <div class="pane-head"><h2>Pedidos</h2><button class="btn sm ghost" id="printReadyBtn"><svg viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6h-3"/><path d="M7 14h10v7H7z"/></svg>Etiquetas de listos</button></div>
       <input type="search" class="a-search" id="oSearch" placeholder="Buscar por nombre, teléfono o número" aria-label="Buscar pedidos">
+      <button class="stock-alert" id="stockAlert" hidden></button>
       <div class="chips" id="oChips" role="group" aria-label="Filtrar por estado"></div>
       <div class="olist" id="oList"></div>
     </section>
@@ -753,7 +783,7 @@ textarea.input { resize: vertical; min-height: 70px; }
     <section data-pane="more" hidden>
       <div class="more-nav" role="group" aria-label="Secciones">
         <button data-sub="reports" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reportes</button>
-        <button data-sub="catalog" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M5 11a7 5 0 0 1 14 0zM4 14h16M5 17h14l-.6 1.8a2 2 0 0 1-1.9 1.2H7.5a2 2 0 0 1-1.9-1.2z"/></svg>Menú</button>
+        <button data-sub="catalog" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></svg>Inventario</button>
         <button data-sub="clients" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5 5 0 0 1 3.5 6"/></svg>Clientes</button>
         <button data-sub="settings" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.6 15H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9.7 4.3V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1.3z"/></svg>Ajustes</button>
       </div>
@@ -769,7 +799,7 @@ textarea.input { resize: vertical; min-height: 70px; }
     <button class="tab" data-pane-btn="kitchen"><svg viewBox="0 0 24 24"><path d="M6 13h12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM4 13h16M8 13V9a4 4 0 0 1 8 0v4"/></svg><span>Cocina</span><span class="badge" data-cooking hidden>0</span></button>
     <button class="tab" data-pane-btn="delivery"><svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 17h7M3 12h9l2-5h3l3 6M14 7l1.5 10"/></svg><span>Delivery</span><span class="badge" data-ready hidden>0</span></button>
     <button class="tab" data-pane-btn="alerts"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Alertas</span><span class="badge" data-unread hidden>0</span></button>
-    <button class="tab" data-pane-btn="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>Más</span></button>
+    <button class="tab" data-pane-btn="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>Más</span><span class="badge" data-lowstock hidden>0</span></button>
   </nav>
 
   <div class="sheet od-sheet" id="orderSheet" aria-hidden="true">
@@ -854,6 +884,8 @@ const CONFIG = {
     pay: { pagoMovil: "", transferencia: "", zelle: "", binance: "" },
     soldOut: [],
     prices: {},
+    stock: {},
+    lowStock: 3,
   },
 };
 
@@ -1047,6 +1079,10 @@ function seedLocal() {
   ];
   const all = {};
   list.forEach((o, i) => { all["ex" + i] = { id: "ex" + i, ...o }; });
+  if (!localStorage.getItem("md-settings")) {
+    const ids = CONFIG.products.map((p) => p.id);
+    lsSet("md-settings", { ...CONFIG.defaults, stock: { [ids[0]]: 20, [ids[1]]: 3, [ids[2]]: 12 } });
+  }
   localStorage.setItem("md-orders", JSON.stringify(all));
 }
 
@@ -1057,17 +1093,21 @@ let settings = structuredClone(CONFIG.defaults);
 let orders = [];
 let ordersLoaded = false;
 const priceOf = (p) => (settings.prices?.[p.id] != null && settings.prices[p.id] !== "" ? Number(settings.prices[p.id]) : p.price);
-const isSoldOut = (p) => (settings.soldOut || []).includes(p.id);
+const stockOf = (p) => { const v = settings.stock?.[p.id]; return v == null || v === "" ? null : Math.max(0, Number(v) || 0); };
+const isSoldOut = (p) => (settings.soldOut || []).includes(p.id) || stockOf(p) === 0;
+const isLow = (p) => { const v = stockOf(p); return v != null && v > 0 && v <= (settings.lowStock ?? 3); };
+const inCart = (id) => cart.reduce((n, l) => n + (l.id === id ? l.qty : 0), 0);
+const availableOf = (p) => { const v = stockOf(p); return v == null ? Infinity : Math.max(0, v - inCart(p.id)); };
 const byId = (id) => CONFIG.products.find((p) => p.id === id);
 const orderById = (id) => orders.find((o) => o.id === id);
 const flip = (x) => [x?.flip ? "flip" : "", x?.photo ? "photo" : ""].join(" ").trim();
 
 let settingsSaveTimer;
-function saveSettings(patch, immediate = false) {
+function saveSettings(patch, immediate = false, silent = false) {
   settings = { ...settings, ...patch };
   applySettings();
   clearTimeout(settingsSaveTimer);
-  const go = () => Backend.saveSettings(settings).then(() => toast("Cambios guardados")).catch(() => {});
+  const go = () => Backend.saveSettings(settings).then(() => { if (!silent) toast("Cambios guardados"); }).catch(() => {});
   if (immediate) go(); else settingsSaveTimer = setTimeout(go, 700);
 }
 function applySettings() {
@@ -1137,7 +1177,7 @@ function renderGrid() {
         <div class="card-media"><img class="${flip(p)}" src="${p.img}" alt="${esc(p.name)}" loading="lazy"></div>
         <div class="card-body"><span class="card-cat">${esc(p.category)}</span><h3>${esc(p.name)}</h3><span class="card-price">${money(priceOf(p))}</span></div>
       </button>
-      ${isSoldOut(p) ? `<span class="soldout-tag">Agotado</span>` : ""}
+      ${isSoldOut(p) ? `<span class="soldout-tag">Agotado</span>` : isLow(p) ? `<span class="soldout-tag low">Quedan ${stockOf(p)}</span>` : ""}
       <button class="fav" data-fav="${p.id}" aria-pressed="${favs.has(p.id)}" aria-label="Guardar ${esc(p.name)} en favoritos">${ICON.heart}</button>
       <span class="round-btn" aria-hidden="true">${ICON.plus}</span>
     </article>`).join("");
@@ -1210,6 +1250,9 @@ function openProduct(id) {
   $("#sheetTitle").textContent = current.name;
   $("#sheetDesc").textContent = current.desc;
   $("#sheetPrice").textContent = money(priceOf(current));
+  const st = stockOf(current);
+  $("#sheetStock").hidden = st == null || st > (settings.lowStock ?? 3) * 3;
+  $("#sheetStock").innerHTML = st === 0 ? "<b>Agotado por hoy</b>" : `Quedan <b>${st}</b> disponibles`;
   $("#sheetForm").innerHTML = current.options.map((key) => {
     const o = CONFIG.options[key];
     return `<fieldset class="opt"><div class="opt-head"><strong>${esc(o.title)} <small>(<span class="n">0</span>/1)</small></strong><span class="tag">Obligatorio</span></div>
@@ -1229,17 +1272,23 @@ function updateAddBtn() {
   });
   const btn = $("#addBtn");
   if (isSoldOut(current)) { btn.disabled = true; btn.textContent = "Agotado por hoy"; return; }
+  if (qty > availableOf(current)) { btn.disabled = true; btn.textContent = availableOf(current) ? `Solo quedan ${availableOf(current)}` : "Ya tienes todo el stock en el carrito"; return; }
   btn.disabled = !complete;
   btn.textContent = complete ? `Agregar · ${money(priceOf(current) * qty)}` : "Elige una opción";
 }
 $("#sheetForm").addEventListener("change", updateAddBtn);
 $("#sheetForm").addEventListener("submit", (e) => e.preventDefault());
 $("#qtyMinus").addEventListener("click", () => { qty = Math.max(1, qty - 1); $("#qtyVal").textContent = qty; updateAddBtn(); });
-$("#qtyPlus").addEventListener("click", () => { qty = Math.min(20, qty + 1); $("#qtyVal").textContent = qty; updateAddBtn(); });
+$("#qtyPlus").addEventListener("click", () => {
+  const max = Math.min(20, availableOf(current));
+  if (qty >= max && max < 20) toast(max ? `Solo quedan ${max} disponibles` : "No queda más stock de este producto");
+  qty = Math.max(1, Math.min(max, qty + 1)); $("#qtyVal").textContent = qty; updateAddBtn();
+});
 
 /* Cart */
 const cart = lsGet("md-cart", []).filter((l) => byId(l.id));
 $("#addBtn").addEventListener("click", () => {
+  if (qty > availableOf(current)) { updateAddBtn(); return; }
   const choices = $$("#sheetForm input:checked").map((i) => i.value);
   const key = current.id + "|" + choices.join("|");
   const line = cart.find((l) => l.key === key);
@@ -1357,6 +1406,8 @@ $("#coForm").addEventListener("submit", async (e) => {
   if (co.dtype === "delivery" && $("#coAddress").value.trim().length < 6) problems.push("la dirección");
   if (co.dtype === "delivery" && !zone) problems.push("la zona");
   if (m.proof && !co.receipt) problems.push("el capture del comprobante");
+  const short = CONFIG.products.filter((p) => { const v = stockOf(p); return (v != null && inCart(p.id) > v) || ((settings.soldOut || []).includes(p.id) && inCart(p.id)); });
+  if (short.length) { err.hidden = false; err.textContent = short.map((p) => stockOf(p) ? `Solo quedan ${stockOf(p)} de ${p.name}` : `${p.name} se agotó`).join(". ") + ". Ajusta tu carrito."; return; }
   if (problems.length) { err.hidden = false; err.textContent = "Falta " + problems.join(", ") + "."; return; }
   err.hidden = true;
   const btn = $("#coSubmit"); btn.disabled = true; btn.textContent = "Enviando…";
@@ -1366,17 +1417,21 @@ $("#coForm").addEventListener("submit", async (e) => {
   const fee = zone ? zone.fee : 0;
   const timeline = [{ at: createdAt, type: "created" }];
   if (m.proof) timeline.push({ at: createdAt + 1, type: "receipt" });
+  const newStock = { ...(settings.stock || {}) };
+  let stockApplied = false;
+  items.forEach((i) => { if (newStock[i.id] != null && newStock[i.id] !== "") { newStock[i.id] = Math.max(0, Number(newStock[i.id]) - i.qty); stockApplied = true; } });
   const order = {
     code: codeFor(createdAt), createdAt, status: m.proof ? "verificar" : "nuevo", example: false,
     customer: { name, phone },
     delivery: zone ? { type: "delivery", zoneId: zone.id, zoneName: zone.name, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() } : { type: "pickup" },
     items, subtotal, fee, total: subtotal + fee, rate: settings.rate || 0,
     payment: { method: m.id, ref: m.proof ? $("#coPayRef").value.trim() : "", status: m.proof ? "pending" : "cash" },
-    hasReceipt: !!(m.proof && co.receipt), notes: $("#coNotes").value.trim(), driverId: null, timeline,
+    hasReceipt: !!(m.proof && co.receipt), notes: $("#coNotes").value.trim(), driverId: null, timeline, stockApplied,
   };
   try {
     const id = await Backend.addOrder(order);
     if (order.hasReceipt) await Backend.setReceipt(id, co.receipt);
+    if (stockApplied) saveSettings({ stock: newStock }, true, true);
     lsSet("md-customer", { name, phone, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() });
     const mine = lsGet("md-my-orders", []); mine.unshift(id); lsSet("md-my-orders", mine.slice(0, 10));
     cart.length = 0; renderCart();
@@ -1472,6 +1527,7 @@ function renderBadges() {
   set("[data-cooking]", orders.filter((o) => o.status === "cocina").length);
   set("[data-ready]", orders.filter((o) => o.status === "listo" && o.delivery.type === "delivery").length);
   set("[data-unread]", unreadCount());
+  set("[data-lowstock]", CONFIG.products.filter((p) => isLow(p) || stockOf(p) === 0).length);
 }
 
 function orderCard(o, { actions = true } = {}) {
@@ -1502,7 +1558,18 @@ function primaryAction(o) {
   return null;
 }
 
+function renderStockAlert() {
+  const out = CONFIG.products.filter((p) => stockOf(p) === 0);
+  const low = CONFIG.products.filter(isLow);
+  const el = $("#stockAlert");
+  el.hidden = !out.length && !low.length;
+  if (el.hidden) return;
+  const parts = [...out.map((p) => `${p.name} (agotado)`), ...low.map((p) => `${p.name} (${stockOf(p)})`)];
+  el.innerHTML = `<span class="a-ico s-verificar"><svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></svg></span><span><b>${out.length ? "Productos sin stock" : "Poco stock"}</b><small>${esc(parts.join(" · "))}</small></span><span class="btn sm ghost">Reponer</span>`;
+}
+$("#stockAlert").addEventListener("click", () => { sub = "catalog"; setPane("more"); });
 function renderOrders() {
+  renderStockAlert();
   $("#oChips").innerHTML = FILTERS.map((f) => `<button class="chip" data-filter="${f.id}" aria-pressed="${oFilter === f.id}">${f.label}<em>${orders.filter(f.test).length}</em></button>`).join("");
   const f = FILTERS.find((x) => x.id === oFilter);
   const q = oQuery.toLowerCase();
@@ -1746,7 +1813,14 @@ async function act(name, id) {
     if (name === "deliver") return await changeStatus(o, "entregado", {}, `${o.code} entregado`);
     if (name === "cancel") {
       if (!confirmStep(id, "cancel", "Toca otra vez para cancelar el pedido")) return;
-      return await changeStatus(o, "cancelado", {}, `${o.code} cancelado`);
+      await changeStatus(o, "cancelado", { stockApplied: false }, `${o.code} cancelado`);
+      if (o.stockApplied) {
+        const stock = { ...(settings.stock || {}) };
+        o.items.forEach((i) => { if (stock[i.id] != null && stock[i.id] !== "") stock[i.id] = Number(stock[i.id]) + i.qty; });
+        saveSettings({ stock }, true, true);
+        toast(`${o.code} cancelado. El stock volvió al inventario.`);
+      }
+      return;
     }
     if (name === "delete") {
       if (!confirmStep(id, "delete", "Toca otra vez para borrar el ejemplo")) return;
@@ -1874,11 +1948,49 @@ function barPath(x, y, w, h) {
 }
 function renderCatalog() {
   const el = $('[data-subpane="catalog"]');
-  el.innerHTML = `<div class="panel"><h3>Menú y disponibilidad</h3><p class="hint">Apaga un producto cuando se agote: en la tienda aparece como “Agotado” al instante. Cambia el precio y se actualiza para los clientes.</p>
-    ${CONFIG.products.map((p) => `<div class="prow"><img class="thumb ${flip(p)}" src="${p.img}" alt=""><div><b>${esc(p.name)}</b><small>${esc(p.category)} · ${(() => { const n = orders.filter((o) => o.createdAt >= startOfDay() && o.status !== "cancelado").reduce((t, o) => t + o.items.filter((i) => i.id === p.id).reduce((m, i) => m + i.qty, 0), 0); return n === 1 ? "1 vendido hoy" : n + " vendidos hoy"; })()}</small></div>
-      <input class="input num" type="number" step="0.01" min="0" inputmode="decimal" value="${priceOf(p).toFixed(2)}" data-price="${p.id}" aria-label="Precio de ${esc(p.name)}">
-      <label class="switch" title="Disponible"><input type="checkbox" data-avail="${p.id}" ${isSoldOut(p) ? "" : "checked"} aria-label="${esc(p.name)} disponible"><i></i></label></div>`).join("")}
+  const soldToday = (p) => orders.filter((o) => o.createdAt >= startOfDay() && o.status !== "cancelado").reduce((t, o) => t + o.items.filter((i) => i.id === p.id).reduce((m, i) => m + i.qty, 0), 0);
+  const out = CONFIG.products.filter((p) => stockOf(p) === 0).length;
+  const low = CONFIG.products.filter(isLow).length;
+  const paused = (settings.soldOut || []).length;
+  el.innerHTML = `<div class="panel"><h3>Inventario</h3>
+    <p class="hint">Cada pedido descuenta del stock y cada cancelación lo devuelve. Cuando llega a 0, la tienda lo muestra “Agotado” y no deja comprarlo. Marca “Sin límite” para productos que no cuentas.</p>
+    <div class="inv-sum"><span class="status s-cancelado">${out} sin stock</span><span class="status s-verificar">${low} con poco stock</span><span class="status s-nuevo">${paused} pausados</span></div>
+    <div class="setrow"><div><b>Avisar con poco stock</b><small>Te aviso cuando queden esta cantidad o menos</small></div><input class="input num" style="width:90px" type="number" min="1" max="99" id="lowStockIn" value="${settings.lowStock ?? 3}" aria-label="Umbral de poco stock"></div>
+    ${CONFIG.products.map((p) => {
+      const v = stockOf(p), unlimited = v == null, paused = (settings.soldOut || []).includes(p.id);
+      const state = paused ? `<span class="stock-state" style="color:var(--muted)">Pausado</span>` : v === 0 ? `<span class="stock-state" style="color:var(--st-cancel)">Agotado</span>` : isLow(p) ? `<span class="stock-state" style="color:var(--st-pay)">Poco stock</span>` : `<span class="stock-state" style="color:var(--st-done)">${unlimited ? "Sin límite" : "En stock"}</span>`;
+      return `<div class="inv">
+        <div class="inv-top"><img class="thumb ${flip(p)}" src="${p.img}" alt=""><div><b>${esc(p.name)}</b><small>${esc(p.category)} · ${(() => { const n = soldToday(p); return n === 1 ? "1 vendido hoy" : n + " vendidos hoy"; })()}</small><br>${state}</div>
+          <label class="switch" title="Visible en la tienda"><input type="checkbox" data-avail="${p.id}" ${paused ? "" : "checked"} aria-label="${esc(p.name)} a la venta"><i></i></label></div>
+        <div class="inv-ctrl">
+          <div class="stepper-ctl" aria-label="Stock de ${esc(p.name)}">
+            <button type="button" data-step="${p.id}" data-d="-1" ${unlimited || v === 0 ? "disabled" : ""} aria-label="Quitar uno">−</button>
+            <input class="num" type="number" min="0" inputmode="numeric" data-stock="${p.id}" value="${unlimited ? "" : v}" placeholder="∞" ${unlimited ? "disabled" : ""} aria-label="Unidades">
+            <button type="button" data-step="${p.id}" data-d="1" ${unlimited ? "disabled" : ""} aria-label="Agregar uno">+</button>
+          </div>
+          <button type="button" class="btn sm ghost" data-step="${p.id}" data-d="10" ${unlimited ? "disabled" : ""}>+10</button>
+          <label class="chk"><input type="checkbox" data-unlim="${p.id}" ${unlimited ? "checked" : ""}>Sin límite</label>
+          <label class="price-in">${CONFIG.currency.trim()}<input class="input num" type="number" step="0.01" min="0" inputmode="decimal" value="${priceOf(p).toFixed(2)}" data-price="${p.id}" aria-label="Precio de ${esc(p.name)}"></label>
+        </div>
+      </div>`;
+    }).join("")}
   </div>`;
+  const setStock = (id, val) => saveSettings({ stock: { ...(settings.stock || {}), [id]: val } }, true, true);
+  $("#lowStockIn").addEventListener("change", (e) => saveSettings({ lowStock: Math.min(99, Math.max(1, parseInt(e.target.value) || 3)) }, true));
+  el.querySelectorAll("[data-step]").forEach((b) => b.addEventListener("click", () => {
+    const p = byId(b.dataset.step), v = stockOf(p) ?? 0;
+    setStock(p.id, Math.max(0, v + Number(b.dataset.d)));
+  }));
+  el.querySelectorAll("[data-stock]").forEach((inp) => inp.addEventListener("change", () => {
+    const n = parseInt(inp.value);
+    if (!(n >= 0)) { inp.value = stockOf(byId(inp.dataset.stock)) ?? ""; return; }
+    setStock(inp.dataset.stock, n); toast("Stock actualizado");
+  }));
+  el.querySelectorAll("[data-unlim]").forEach((c) => c.addEventListener("change", () => {
+    const stock = { ...(settings.stock || {}) };
+    if (c.checked) delete stock[c.dataset.unlim]; else stock[c.dataset.unlim] = 10;
+    saveSettings({ stock }, true);
+  }));
   el.querySelectorAll("[data-avail]").forEach((c) => c.addEventListener("change", () => {
     const so = new Set(settings.soldOut || []);
     c.checked ? so.delete(c.dataset.avail) : so.add(c.dataset.avail);
@@ -1927,8 +2039,10 @@ function renderSettings() {
     <div class="panel"><h3>Datos de pago</h3><p class="hint">Lo que ve el cliente al elegir cada método.</p>
       ${CONFIG.payMethods.filter((m) => m.infoKey).map((m) => `<label class="field"><span>${esc(m.name)}</span><input class="input" data-pay="${m.infoKey}" value="${esc(s.pay?.[m.infoKey] || "")}"></label>`).join("")}
     </div>
+    <div class="panel" id="installPanel" ${IN_VIEWER ? "hidden" : ""}><h3>App en el teléfono</h3><p class="hint" id="installHint">${isStandalone() ? "Ya estás usando la app instalada." : "Instala el panel como app: ícono en la pantalla de inicio, pantalla completa y funciona aunque se caiga el internet un momento."}</p>${isStandalone() ? "" : `<div class="btn-row" style="margin-top:10px"><button class="btn sm purple" id="installBtn">Instalar app</button></div>`}</div>
     <div class="panel"><h3>Conexión</h3><p class="hint">${Backend.mode === "db" ? "Conectado a la base de datos compartida: la tienda y este panel ven los mismos pedidos en tiempo real." : "Modo local: los pedidos se guardan en este navegador y se sincronizan entre pestañas. En producción se conecta a un servidor."}</p></div>`;
   const num = (v) => Math.max(0, parseFloat(v) || 0);
+  $("#installBtn")?.addEventListener("click", installApp);
   $("#stOpen").addEventListener("change", (e) => saveSettings({ open: e.target.checked }, true));
   $("#stRate").addEventListener("change", (e) => saveSettings({ rate: num(e.target.value) }, true));
   $("#stPrep").addEventListener("change", (e) => saveSettings({ prepMinutes: Math.min(90, Math.max(5, parseInt(e.target.value) || 20)) }, true));
@@ -2084,6 +2198,22 @@ $("#lbDownload").addEventListener("click", async () => {
     } catch (e) { if (e?.code !== "declined" && e?.code !== "cancelled") toast("No se pudo descargar la etiqueta."); return; }
   }
 });
+
+/* App instalable (PWA) */
+let installEvt = null;
+const isStandalone = () => window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); installEvt = e; });
+window.addEventListener("appinstalled", () => { installEvt = null; toast("App instalada. Búscala en tu pantalla de inicio."); });
+async function installApp() {
+  if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); if (r?.outcome === "accepted") installEvt = null; return; }
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  $("#installHint").textContent = ios
+    ? "En iPhone: abre esta página en Safari, toca Compartir y luego “Agregar a inicio”."
+    : "En Android: abre el menú ⋮ de Chrome y toca “Instalar app” o “Agregar a la pantalla principal”.";
+}
+if (!IN_VIEWER && "serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
 
 /* =========================================================
    Router e inicio

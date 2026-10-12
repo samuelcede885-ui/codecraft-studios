@@ -1,0 +1,22 @@
+{
+  "name": "Rafa's Panel",
+  "short_name": "Rafa's",
+  "description": "Pedidos, comprobantes, cocina, delivery, inventario y reportes de Rafa's Casual Food.",
+  "id": "./#panel",
+  "start_url": "./#panel",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#5e4497",
+  "theme_color": "#7457b0",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Pedidos", "url": "./#panel" },
+    { "name": "Tienda", "url": "./" }
+  ]
+}

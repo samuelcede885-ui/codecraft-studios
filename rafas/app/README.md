@@ -16,11 +16,23 @@ Un solo archivo (`index.html`) con dos caras:
 | **Alertas** | Cada pedido nuevo y cada comprobante llega como notificación con sonido y vibración, más un aviso arriba de la pantalla. |
 | **Etiquetas** | Etiqueta para el paquete (58 u 80 mm) con número de pedido, cliente, teléfono, dirección, referencia, productos, total, si se cobra o ya está pagado y un QR que abre la dirección en Google Maps. Se pueden imprimir una o todas las listas. |
 | **Reportes** | Ventas, ticket promedio, ventas por hora, más vendidos, métodos de pago y zonas. Exporta la tabla para Excel. |
-| **Menú** | Marcar productos como agotados y cambiar precios; la tienda se actualiza sola. |
+| **Inventario** | Stock por producto con botones −/+/+10, “Sin límite” para lo que no se cuenta, aviso de poco stock (umbral configurable), pausar un producto y cambiar precios. Cada pedido descuenta el stock, cada cancelación lo devuelve, y en 0 la tienda lo muestra “Agotado” y no deja comprarlo. |
 | **Clientes** | Quién compra más, cuántos pedidos lleva y acceso directo a WhatsApp. |
 | **Ajustes** | Abrir/cerrar el local, tasa del día, meta de cocina, ancho de etiqueta, zonas con su costo, repartidores y datos de pago que ve el cliente. |
 
 Desde el pedido también se manda un **WhatsApp al cliente** con el mensaje según el estado, y al **repartidor** con la dirección y el link del mapa.
+
+## Instalar la app en el teléfono
+
+El panel es una app instalable (PWA): `manifest.webmanifest`, `sw.js` e `icons/`.
+
+1. La carpeta `rafas/` tiene que estar en un sitio con `https://` (las apps instalables no funcionan desde un archivo local).
+2. Abre `https://<tu-sitio>/app/#panel` en el teléfono del local.
+3. **Android (Chrome):** Más › Ajustes › *Instalar app*, o el menú ⋮ › *Instalar app*.
+   **iPhone (Safari):** Compartir › *Agregar a inicio*.
+4. Queda el ícono “Rafa's” en la pantalla de inicio; abre directo en el panel, a pantalla completa y sin barra del navegador.
+
+Cada vez que publiques cambios, sube el número de `CACHE` en `sw.js` (`rafas-panel-v2`, `v3`…) para que los teléfonos descarguen la versión nueva.
 
 ## Cómo se conecta hoy
 

@@ -1,6 +1,6 @@
 // Service worker: deja la app abrir sin conexión y carga más rápido.
 // Sube CACHE (v2, v3…) cada vez que publiques cambios para que los teléfonos tomen la versión nueva.
-const CACHE = "rafas-panel-v2";
+const CACHE = "rafas-panel-v3";
 const SHELL = [
   "./",
   "./index.html",

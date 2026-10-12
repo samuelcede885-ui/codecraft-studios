@@ -474,6 +474,19 @@ textarea.input { resize: vertical; min-height: 70px; }
 .stat b { display: block; font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 4px; }
 .stat small { color: var(--muted); font-size: .74rem; }
 .chart { position: relative; margin-top: 12px; }
+.mgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; margin-bottom: 12px; }
+.delta { display: inline-flex; align-items: center; gap: 3px; font-size: .72rem; font-weight: 800; margin-top: 4px; }
+.delta.up { color: var(--st-done); }
+.delta.down { color: var(--st-cancel); }
+.delta.flat { color: var(--muted); }
+.mcols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.mcols .panel { margin-bottom: 0; }
+.mtable { width: 100%; border-collapse: collapse; font-size: .84rem; margin-top: 10px; }
+.mtable th { text-align: left; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 800; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.mtable td { padding: 9px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.mtable td:not(:first-child), .mtable th:not(:first-child) { text-align: right; }
+.m-empty { background: var(--surface); border-radius: 20px; padding: 34px 20px; text-align: center; color: var(--muted); box-shadow: var(--shadow); }
+.m-empty b { display: block; color: var(--ink); font-size: 1.05rem; margin-bottom: 6px; }
 .chart svg { width: 100%; height: 180px; display: block; overflow: visible; }
 .chart .bar { fill: var(--purple); }
 .chart .bar:hover, .chart .bar.hot { fill: var(--purple-deep); }
@@ -780,15 +793,19 @@ textarea.input { resize: vertical; min-height: 70px; }
       <ul class="alist" id="aList"></ul>
     </section>
 
+    <section data-pane="metrics" hidden>
+      <div class="pane-head"><h2>Métricas</h2><span class="kicker" id="mSub"></span></div>
+      <div id="mBody"></div>
+    </section>
+
     <section data-pane="more" hidden>
       <div class="more-nav" role="group" aria-label="Secciones">
-        <button data-sub="reports" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reportes</button>
-        <button data-sub="catalog" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></svg>Inventario</button>
+        <button data-pane-btn="alerts" aria-pressed="false" style="position:relative"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Alertas<span class="badge" data-unread hidden style="top:6px;right:calc(50% - 26px)">0</span></button>
+        <button data-sub="catalog" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></svg>Inventario</button>
         <button data-sub="clients" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5 5 0 0 1 3.5 6"/></svg>Clientes</button>
         <button data-sub="settings" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.6 15H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9.7 4.3V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1.3z"/></svg>Ajustes</button>
       </div>
-      <div data-subpane="reports"></div>
-      <div data-subpane="catalog" hidden></div>
+      <div data-subpane="catalog"></div>
       <div data-subpane="clients" hidden></div>
       <div data-subpane="settings" hidden></div>
     </section>
@@ -798,7 +815,7 @@ textarea.input { resize: vertical; min-height: 70px; }
     <button class="tab active" data-pane-btn="orders"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span>Pedidos</span><span class="badge" data-pending hidden>0</span></button>
     <button class="tab" data-pane-btn="kitchen"><svg viewBox="0 0 24 24"><path d="M6 13h12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM4 13h16M8 13V9a4 4 0 0 1 8 0v4"/></svg><span>Cocina</span><span class="badge" data-cooking hidden>0</span></button>
     <button class="tab" data-pane-btn="delivery"><svg viewBox="0 0 24 24"><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M8.5 17h7M3 12h9l2-5h3l3 6M14 7l1.5 10"/></svg><span>Delivery</span><span class="badge" data-ready hidden>0</span></button>
-    <button class="tab" data-pane-btn="alerts"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>Alertas</span><span class="badge" data-unread hidden>0</span></button>
+    <button class="tab" data-pane-btn="metrics"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Métricas</span></button>
     <button class="tab" data-pane-btn="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span>Más</span><span class="badge" data-lowstock hidden>0</span></button>
   </nav>
 
@@ -994,7 +1011,6 @@ const Backend = (() => {
       );
       db.doc("config/store").onSnapshot((snap) => { const s = snap.exists ? snap.data() : null; subs.settings.forEach((cb) => cb(s)); }, () => setLive(false));
     } else {
-      if (!localStorage.getItem(K.orders)) seedLocal();
       emitLocal();
     }
     return mode;
@@ -1046,45 +1062,6 @@ function setLive(on) {
   const t = $("#liveTag");
   t.classList.toggle("off", !on);
   t.textContent = on ? (Backend.mode === "db" ? "En vivo" : "Modo local") : "Sin conexión";
-}
-
-/* Pedidos de ejemplo solo para el modo local (fuera de claude.ai). */
-function seedLocal() {
-  const now = Date.now();
-  const mk = (min, status, name, zone, items, method, extra = {}) => {
-    const createdAt = now - min * 60000;
-    const sub = items.reduce((n, i) => n + i.price * i.qty, 0);
-    const fee = zone ? zone.fee : 0;
-    const tl = [{ at: createdAt, type: "created" }];
-    if (method !== "efectivo") tl.push({ at: createdAt + 20000, type: "receipt" });
-    if (["cocina", "listo", "camino", "entregado"].includes(status)) tl.push({ at: createdAt + 120000, type: "status", status: "cocina" });
-    if (["listo", "camino", "entregado"].includes(status)) tl.push({ at: createdAt + 900000, type: "status", status: "listo" });
-    if (["camino", "entregado"].includes(status)) tl.push({ at: createdAt + 1000000, type: "status", status: "camino" });
-    if (status === "entregado") tl.push({ at: createdAt + 1800000, type: "status", status: "entregado" });
-    return { code: codeFor(createdAt), createdAt, status, example: true,
-      customer: { name, phone: "0412" + String(1000000 + Math.floor(Math.random() * 8999999)) },
-      delivery: zone ? { type: "delivery", zoneId: zone.id, zoneName: zone.name, address: "Calle de ejemplo, edificio 4, apto 2B", reference: "Frente a la plaza" } : { type: "pickup" },
-      items, subtotal: sub, fee, total: sub + fee, rate: CONFIG.defaults.rate,
-      payment: { method, ref: method === "efectivo" ? "" : "123456", status: status === "verificar" ? "pending" : "verified" },
-      hasReceipt: false, notes: "", driverId: status === "camino" || status === "entregado" ? "d1" : null, timeline: tl, ...extra };
-  };
-  const P = (id, qty, choices) => { const p = CONFIG.products.find((x) => x.id === id); return { id, name: p.name, price: p.price, qty, choices }; };
-  const z = CONFIG.defaults.zones;
-  const list = [
-    mk(3, "verificar", "Ana Pérez", z[1], [P("bacon-cloud", 2, ["Papas", "Regular"]), P("la-mentirosa", 1, ["Regular"])], "pagomovil", { notes: "Una sin cebolla" }),
-    mk(9, "nuevo", "José Rivas", null, [P("la-antiburger", 1, ["Aros"])], "efectivo"),
-    mk(18, "cocina", "María Gómez", z[0], [P("la-cabrona", 1, ["Papas"]), P("trufalina-chicken", 2, [])], "zelle"),
-    mk(31, "listo", "Pedro Silva", z[2], [P("bacon-cloud", 2, ["Papas", "Regular"])], "binance"),
-    mk(46, "camino", "Lucía Torres", z[3], [P("bacon-cloud", 1, ["Aros", "Regular"])], "transferencia"),
-    mk(140, "entregado", "Carlos Méndez", z[1], [P("la-cabrona", 2, ["Aros"])], "pagomovil"),
-  ];
-  const all = {};
-  list.forEach((o, i) => { all["ex" + i] = { id: "ex" + i, ...o }; });
-  if (!localStorage.getItem("md-settings")) {
-    const ids = CONFIG.products.map((p) => p.id);
-    lsSet("md-settings", { ...CONFIG.defaults, stock: { [ids[0]]: 20, [ids[1]]: 3, [ids[2]]: 12 } });
-  }
-  localStorage.setItem("md-orders", JSON.stringify(all));
 }
 
 /* =========================================================
@@ -1493,7 +1470,8 @@ function renderTracking() {
 /* =========================================================
    PANEL DEL DUEÑO
    ========================================================= */
-let pane = "orders", sub = "reports", oFilter = "activos", oQuery = "", reportRange = "today";
+let mRange = "today";
+let pane = "orders", sub = "catalog", oFilter = "activos", oQuery = "";
 const ACTIVE = ["nuevo", "verificar", "cocina", "listo", "camino"];
 const FILTERS = [
   { id: "activos", label: "Activos", test: (o) => ACTIVE.includes(o.status) },
@@ -1516,6 +1494,7 @@ function renderAdmin() {
   if (pane === "delivery") renderDelivery();
   if (pane === "alerts") renderAlerts();
   if (pane === "more") renderMore();
+  if (pane === "metrics") renderMetrics();
   if ($("#orderSheet").classList.contains("open")) renderOrderSheet();
 }
 function renderHeader() {
@@ -1868,8 +1847,8 @@ $("#adminView").addEventListener("click", (e) => {
   if (pb) { setPane(pb.dataset.paneBtn); return; }
   const sb = e.target.closest("[data-sub]");
   if (sb) { sub = sb.dataset.sub; renderMore(); return; }
-  const rr = e.target.closest("[data-range]");
-  if (rr) { reportRange = rr.dataset.range; renderMore(); return; }
+  const mr = e.target.closest("[data-mrange]");
+  if (mr) { mRange = mr.dataset.mrange; renderMetrics(); return; }
 });
 $("#viewerClose").addEventListener("click", () => ($("#viewer").hidden = true));
 $("#viewer").addEventListener("click", (e) => { if (e.target.id === "viewer") $("#viewer").hidden = true; });
@@ -1889,70 +1868,133 @@ function setPane(p) {
 function renderMore() {
   $$("[data-sub]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sub === sub)));
   $$("[data-subpane]").forEach((s) => (s.hidden = s.dataset.subpane !== sub));
-  if (sub === "reports") renderReports();
   if (sub === "catalog") renderCatalog();
   if (sub === "clients") renderClients();
   if (sub === "settings") renderSettings();
 }
-function renderReports() {
-  const from = reportRange === "today" ? startOfDay() : reportRange === "week" ? startOfDay() - 6 * 86400000 : 0;
-  const list = orders.filter((o) => o.createdAt >= from && o.status !== "cancelado");
-  const cancelled = orders.filter((o) => o.createdAt >= from && o.status === "cancelado").length;
-  const sales = list.reduce((n, o) => n + o.total, 0);
-  const avg = list.length ? sales / list.length : 0;
-  const deliv = list.filter((o) => o.delivery.type === "delivery").length;
-  const byHour = Array.from({ length: 24 }, () => 0);
-  list.forEach((o) => (byHour[new Date(o.createdAt).getHours()] += o.total));
-  const first = Math.min(11, ...byHour.map((v, i) => (v ? i : 99)));
-  const last = Math.max(23, ...byHour.map((v, i) => (v ? i : -1)));
-  const hours = byHour.slice(first, last + 1).map((v, i) => ({ h: first + i, v }));
+function renderMetrics() {
+  const DAY = 86400000, t0 = startOfDay();
+  const ranges = {
+    today: { label: "Hoy", from: t0, to: Date.now() + 1, prevFrom: t0 - DAY, prevTo: t0, byDay: false, cmp: "vs. ayer" },
+    yesterday: { label: "Ayer", from: t0 - DAY, to: t0, prevFrom: t0 - 2 * DAY, prevTo: t0 - DAY, byDay: false, cmp: "vs. anteayer" },
+    week: { label: "7 días", from: t0 - 6 * DAY, to: Date.now() + 1, prevFrom: t0 - 13 * DAY, prevTo: t0 - 6 * DAY, byDay: true, cmp: "vs. 7 días antes" },
+    month: { label: "30 días", from: t0 - 29 * DAY, to: Date.now() + 1, prevFrom: t0 - 59 * DAY, prevTo: t0 - 29 * DAY, byDay: true, cmp: "vs. 30 días antes" },
+    all: { label: "Todo", from: 0, to: Date.now() + 1, prevFrom: 0, prevTo: 0, byDay: true, cmp: "" },
+  };
+  const R = ranges[mRange];
+  const inR = (o, f, t) => o.createdAt >= f && o.createdAt < t;
+  const all = orders.filter((o) => inR(o, R.from, R.to));
+  const prevAll = R.prevTo ? orders.filter((o) => inR(o, R.prevFrom, R.prevTo)) : [];
+  const ok = (l) => l.filter((o) => o.status !== "cancelado");
+  const list = ok(all), prev = ok(prevAll);
+  const sum = (l) => l.reduce((n, o) => n + o.total, 0);
+  const avg = (a) => (a.length ? a.reduce((n, x) => n + x, 0) / a.length : null);
+  const at = (o, st) => o.timeline?.find((e) => e.type === "status" && e.status === st)?.at;
+  const minsBetween = (l, a, b) => avg(l.map((o) => { const x = a === "created" ? o.createdAt : at(o, a), y = at(o, b); return x && y && y > x ? (y - x) / 60000 : null; }).filter((v) => v != null));
+  const custKey = (o) => waPhone(o.customer.phone) || o.customer.name;
+  const firstSeen = {};
+  orders.filter((o) => o.status !== "cancelado").forEach((o) => { const k = custKey(o); if (!firstSeen[k] || o.createdAt < firstSeen[k]) firstSeen[k] = o.createdAt; });
+  const custs = new Set(list.map(custKey));
+  const newCust = [...custs].filter((k) => firstSeen[k] >= R.from).length;
+
+  const sales = sum(list), pSales = sum(prev);
+  const ticket = list.length ? sales / list.length : 0, pTicket = prev.length ? pSales / prev.length : 0;
+  const cancelRate = all.length ? (all.length - list.length) / all.length : 0;
+  const rejected = all.filter((o) => o.payment?.status === "rejected").length;
+  const prep = minsBetween(list, "cocina", "listo"), road = minsBetween(list, "camino", "entregado"), total = minsBetween(list, "created", "entregado");
+  const delta = (cur, before, invert) => {
+    if (!R.cmp || !before) return R.cmp && cur ? `<span class="delta flat">Nuevo ${R.cmp}</span>` : `<span class="delta flat">&nbsp;</span>`;
+    const pct = ((cur - before) / before) * 100;
+    if (Math.abs(pct) < 0.5) return `<span class="delta flat">= ${R.cmp}</span>`;
+    const good = invert ? pct < 0 : pct > 0;
+    return `<span class="delta ${good ? "up" : "down"}">${pct > 0 ? "▲" : "▼"} ${Math.abs(pct).toFixed(0)}% <span style="font-weight:600;color:var(--muted)">${R.cmp}</span></span>`;
+  };
+  const fmtMin = (m) => (m == null ? "—" : m < 60 ? `${Math.round(m)} min` : `${Math.floor(m / 60)} h ${Math.round(m % 60)} min`);
+  $("#mSub").textContent = `${R.label} · se actualiza solo`;
+
+  const chips = `<div class="chips" role="group" aria-label="Rango">${Object.entries(ranges).map(([id, r]) => `<button class="chip" data-mrange="${id}" aria-pressed="${mRange === id}">${r.label}</button>`).join("")}</div>`;
+  if (!all.length) {
+    $("#mBody").innerHTML = chips + `<div class="m-empty"><b>Todavía no hay pedidos ${mRange === "all" ? "" : "en este rango"}</b>Las métricas se llenan solas con cada pedido real que entre por la tienda.</div>`;
+    return;
+  }
+
+  // series: per hour (single day) or per day
+  let series;
+  if (!R.byDay) {
+    const byH = Array.from({ length: 24 }, (_, h) => ({ k: `${h}h`, tip: `${h}:00`, v: 0 }));
+    list.forEach((o) => (byH[new Date(o.createdAt).getHours()].v += o.total));
+    const used = byH.map((x, i) => (x.v ? i : -1)).filter((i) => i >= 0);
+    const a = Math.min(11, ...used), b = Math.max(22, ...used);
+    series = byH.slice(a, b + 1);
+  } else {
+    const start = mRange === "all" ? startOfDay(new Date(Math.min(...list.map((o) => o.createdAt)))) : R.from;
+    const days = Math.max(1, Math.round((startOfDay() - start) / DAY) + 1);
+    series = Array.from({ length: Math.min(days, 60) }, (_, i) => { const d = start + (days > 60 ? days - 60 + i : i) * DAY; return { k: dmy(d), tip: new Date(d).toLocaleDateString("es-VE", { weekday: "short", day: "numeric", month: "short" }), v: 0, d }; });
+    list.forEach((o) => { const x = series.find((s) => o.createdAt >= s.d && o.createdAt < s.d + DAY); if (x) x.v += o.total; });
+  }
+  const maxV = Math.max(1, ...series.map((x) => x.v));
+  const W = 320, H = 150, bw = W / series.length, step = Math.ceil(series.length / 8);
+  const chart = `<div class="chart" id="mChart"><svg viewBox="0 0 ${W + 40} ${H + 22}" role="img" aria-label="Ventas ${R.byDay ? "por día" : "por hora"}">
+    ${[0, maxV / 2, maxV].map((t) => { const y = H - (t / maxV) * H + 4; return `<line class="grid-l" x1="40" x2="${W + 40}" y1="${y}" y2="${y}"/><text x="36" y="${y + 3}" text-anchor="end">${CONFIG.currency.trim()}${Math.round(t)}</text>`; }).join("")}
+    ${series.map((x, i) => { const h = (x.v / maxV) * H, bx = 40 + i * bw + 1, w = Math.max(2, bw - 2); return `<path class="bar" data-tip="${x.tip} · ${money(x.v)}" d="${barPath(bx, H + 4 - h, w, h)}"/><rect x="${bx}" y="4" width="${w}" height="${H}" fill="transparent" data-tip="${x.tip} · ${money(x.v)}" class="hit"/>${i % step === 0 ? `<text x="${bx + w / 2}" y="${H + 18}" text-anchor="middle">${x.k}</text>` : ""}`; }).join("")}
+  </svg><span class="tip" id="mTip" hidden></span></div>`;
+
+  // breakdowns
   const prod = {};
-  list.forEach((o) => o.items.forEach((i) => { prod[i.name] = prod[i.name] || { q: 0, v: 0 }; prod[i.name].q += i.qty; prod[i.name].v += i.qty * i.price; }));
-  const top = Object.entries(prod).sort((a, b) => b[1].q - a[1].q).slice(0, 5);
-  const pays = {};
-  list.forEach((o) => (pays[o.payment.method] = (pays[o.payment.method] || 0) + o.total));
-  const payList = Object.entries(pays).sort((a, b) => b[1] - a[1]);
-  const zones = {};
-  list.filter((o) => o.delivery.type === "delivery").forEach((o) => (zones[o.delivery.zoneName] = (zones[o.delivery.zoneName] || 0) + 1));
-  const maxH = Math.max(1, ...hours.map((x) => x.v));
-  const W = 320, H = 150, bw = W / hours.length;
-  const ticks = [0, maxH / 2, maxH];
-  const hbar = (rows, fmt) => rows.length ? `<ul class="hbars">${rows.map(([k, v, extra]) => `<li><div class="hb-top"><span>${esc(k)}</span><b>${fmt(v, extra)}</b></div><div class="track"><div class="fill" style="width:${(v / Math.max(...rows.map((r) => r[1]))) * 100}%"></div></div></li>`).join("")}</ul>` : `<p class="hint" style="margin-top:10px;color:var(--muted);font-size:.84rem">Sin datos en este rango.</p>`;
-  $('[data-subpane="reports"]').innerHTML = `
-    <div class="chips" role="group" aria-label="Rango">${[["today", "Hoy"], ["week", "7 días"], ["all", "Todo"]].map(([id, l]) => `<button class="chip" data-range="${id}" aria-pressed="${reportRange === id}">${l}</button>`).join("")}</div>
-    <div class="stats">
-      <div class="stat"><span>Ventas</span><b>${money(sales)}</b><small>${settings.rate ? bs(sales, settings.rate) : "&nbsp;"}</small></div>
-      <div class="stat"><span>Pedidos</span><b>${list.length}</b><small>${cancelled} cancelados</small></div>
-      <div class="stat"><span>Ticket promedio</span><b>${money(avg)}</b><small>por pedido</small></div>
-      <div class="stat"><span>Delivery</span><b>${list.length ? Math.round((deliv / list.length) * 100) : 0}%</b><small>${list.length - deliv} retiros</small></div>
+  list.forEach((o) => o.items.forEach((i) => { const p = (prod[i.id] = prod[i.id] || { name: i.name, q: 0, v: 0 }); p.q += i.qty; p.v += i.qty * i.price; }));
+  const prodRows = Object.values(prod).sort((a, b) => b.q - a.q);
+  const unsold = CONFIG.products.filter((p) => !prod[p.id]).map((p) => p.name);
+  const group = (fn) => { const g = {}; list.forEach((o) => { const k = fn(o); if (k) { g[k] = g[k] || { n: 0, v: 0 }; g[k].n++; g[k].v += o.total; } }); return Object.entries(g).sort((a, b) => b[1].v - a[1].v); };
+  const pays = group((o) => payName(o.payment.method));
+  const zones = group((o) => (o.delivery.type === "delivery" ? o.delivery.zoneName : "Retiro en tienda"));
+  const wd = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  const byWd = group((o) => wd[new Date(o.createdAt).getDay()]);
+  const drv = {};
+  list.filter((o) => o.driverId && o.status === "entregado").forEach((o) => { const d = (drv[o.driverId] = drv[o.driverId] || { n: 0, mins: [] }); d.n++; const a = at(o, "camino"), b = at(o, "entregado"); if (a && b) d.mins.push((b - a) / 60000); });
+  const hbar = (rows, fmt) => rows.length ? `<ul class="hbars">${rows.map(([k, v, extra]) => `<li><div class="hb-top"><span>${esc(k)}</span><b>${fmt(v, extra)}</b></div><div class="track"><div class="fill" style="width:${(v / Math.max(...rows.map((r) => r[1]))) * 100}%"></div></div></li>`).join("")}</ul>` : `<p class="hint" style="margin-top:10px">Sin datos en este rango.</p>`;
+
+  $("#mBody").innerHTML = chips + `
+    <div class="mgrid">
+      <div class="stat"><span>Ventas</span><b>${money(sales)}</b>${delta(sales, pSales)}</div>
+      <div class="stat"><span>Pedidos</span><b>${list.length}</b>${delta(list.length, prev.length)}</div>
+      <div class="stat"><span>Ticket promedio</span><b>${money(ticket)}</b>${delta(ticket, pTicket)}</div>
+      <div class="stat"><span>Clientes</span><b>${custs.size}</b><small>${newCust} nuevo${newCust === 1 ? "" : "s"} · ${custs.size - newCust} repiten</small></div>
     </div>
-    <div class="panel"><h3>Ventas por hora</h3>
-      <div class="chart" id="hourChart">
-        <svg viewBox="0 0 ${W + 34} ${H + 22}" role="img" aria-label="Ventas por hora">
-          ${ticks.map((t) => { const y = H - (t / maxH) * H + 4; return `<line class="grid-l" x1="34" x2="${W + 34}" y1="${y}" y2="${y}"/><text x="30" y="${y + 3}" text-anchor="end">${CONFIG.currency}${Math.round(t)}</text>`; }).join("")}
-          ${hours.map((x, i) => { const h = (x.v / maxH) * H; const bx = 34 + i * bw + 1; const w = Math.max(2, bw - 2); return `<path class="bar" data-tip="${x.h}:00 · ${money(x.v)}" d="${barPath(bx, H + 4 - h, w, h)}"/>${i % 2 === 0 ? `<text x="${bx + w / 2}" y="${H + 18}" text-anchor="middle">${x.h}h</text>` : ""}`; }).join("")}
-        </svg>
-        <span class="tip" id="chartTip" hidden></span>
+    <div class="mgrid">
+      <div class="stat"><span>Tiempo en cocina</span><b>${fmtMin(prep)}</b><small>meta ${settings.prepMinutes} min</small></div>
+      <div class="stat"><span>Tiempo de entrega</span><b>${fmtMin(road)}</b><small>desde que sale</small></div>
+      <div class="stat"><span>Pedido completo</span><b>${fmtMin(total)}</b><small>de pedir a recibir</small></div>
+      <div class="stat"><span>Cancelados</span><b>${Math.round(cancelRate * 100)}%</b><small>${all.length - list.length} pedidos · ${rejected} pagos rechazados</small></div>
+    </div>
+    <div class="panel"><h3>Ventas ${R.byDay ? "por día" : "por hora"} <span class="kicker">${settings.rate ? bs(sales, settings.rate) : ""}</span></h3>${chart}</div>
+    <div class="mcols">
+      <div class="panel"><h3>Productos</h3>
+        <table class="mtable"><thead><tr><th>Producto</th><th>Unid.</th><th>Ventas</th></tr></thead><tbody>
+        ${prodRows.map((p) => `<tr><td>${esc(p.name)}</td><td>${p.q}</td><td>${money(p.v)}</td></tr>`).join("")}</tbody></table>
+        ${unsold.length ? `<p class="hint" style="margin-top:10px">Sin ventas: ${esc(unsold.join(", "))}</p>` : ""}
       </div>
+      <div class="panel"><h3>Métodos de pago</h3>${hbar(pays.map(([k, v]) => [k, v.v, v.n]), (v, n) => `${money(v)} · ${n}`)}</div>
+      <div class="panel"><h3>Zonas y retiro</h3>${hbar(zones.map(([k, v]) => [k, v.n, v.v]), (n, v) => `${n} · ${money(v)}`)}</div>
+      ${R.byDay ? `<div class="panel"><h3>Días de la semana</h3>${hbar(wd.map((d) => [d, byWd.find(([k]) => k === d)?.[1].v || 0]).filter(([, v]) => v), (v) => money(v))}</div>` : ""}
+      <div class="panel"><h3>Repartidores</h3>${Object.keys(drv).length ? `<table class="mtable"><thead><tr><th>Repartidor</th><th>Entregas</th><th>Promedio</th></tr></thead><tbody>${Object.entries(drv).sort((a, b) => b[1].n - a[1].n).map(([id, d]) => `<tr><td>${esc(driverName(id) || "—")}</td><td>${d.n}</td><td>${fmtMin(avg(d.mins))}</td></tr>`).join("")}</tbody></table>` : `<p class="hint" style="margin-top:10px">Aún no hay entregas en este rango.</p>`}</div>
     </div>
-    <div class="panel"><h3>Más vendidos</h3>${hbar(top.map(([k, v]) => [k, v.q, v.v]), (q, v) => `${q} u · ${money(v)}`)}</div>
-    <div class="panel"><h3>Por método de pago</h3>${hbar(payList.map(([k, v]) => [payName(k), v]), (v) => money(v))}</div>
-    <div class="panel"><h3>Pedidos por zona</h3>${hbar(Object.entries(zones).sort((a, b) => b[1] - a[1]), (v) => `${v}`)}</div>
-    <div class="panel"><h3>Exportar <span></span></h3><p class="hint">Copia las ventas del rango en formato de tabla para pegarlas en Excel o Google Sheets.</p><div class="btn-row" style="margin-top:10px"><button class="btn sm ghost" id="exportBtn">${ICON.copy}Copiar tabla de ventas</button></div></div>`;
-  const chart = $("#hourChart"), tip = $("#chartTip");
-  chart.addEventListener("pointermove", (e) => {
-    const bar = e.target.closest(".bar");
-    $$(".bar.hot", chart).forEach((b) => b !== bar && b.classList.remove("hot"));
-    if (!bar) { tip.hidden = true; return; }
-    bar.classList.add("hot");
-    const r = chart.getBoundingClientRect(), br = bar.getBoundingClientRect();
-    tip.hidden = false; tip.textContent = bar.dataset.tip;
-    tip.style.left = `${br.left - r.left + br.width / 2}px`; tip.style.top = `${br.top - r.top}px`;
+    <div class="panel" style="margin-top:12px"><h3>Exportar</h3><p class="hint">Copia los pedidos del rango como tabla para pegarlos en Excel o Google Sheets.</p><div class="btn-row" style="margin-top:10px"><button class="btn sm ghost" id="exportBtn">${ICON.copy}Copiar tabla</button></div></div>`;
+
+  const c = $("#mChart"), tip = $("#mTip");
+  c.addEventListener("pointermove", (e) => {
+    const t = e.target.closest("[data-tip]");
+    $$(".bar.hot", c).forEach((b) => b.classList.remove("hot"));
+    if (!t) { tip.hidden = true; return; }
+    const bar = t.classList.contains("bar") ? t : t.previousElementSibling;
+    bar?.classList.add("hot");
+    const r = c.getBoundingClientRect(), br = (bar || t).getBoundingClientRect();
+    tip.hidden = false; tip.textContent = t.dataset.tip;
+    tip.style.left = `${Math.min(Math.max(br.left - r.left + br.width / 2, 60), r.width - 60)}px`; tip.style.top = `${br.top - r.top}px`;
   });
-  chart.addEventListener("pointerleave", () => { tip.hidden = true; $$(".bar.hot", chart).forEach((b) => b.classList.remove("hot")); });
+  c.addEventListener("pointerleave", () => { tip.hidden = true; $$(".bar.hot", c).forEach((b) => b.classList.remove("hot")); });
   $("#exportBtn").addEventListener("click", () => {
     const rows = [["Pedido", "Fecha", "Hora", "Cliente", "Teléfono", "Entrega", "Zona", "Método", "Estado", "Subtotal", "Delivery", "Total"]];
-    list.forEach((o) => rows.push([o.code, dmy(o.createdAt), hhmm(o.createdAt), o.customer.name, o.customer.phone, o.delivery.type === "delivery" ? "Delivery" : "Retiro", o.delivery.zoneName || "", payName(o.payment.method), STATUS[o.status].label, o.subtotal.toFixed(2), o.fee.toFixed(2), o.total.toFixed(2)]));
+    all.forEach((o) => rows.push([o.code, dmy(o.createdAt), hhmm(o.createdAt), o.customer.name, o.customer.phone, o.delivery.type === "delivery" ? "Delivery" : "Retiro", o.delivery.zoneName || "", payName(o.payment.method), STATUS[o.status].label, o.subtotal.toFixed(2), o.fee.toFixed(2), o.total.toFixed(2)]));
     copyText(rows.map((r) => r.join("\t")).join("\n"), "Tabla copiada. Pégala en tu hoja de cálculo.");
   });
 }

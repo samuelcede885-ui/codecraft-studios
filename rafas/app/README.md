@@ -13,9 +13,9 @@ Un solo archivo (`index.html`) con dos caras:
 | **Detalle del pedido** | Foto del comprobante (se amplía al tocarla), botones *Pago correcto* / *Rechazar*, datos del cliente, dirección con mapa, productos, total en REF y Bs, repartidor e historial. |
 | **Cocina** | Tarjetas grandes con lo que hay que preparar y cronómetro; se pone en rojo si pasa la meta de minutos. |
 | **Delivery** | Pedidos listos para despachar, asignación de repartidor, pedidos en la calle y estado de cada repartidor. |
-| **Alertas** | Cada pedido nuevo y cada comprobante llega como notificación con sonido y vibración, más un aviso arriba de la pantalla. |
+| **Alertas** (campana o Más › Alertas) | Cada pedido nuevo y cada comprobante llega como notificación con sonido y vibración, más un aviso arriba de la pantalla. |
 | **Etiquetas** | Etiqueta para el paquete (58 u 80 mm) con número de pedido, cliente, teléfono, dirección, referencia, productos, total, si se cobra o ya está pagado y un QR que abre la dirección en Google Maps. Se pueden imprimir una o todas las listas. |
-| **Reportes** | Ventas, ticket promedio, ventas por hora, más vendidos, métodos de pago y zonas. Exporta la tabla para Excel. |
+| **Métricas** | Pestaña propia con rangos Hoy, Ayer, 7 días, 30 días y Todo: ventas, pedidos, ticket promedio y clientes (nuevos y que repiten) comparados con el periodo anterior; tiempo en cocina, de entrega y total; cancelaciones y pagos rechazados; ventas por hora o por día; productos (y cuáles no se vendieron), métodos de pago, zonas, días de la semana y repartidores. Exporta la tabla para Excel. |
 | **Inventario** | Stock por producto con botones −/+/+10, “Sin límite” para lo que no se cuenta, aviso de poco stock (umbral configurable), pausar un producto y cambiar precios. Cada pedido descuenta el stock, cada cancelación lo devuelve, y en 0 la tienda lo muestra “Agotado” y no deja comprarlo. |
 | **Clientes** | Quién compra más, cuántos pedidos lleva y acceso directo a WhatsApp. |
 | **Automático** | Aceptar solos los pedidos en efectivo (van directo a cocina aunque el panel esté cerrado), abrir y cerrar la tienda por horario, e imprimir la etiqueta sola al marcar listo. |
@@ -37,7 +37,7 @@ Cada vez que publiques cambios, sube el número de `CACHE` en `sw.js` (`rafas-pa
 
 ## Cómo se conecta hoy
 
-`Backend` (dentro del `<script>`) guarda en `localStorage` y sincroniza entre pestañas: abre la tienda en una pestaña y `#panel` en otra para probarlo. Si no hay pedidos, carga 6 de ejemplo.
+`Backend` (dentro del `<script>`) guarda en `localStorage` y sincroniza entre pestañas: abre la tienda en una pestaña y `#panel` en otra para probarlo. Arranca vacía: no trae pedidos ni cifras de ejemplo.
 
 ## Para dárselo al dueño (producción)
 

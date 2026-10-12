@@ -362,6 +362,26 @@ textarea.input { resize: vertical; min-height: 70px; }
 .s-camino { --st: var(--st-road); --st-bg: var(--st-road-bg); }
 .s-entregado { --st: var(--st-done); --st-bg: var(--st-done-bg); }
 .s-cancelado { --st: var(--st-cancel); --st-bg: var(--st-cancel-bg); }
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.login-card { width: min(100%, 420px); background: var(--surface); border-radius: 28px; overflow: hidden; box-shadow: 0 20px 50px rgba(45,25,90,.15); }
+.login-top { color: var(--on-purple); padding: 26px 24px 30px; background: radial-gradient(120% 90% at 85% 0%, var(--purple-glow) 0%, transparent 55%), linear-gradient(160deg, #5e4497 0%, #7457b0 70%); }
+.login-top .logo { font-size: 2.1rem; }
+.login-top small { display: block; margin-top: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; opacity: .85; }
+.login-body { padding: 22px 24px 26px; display: grid; gap: 4px; }
+.login-body h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+.login-body .btn { margin-top: 16px; }
+.login-links { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.login-body.connecting .field, .login-body.connecting .btn, .login-body.connecting .login-links { display: none !important; }
+.login-links button { color: var(--lilac); font-weight: 700; font-size: .82rem; }
+.admin.locked .a-top, .admin.locked .a-body, .admin.locked #adminTabs { display: none; }
+.role-limited [data-pane-btn="more"], .role-limited [data-pane-btn="metrics"], .role-limited #openSwitch { display: none !important; }
+.role-limited #adminTabs { grid-template-columns: repeat(3, 1fr); }
+.staff-row { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.staff-row b { display: block; font-size: .9rem; }
+.staff-row small { color: var(--muted); font-size: .76rem; }
+.staff-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.staff-form .input, .staff-form .select { padding: 10px 12px; font-size: .88rem; }
+.staff-form .btn { grid-column: 1 / -1; }
 .notif-card { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--btn-bg); color: var(--btn-fg); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
 .notif-card .a-ico { width: 44px; height: 44px; background: rgba(164,141,220,.25); color: var(--purple-glow); }
 .notif-card b { display: block; font-size: .95rem; }
@@ -749,6 +769,25 @@ textarea.input { resize: vertical; min-height: 70px; }
 
 <!-- ============ OWNER PANEL ============ -->
 <div id="adminView" class="admin" hidden>
+  <div class="login" id="loginView" hidden>
+    <div class="login-card">
+      <div class="login-top"><span class="logo" data-brand>Rafa's</span><small>Panel del local</small></div>
+      <form class="login-body" id="loginForm" novalidate>
+        <h1 id="loginTitle">Entrar al panel</h1>
+        <p class="desc" id="loginSub">Usa el correo y la contraseña que te dio el dueño.</p>
+        <label class="field"><span>Correo</span><input class="input" id="lgEmail" type="email" autocomplete="username" required></label>
+        <label class="field"><span>Contraseña</span><input class="input" id="lgPass" type="password" autocomplete="current-password" minlength="6" required></label>
+        <label class="field" id="lgCodeWrap" hidden><span>Código de configuración</span><input class="input" id="lgCode" autocomplete="off" placeholder="El que elegiste al publicar"></label>
+        <p class="form-error" id="lgError" role="alert" hidden></p>
+        <button class="btn purple wide" id="lgSubmit" type="submit">Entrar</button>
+        <div class="login-links">
+          <button type="button" id="lgForgot">Olvidé mi contraseña</button>
+          <button type="button" id="lgMode">Primera vez: crear cuenta del dueño</button>
+        </div>
+        <p class="desc" id="lgNoStaff" hidden></p>
+      </form>
+    </div>
+  </div>
   <header class="a-top">
     <div class="a-top-inner">
       <div class="a-bar">
@@ -859,6 +898,7 @@ textarea.input { resize: vertical; min-height: 70px; }
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="printArea"></div>
 
+<script src="firebase-config.js"></script>
 <script>
 /* =========================================================
    CONFIG — cambia esto para cada negocio
@@ -868,15 +908,15 @@ const CONFIG = {
   currency: "REF ",
   demo: false,
   products: [
-    { id: "bacon-cloud", name: "Bacon Cloud Burger", category: "A Lo Que Se Vino", price: 11.99, img: "../img/bacon-cloud.webp",
+    { id: "bacon-cloud", name: "Bacon Cloud Burger", category: "A Lo Que Se Vino", price: 11.99, img: "img/bacon-cloud.webp",
       desc: "Pan, carne de 130g, queso americano, queso crema aliñado, tocineta glaseada, wanton frito, rúcula, sirope de piña y aderezo Chicago.", options: ["acomp", "pan"] },
-    { id: "la-mentirosa", name: "La Mentirosa", category: "A Lo Que Se Vino", price: 10.99, img: "../img/la-mentirosa.webp",
+    { id: "la-mentirosa", name: "La Mentirosa", category: "A Lo Que Se Vino", price: 10.99, img: "img/la-mentirosa.webp",
       desc: "Pan a base de cerveza y malta coronado de nuestra molienda de res especial y patty cremoso de parmigiano.", options: ["pan"] },
-    { id: "la-cabrona", name: "La Cabrona", category: "Promo", price: 14.99, img: "../img/la-cabrona.webp",
+    { id: "la-cabrona", name: "La Cabrona", category: "Promo", price: 14.99, img: "img/la-cabrona.webp",
       desc: "Pan, carne de 200g, patty de queso de cabra con yerbas, champiñones al ajillo, compota bourbon, mostaza miel y coronada con queso Mozzarella.", options: ["acomp"] },
-    { id: "trufalina-chicken", name: "Trufalina Chicken", category: "Por Aquí Sandwich", price: 10.99, img: "../img/trufalina-chicken.webp", photo: true,
+    { id: "trufalina-chicken", name: "Trufalina Chicken", category: "Por Aquí Sandwich", price: 10.99, img: "img/trufalina-chicken.webp", photo: true,
       desc: "Pechuga de pollo crispy, coronada en queso suizo, hongos salteados al ajillo, tocineta, huevo y aderezo.", options: [] },
-    { id: "la-antiburger", name: "La AntiBurger", category: "A Lo Que Se Vino", price: 11.99, img: "../img/la-antiburger.webp", photo: true,
+    { id: "la-antiburger", name: "La AntiBurger", category: "A Lo Que Se Vino", price: 11.99, img: "img/la-antiburger.webp", photo: true,
       desc: "Pan de masa madre, molienda de res especial, mezcla de quesos, tocineta, cebolla crispy, pepinillos y aderezo de pimientos asados. Acompañada con papas o aros de cebolla.", options: ["acomp"] },
   ],
   options: {
@@ -887,10 +927,10 @@ const CONFIG = {
   featuredId: "la-cabrona",
   featuredText: "Carne de 200g, queso de cabra con yerbas y compota bourbon.",
   categories: [
-    { name: "Todas", img: "../img/bacon-cloud.webp" },
-    { name: "A Lo Que Se Vino", img: "../img/la-mentirosa.webp" },
-    { name: "Promo", img: "../img/la-cabrona.webp" },
-    { name: "Por Aquí Sandwich", img: "../img/trufalina-chicken.webp", photo: true },
+    { name: "Todas", img: "img/bacon-cloud.webp" },
+    { name: "A Lo Que Se Vino", img: "img/la-mentirosa.webp" },
+    { name: "Promo", img: "img/la-cabrona.webp" },
+    { name: "Por Aquí Sandwich", img: "img/trufalina-chicken.webp", photo: true },
   ],
   payMethods: [
     { id: "pagomovil", name: "Pago Móvil", proof: true, infoKey: "pagoMovil" },
@@ -914,6 +954,8 @@ const CONFIG = {
     prices: {},
     stock: {},
     lowStock: 3,
+    autoRate: false,
+    igtf: { enabled: false, pct: 3, methods: ["efectivo", "zelle", "binance"] },
     auto: { acceptCash: false, schedule: false, openAt: "11:00", closeAt: "23:00", printOnReady: false },
   },
 };
@@ -992,14 +1034,12 @@ const payName = (id) => CONFIG.payMethods.find((m) => m.id === id)?.name || id;
 const IN_VIEWER = !!window.claude;
 
 /* =========================================================
-   Backend: base de datos compartida del artifact (db) o,
-   fuera de claude.ai, localStorage sincronizado entre pestañas.
-   En producción esto se cambia por Firebase/Supabase con la misma API.
+   Backend: Firebase (si firebase-config.js tiene la configuración)
+   o modo local (localStorage sincronizado entre pestañas) para probar.
    ========================================================= */
 const Backend = (() => {
-  let db = null;
-  let mode = "local";
-  const subs = { orders: new Set(), settings: new Set() };
+  let mode = "local", ready = !window.FIREBASE_CONFIG;
+  const subs = { orders: new Set(), settings: new Set(), auth: new Set(), staff: new Set() };
   const K = { orders: "md-orders", receipts: "md-receipts", settings: "md-settings" };
   const localOrders = () => Object.values(lsGet(K.orders, {})).sort((a, b) => b.createdAt - a.createdAt);
   function emitLocal() {
@@ -1010,61 +1050,189 @@ const Backend = (() => {
   }
   window.addEventListener("storage", (e) => { if (mode === "local" && Object.values(K).includes(e.key)) emitLocal(); });
 
+  /* ---------- Firebase ---------- */
+  const SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+  const sid = window.STORE_ID || "rafas";
+  let F = {}, app, auth, fs, storage, fns, user = null, role = null, unsubOrders = null, unsubStaff = null, authReady;
+  const call = (name, data) => F.fn.httpsCallable(fns, name)({ storeId: sid, ...data }).then((r) => r.data);
+  const cfgRef = () => F.fs.doc(fs, "stores", sid, "config", "public");
+  const ordersCol = () => F.fs.collection(fs, "stores", sid, "orders");
+  function fbError(e, fallback) {
+    const msg = e?.message && !/^(internal|INTERNAL|Firebase:)/.test(e.message) ? e.message.replace(/^.*?\): /, "") : fallback;
+    const err = new Error(msg); err.code = e?.code; return err;
+  }
+  function subscribeOrders() {
+    unsubOrders?.(); unsubOrders = null;
+    const emit = (list) => subs.orders.forEach((cb) => cb(list));
+    const onErr = () => setLive(false);
+    if (role) {
+      unsubOrders = F.fs.onSnapshot(F.fs.query(ordersCol(), F.fs.orderBy("createdAt", "desc"), F.fs.limit(400)), (s) => { setLive(true); emit(s.docs.map((d) => ({ id: d.id, ...d.data() }))); }, onErr);
+    } else if (user) {
+      unsubOrders = F.fs.onSnapshot(F.fs.query(ordersCol(), F.fs.where("customerUid", "==", user.uid)), (s) => emit(s.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => b.createdAt - a.createdAt)), onErr);
+    } else emit([]);
+  }
+  function subscribeStaff() {
+    unsubStaff?.(); unsubStaff = null;
+    if (!["owner", "admin"].includes(role)) { subs.staff.forEach((cb) => cb([])); return; }
+    unsubStaff = F.fs.onSnapshot(F.fs.collection(fs, "stores", sid, "staff"), (s) => { const list = s.docs.map((d) => ({ uid: d.id, ...d.data() })); subs.staff.forEach((cb) => cb(list)); }, () => {});
+  }
+  async function initFirebase() {
+    const names = ["firebase-app", "firebase-auth", "firebase-firestore", "firebase-storage", "firebase-functions"];
+    const [a, au, f, st, fn] = await Promise.all(names.map((n) => import(SDK + n + ".js")));
+    F = { app: a, auth: au, fs: f, st, fn };
+    app = a.initializeApp(window.FIREBASE_CONFIG);
+    auth = au.getAuth(app);
+    try { fs = f.initializeFirestore(app, { localCache: f.persistentLocalCache({ tabManager: f.persistentMultipleTabManager() }) }); }
+    catch { fs = f.getFirestore(app); }
+    storage = st.getStorage(app);
+    fns = fn.getFunctions(app, "us-central1");
+    if (window.FIREBASE_EMULATORS) {
+      au.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+      f.connectFirestoreEmulator(fs, "127.0.0.1", 8080);
+      st.connectStorageEmulator(storage, "127.0.0.1", 9199);
+      fn.connectFunctionsEmulator(fns, "127.0.0.1", 5001);
+    }
+    f.onSnapshot(cfgRef(), (snap) => { const s = snap.exists() ? snap.data() : null; subs.settings.forEach((cb) => cb(s)); }, () => setLive(false));
+    authReady = new Promise((resolve) => {
+      au.onAuthStateChanged(auth, async (u) => {
+        user = u; role = null;
+        if (u && !u.isAnonymous) {
+          const s = await f.getDoc(f.doc(fs, "stores", sid, "staff", u.uid)).catch(() => null);
+          role = s?.exists() ? s.data().role : null;
+        }
+        subscribeOrders(); subscribeStaff();
+        if (["owner", "admin"].includes(role)) syncCatalog().catch(() => {});
+        subs.auth.forEach((cb) => cb({ user, role }));
+        resolve();
+      });
+    });
+    await authReady;
+  }
+  async function ensureCustomer() {
+    if (mode !== "firebase") return;
+    await authReady;
+    if (!user) await F.auth.signInAnonymously(auth);
+  }
+  // El servidor valida precios con este catálogo: lo publica el dueño al entrar.
+  async function syncCatalog() {
+    const catalog = {
+      products: CONFIG.products.map((p) => ({ id: p.id, name: p.name, price: p.price, options: p.options })),
+      options: CONFIG.options,
+      payMethods: CONFIG.payMethods.map((m) => ({ id: m.id, proof: !!m.proof })),
+    };
+    const ref = F.fs.doc(fs, "stores", sid, "config", "catalog");
+    const cur = await F.fs.getDoc(ref);
+    if (!cur.exists() || JSON.stringify(cur.data()) !== JSON.stringify(catalog)) await F.fs.setDoc(ref, catalog);
+    const cfg = await F.fs.getDoc(cfgRef());
+    if (!cfg.exists()) await F.fs.setDoc(cfgRef(), structuredClone(CONFIG.defaults));
+  }
+
   async function init() {
-    if (window.claude?.use) {
-      try { db = await window.claude.use("db"); } catch { db = null; }
+    if (window.FIREBASE_CONFIG) {
+      try { await initFirebase(); mode = "firebase"; ready = true; }
+      catch (e) { console.error(e); toast("No se pudo conectar con el servidor. Revisa tu internet."); setLive(false); }
+      return mode;
     }
-    mode = db ? "db" : "local";
-    if (mode === "db") {
-      db.collection("orders").orderBy("createdAt", "desc").limit(400).onSnapshot(
-        (snap) => { const list = snap.docs.map((d) => ({ id: d.id, ...d.data() })); subs.orders.forEach((cb) => cb(list)); },
-        () => setLive(false)
-      );
-      db.doc("config/store").onSnapshot((snap) => { const s = snap.exists ? snap.data() : null; subs.settings.forEach((cb) => cb(s)); }, () => setLive(false));
-    } else {
-      emitLocal();
-    }
+    emitLocal();
     return mode;
   }
-  function failed(e) {
-    if (e?.code === "invalid_argument") toast("Esta cuenta no tiene permiso para guardar en la demo.");
-    else if (e?.code === "quota_exceeded") toast("La base de datos de la demo está llena. Borra pedidos viejos.");
-    else toast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
-    throw e;
-  }
+  function localFailed() { toast("No se pudo guardar en este navegador."); }
   return {
     init,
+    ensureCustomer,
     get mode() { return mode; },
+    get ready() { return ready; },
+    get role() { return role; },
+    get user() { return user; },
+    get storeId() { return sid; },
     onOrders(cb) { subs.orders.add(cb); },
     onSettings(cb) { subs.settings.add(cb); },
-    async addOrder(order) {
+    onAuth(cb) { subs.auth.add(cb); },
+    onStaff(cb) { subs.staff.add(cb); },
+    // Crear pedido: en Firebase lo hace el servidor (precios, stock, IGTF); en local, aquí.
+    async placeOrder(draft, localOrder, receipt) {
+      if (mode === "firebase") {
+        await ensureCustomer();
+        let receiptPath = "";
+        if (receipt) {
+          const blob = await (await fetch(receipt)).blob();
+          receiptPath = `stores/${sid}/uploads/${user.uid}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+          try { await F.st.uploadBytes(F.st.ref(storage, receiptPath), blob, { contentType: "image/jpeg" }); }
+          catch (e) { throw fbError(e, "No pudimos subir el comprobante. Revisa tu conexión."); }
+        }
+        try { return await call("createOrder", { order: draft, receiptPath }); }
+        catch (e) { throw fbError(e, "No pudimos enviar el pedido. Intenta otra vez."); }
+      }
       const id = uid();
-      if (mode === "db") { await db.collection("orders").doc(id).set(order).catch(failed); }
-      else { const all = lsGet(K.orders, {}); all[id] = { id, ...order }; lsSet(K.orders, all); emitLocal(); }
-      return id;
+      const all = lsGet(K.orders, {}); all[id] = { id, ...localOrder }; lsSet(K.orders, all);
+      if (receipt) { const r = lsGet(K.receipts, {}); r[id] = receipt; try { localStorage.setItem(K.receipts, JSON.stringify(r)); } catch { toast("El navegador no tiene espacio para guardar más comprobantes."); } }
+      emitLocal();
+      return { id, code: localOrder.code };
     },
     async updateOrder(id, patch) {
-      if (mode === "db") return db.doc("orders/" + id).update(patch).catch(failed);
+      if (mode === "firebase") return F.fs.updateDoc(F.fs.doc(fs, "stores", sid, "orders", id), patch).catch((e) => { toast("No se pudo guardar el cambio. Revisa tu conexión."); throw e; });
       const all = lsGet(K.orders, {});
       if (all[id]) { all[id] = { ...all[id], ...patch }; lsSet(K.orders, all); emitLocal(); }
     },
     async deleteOrder(id) {
-      if (mode === "db") { await db.doc("orders/" + id).delete().catch(failed); await db.doc("receipts/" + id).delete().catch(() => {}); return; }
+      if (mode === "firebase") return F.fs.deleteDoc(F.fs.doc(fs, "stores", sid, "orders", id)).catch((e) => { toast("Solo el dueño puede borrar pedidos."); throw e; });
       const all = lsGet(K.orders, {}); delete all[id]; lsSet(K.orders, all);
       const r = lsGet(K.receipts, {}); delete r[id]; lsSet(K.receipts, r); emitLocal();
     },
-    async setReceipt(id, img) {
-      if (mode === "db") return db.doc("receipts/" + id).set({ img, at: Date.now() }).catch(failed);
-      const r = lsGet(K.receipts, {}); r[id] = img;
-      try { localStorage.setItem(K.receipts, JSON.stringify(r)); } catch { toast("El navegador no tiene espacio para guardar más comprobantes."); }
-    },
     async getReceipt(id) {
-      if (mode === "db") { const s = await db.doc("receipts/" + id).get().catch(() => null); return s?.exists ? s.data().img : null; }
+      if (mode === "firebase") {
+        const o = orderById(id);
+        if (!o?.receiptPath) return null;
+        return F.st.getDownloadURL(F.st.ref(storage, o.receiptPath)).catch(() => null);
+      }
       return lsGet(K.receipts, {})[id] || null;
     },
-    async saveSettings(s) {
-      if (mode === "db") return db.doc("config/store").set(s).catch(failed);
-      lsSet(K.settings, s); emitLocal();
+    // En Firebase solo se envían los campos que cambiaron, para no pisar el stock que descuenta el servidor.
+    async saveSettings(full, patch) {
+      if (mode === "firebase") {
+        const data = patch || full;
+        return F.fs.setDoc(cfgRef(), data, { mergeFields: Object.keys(data) }).catch((e) => { toast("Solo el dueño o un administrador pueden cambiar esto."); throw e; });
+      }
+      lsSet(K.settings, full); emitLocal();
+    },
+    /* Sesión y equipo (solo Firebase) */
+    async login(email, password) {
+      try { await F.auth.signInWithEmailAndPassword(auth, email, password); }
+      catch (e) { throw new Error(/invalid-credential|wrong-password|user-not-found|invalid-email/.test(e.code) ? "Correo o contraseña incorrectos." : /too-many-requests/.test(e.code) ? "Demasiados intentos. Espera unos minutos." : "No pudimos iniciar sesión. Revisa tu conexión."); }
+      await new Promise((r) => setTimeout(r, 50));
+    },
+    async registerOwner(email, password, setupCode) {
+      try { await F.auth.createUserWithEmailAndPassword(auth, email, password); }
+      catch (e) {
+        if (/email-already-in-use/.test(e.code)) await this.login(email, password);
+        else throw new Error(/weak-password/.test(e.code) ? "La contraseña debe tener al menos 6 caracteres." : /invalid-email/.test(e.code) ? "Correo no válido." : "No pudimos crear la cuenta.");
+      }
+      try { await call("claimOwner", { setupCode }); }
+      catch (e) { throw fbError(e, "No pudimos activar la cuenta del dueño."); }
+      const s = await F.fs.getDoc(F.fs.doc(fs, "stores", sid, "staff", auth.currentUser.uid));
+      role = s.exists() ? s.data().role : null;
+      subscribeOrders(); subscribeStaff(); syncCatalog().catch(() => {});
+      subs.auth.forEach((cb) => cb({ user, role }));
+    },
+    async logout() { await F.auth.signOut(auth); },
+    async resetPassword(email) {
+      try { await F.auth.sendPasswordResetEmail(auth, email); }
+      catch { throw new Error("No pudimos enviar el correo. Revisa que esté bien escrito."); }
+    },
+    async addStaff(data) { try { return await call("addStaff", data); } catch (e) { throw fbError(e, "No pudimos agregar a esa persona."); } },
+    async removeStaff(uid) { try { return await call("removeStaff", { uid }); } catch (e) { throw fbError(e, "No pudimos quitar a esa persona."); } },
+    async refreshRate() { try { return await call("refreshRate", {}); } catch (e) { throw fbError(e, "No pudimos leer la tasa del BCV."); } },
+    async registerPush() {
+      if (mode !== "firebase" || !role || !window.FIREBASE_VAPID_KEY || !("serviceWorker" in navigator)) return false;
+      try {
+        const m = await import(SDK + "firebase-messaging.js");
+        if (!(await m.isSupported())) return false;
+        const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.register("sw.js"));
+        const token = await m.getToken(m.getMessaging(app), { vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
+        if (!token) return false;
+        await F.fs.updateDoc(F.fs.doc(fs, "stores", sid, "staff", user.uid), { tokens: F.fs.arrayUnion(token), lastSeen: Date.now() });
+        return true;
+      } catch (e) { console.warn(e); return false; }
     },
   };
 })();
@@ -1072,7 +1240,7 @@ const Backend = (() => {
 function setLive(on) {
   const t = $("#liveTag");
   t.classList.toggle("off", !on);
-  t.textContent = on ? (Backend.mode === "db" ? "En vivo" : "Modo local") : "Sin conexión";
+  t.textContent = on ? (Backend.mode === "firebase" ? "En vivo" : "Modo local") : "Sin conexión";
 }
 
 /* =========================================================
@@ -1083,6 +1251,10 @@ let orders = [];
 let ordersLoaded = false;
 const priceOf = (p) => (settings.prices?.[p.id] != null && settings.prices[p.id] !== "" ? Number(settings.prices[p.id]) : p.price);
 const stockOf = (p) => { const v = settings.stock?.[p.id]; return v == null || v === "" ? null : Math.max(0, Number(v) || 0); };
+function igtfFor(methodId, base) {
+  const g = settings.igtf || {};
+  return g.enabled && (g.methods || ["efectivo", "zelle", "binance"]).includes(methodId) ? Math.round(base * (Number(g.pct ?? 3) / 100) * 100) / 100 : 0;
+}
 function isOpenNow() {
   if (settings.open === false) return false;
   const a = settings.auto || {};
@@ -1100,12 +1272,15 @@ const orderById = (id) => orders.find((o) => o.id === id);
 const flip = (x) => [x?.flip ? "flip" : "", x?.photo ? "photo" : ""].join(" ").trim();
 
 let settingsSaveTimer;
+let patchAcc = {};
 function saveSettings(patch, immediate = false, silent = false) {
   settings = { ...settings, ...patch };
+  patchAcc = { ...patchAcc, ...patch };
   applySettings();
   clearTimeout(settingsSaveTimer);
-  const go = () => Backend.saveSettings(settings).then(() => { if (!silent) toast("Cambios guardados"); }).catch(() => {});
-  if (immediate) go(); else settingsSaveTimer = setTimeout(go, 700);
+  const go = () => Backend.saveSettings(settings, patchAcc).then(() => { if (!silent) toast("Cambios guardados"); }).catch(() => {});
+  const run = () => { const p = patchAcc; patchAcc = {}; Backend.saveSettings(settings, p).then(() => { if (!silent) toast("Cambios guardados"); }).catch(() => {}); };
+  if (immediate) run(); else settingsSaveTimer = setTimeout(run, 700);
 }
 function applySettings() {
   $("#closedPill").hidden = isOpenNow();
@@ -1339,10 +1514,12 @@ function renderCheckout() {
   const sub = cartSubtotal();
   const zone = co.dtype === "delivery" ? settings.zones.find((z) => z.id === $("#coZone").value) : null;
   const fee = zone ? zone.fee : 0;
-  const total = sub + fee;
+  const igtf = igtfFor(co.method, sub + fee);
+  const total = sub + fee + igtf;
   $("#coSummary").innerHTML = `
     <div><span>Subtotal</span><span class="num">${money(sub)}</span></div>
     <div><span>${co.dtype === "delivery" ? "Delivery" : "Retiro en tienda"}</span><span class="num">${money(fee)}</span></div>
+    ${igtf ? `<div><span>IGTF ${settings.igtf.pct ?? 3}% (pago en divisas)</span><span class="num">${money(igtf)}</span></div>` : ""}
     <div class="grand"><span>Total</span><span class="num">${money(total)}${settings.rate > 0 ? ` · ${bs(total, settings.rate)}` : ""}</span></div>`;
 }
 $("#checkout").addEventListener("click", (e) => {
@@ -1423,14 +1600,20 @@ $("#coForm").addEventListener("submit", async (e) => {
     code: codeFor(createdAt), createdAt, status: m.proof ? "verificar" : settings.auto?.acceptCash ? "cocina" : "nuevo", example: false,
     customer: { name, phone },
     delivery: zone ? { type: "delivery", zoneId: zone.id, zoneName: zone.name, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() } : { type: "pickup" },
-    items, subtotal, fee, total: subtotal + fee, rate: settings.rate || 0,
+    items, subtotal, fee, igtf: igtfFor(m.id, subtotal + fee), total: subtotal + fee + igtfFor(m.id, subtotal + fee), rate: settings.rate || 0,
     payment: { method: m.id, ref: m.proof ? $("#coPayRef").value.trim() : "", status: m.proof ? "pending" : "cash" },
     hasReceipt: !!(m.proof && co.receipt), notes: $("#coNotes").value.trim(), driverId: null, timeline, stockApplied,
   };
+  const draft = {
+    items: cart.map((l) => ({ id: l.id, qty: l.qty, choices: l.choices })),
+    customer: { name, phone },
+    delivery: zone ? { type: "delivery", zoneId: zone.id, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() } : { type: "pickup" },
+    payment: { method: m.id, ref: m.proof ? $("#coPayRef").value.trim() : "" },
+    notes: $("#coNotes").value.trim(),
+  };
   try {
-    const id = await Backend.addOrder(order);
-    if (order.hasReceipt) await Backend.setReceipt(id, co.receipt);
-    if (stockApplied) saveSettings({ stock: newStock }, true, true);
+    const { id } = await Backend.placeOrder(draft, order, order.hasReceipt ? co.receipt : null);
+    if (stockApplied && Backend.mode !== "firebase") saveSettings({ stock: newStock }, true, true);
     lsSet("md-customer", { name, phone, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() });
     const mine = lsGet("md-my-orders", []); mine.unshift(id); lsSet("md-my-orders", mine.slice(0, 10));
     cart.length = 0; renderCart();
@@ -1439,8 +1622,8 @@ $("#coForm").addEventListener("submit", async (e) => {
     $("#coFileLabel").textContent = "Sube el capture del comprobante";
     close($("#checkout"));
     trackingId = id; openTracking();
-  } catch {
-    err.hidden = false; err.textContent = "No pudimos enviar el pedido. Intenta otra vez.";
+  } catch (ex) {
+    err.hidden = false; err.textContent = ex?.message || "No pudimos enviar el pedido. Intenta otra vez.";
   } finally { btn.disabled = false; btn.textContent = "Enviar pedido"; }
 });
 
@@ -1473,6 +1656,7 @@ function renderTracking() {
     <div class="summary">
       ${o.items.map((i) => `<div><span>${i.qty} × ${esc(i.name)}</span><span class="num">${money(i.qty * i.price)}</span></div>`).join("")}
       <div><span>${o.delivery.type === "delivery" ? "Delivery · " + esc(o.delivery.zoneName) : "Retiro en tienda"}</span><span class="num">${money(o.fee)}</span></div>
+      ${o.igtf ? `<div><span>IGTF</span><span class="num">${money(o.igtf)}</span></div>` : ""}
       <div class="grand"><span>Total · ${esc(payName(o.payment.method))}</span><span class="num">${money(o.total)}</span></div>
     </div>
     <p class="desc" style="margin-top:12px">Esta pantalla se actualiza sola cuando el local cambia el estado.</p>`;
@@ -1497,7 +1681,52 @@ const FILTERS = [
 const driverName = (id) => settings.drivers?.find((d) => d.id === id)?.name || "";
 const itemsLine = (o) => o.items.map((i) => `${i.qty}× ${i.name}`).join(", ");
 
+/* Inicio de sesión del panel (solo con Firebase) */
+let loginMode = "login";
+const ROLE_NAMES = { owner: "Dueño", admin: "Administrador", caja: "Caja", cocina: "Cocina", delivery: "Delivery" };
+const isAdminRole = () => Backend.mode !== "firebase" || ["owner", "admin"].includes(Backend.role);
+function needsLogin() { return !!window.FIREBASE_CONFIG && !Backend.role; }
+function renderLogin() {
+  $("#loginForm").classList.toggle("connecting", !Backend.ready);
+  if (!Backend.ready) { $("#loginTitle").textContent = "Conectando…"; $("#loginSub").textContent = "Un momento, estamos abriendo tu panel."; return; }
+  const owner = loginMode === "owner";
+  $("#loginTitle").textContent = owner ? "Crear la cuenta del dueño" : loginMode === "reset" ? "Recuperar contraseña" : "Entrar al panel";
+  $("#loginSub").textContent = owner ? "Solo se hace una vez. Usa el código de configuración que elegiste al publicar la app." : loginMode === "reset" ? "Te enviaremos un correo para crear una contraseña nueva." : "Usa el correo y la contraseña que te dio el dueño.";
+  $("#lgCodeWrap").hidden = !owner;
+  $("#lgPass").closest(".field").hidden = loginMode === "reset";
+  $("#lgSubmit").textContent = owner ? "Crear cuenta y entrar" : loginMode === "reset" ? "Enviar correo" : "Entrar";
+  $("#lgMode").textContent = owner || loginMode === "reset" ? "Volver a entrar" : "Primera vez: crear cuenta del dueño";
+  $("#lgForgot").hidden = loginMode !== "login";
+  const u = Backend.user;
+  $("#lgNoStaff").hidden = !(u && !u.isAnonymous && !Backend.role);
+  $("#lgNoStaff").innerHTML = `Entraste como <b>${esc(u?.email || "")}</b>, pero esa cuenta no es parte del equipo de este local. Pídele al dueño que te agregue. <button type="button" class="remove" id="lgOut">Cerrar sesión</button>`;
+  $("#lgOut")?.addEventListener("click", () => Backend.logout());
+}
+$("#lgMode").addEventListener("click", () => { loginMode = loginMode === "login" ? "owner" : "login"; $("#lgError").hidden = true; renderLogin(); });
+$("#lgForgot").addEventListener("click", () => { loginMode = "reset"; $("#lgError").hidden = true; renderLogin(); });
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("#lgError"), btn = $("#lgSubmit"), email = $("#lgEmail").value.trim(), pass = $("#lgPass").value;
+  err.hidden = true;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.hidden = false; err.textContent = "Escribe un correo válido."; return; }
+  if (loginMode !== "reset" && pass.length < 6) { err.hidden = false; err.textContent = "La contraseña tiene al menos 6 caracteres."; return; }
+  btn.disabled = true; const label = btn.textContent; btn.textContent = "Un momento…";
+  try {
+    if (loginMode === "reset") { await Backend.resetPassword(email); toast("Te enviamos un correo para cambiar la contraseña."); loginMode = "login"; renderLogin(); }
+    else if (loginMode === "owner") await Backend.registerOwner(email, pass, $("#lgCode").value.trim());
+    else await Backend.login(email, pass);
+  } catch (ex) { err.hidden = false; err.textContent = ex.message; }
+  finally { btn.disabled = false; btn.textContent = label; }
+});
+Backend.onAuth(() => { if (route === "panel") renderAdmin(); renderTrackPill(); });
+
 function renderAdmin() {
+  const locked = needsLogin();
+  $("#adminView").classList.toggle("locked", locked);
+  $("#loginView").hidden = !locked;
+  document.body.classList.toggle("role-limited", Backend.mode === "firebase" && !!Backend.role && !isAdminRole());
+  if (locked) { renderLogin(); return; }
+  if (!isAdminRole() && (pane === "more" || pane === "metrics")) pane = "orders";
   renderHeader();
   renderBadges();
   if (pane === "orders") renderOrders();
@@ -1563,7 +1792,7 @@ function renderStockAlert() {
   const out = CONFIG.products.filter((p) => stockOf(p) === 0);
   const low = CONFIG.products.filter(isLow);
   const el = $("#stockAlert");
-  el.hidden = !out.length && !low.length;
+  el.hidden = (!out.length && !low.length) || !isAdminRole();
   if (el.hidden) return;
   const parts = [...out.map((p) => `${p.name} (agotado)`), ...low.map((p) => `${p.name} (${stockOf(p)})`)];
   el.innerHTML = `<span class="a-ico s-verificar"><svg viewBox="0 0 24 24"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 7.5v9L12 21l9-4.5v-9M12 12v9"/></svg></span><span><b>${out.length ? "Productos sin stock" : "Poco stock"}</b><small>${esc(parts.join(" · "))}</small></span><span class="btn sm ghost">Reponer</span>`;
@@ -1685,6 +1914,7 @@ async function enableNotifications() {
   let sys = "unsupported";
   try { if ("Notification" in window) sys = await Notification.requestPermission(); } catch { sys = "blocked"; }
   if (lsGet("md-wake", false)) keepAwake(true);
+  if (sys === "granted") Backend.registerPush().then((ok) => { if (ok) toast("Avisos activados también con la app cerrada"); });
   toast(sys === "granted" ? "Notificaciones activadas: sonido, vibración y avisos del sistema" : "Notificaciones activadas: sonido, vibración y aviso en pantalla");
   renderNotifCard(); if (pane === "alerts") renderAlerts();
   updatePushHint();
@@ -1817,7 +2047,7 @@ function renderOrderSheet() {
       <h5>Productos</h5>
       <ul class="od-items">${o.items.map((i) => `<li><span>${i.qty} × ${esc(i.name)}<small>${esc(i.choices.join(" · "))}</small></span><b class="num">${money(i.qty * i.price)}</b></li>`).join("")}</ul>
       ${o.notes ? `<div class="notice warn">Nota del cliente: ${esc(o.notes)}</div>` : ""}
-      <div class="od-tot"><div><span>Subtotal</span><span class="num">${money(o.subtotal)}</span></div><div><span>Delivery</span><span class="num">${money(o.fee)}</span></div><div class="grand"><span>Total</span><span class="num">${money(o.total)}</span></div>${rate ? `<div><span>En bolívares</span><span class="num">${bs(o.total, rate)}</span></div>` : ""}</div>
+      <div class="od-tot"><div><span>Subtotal</span><span class="num">${money(o.subtotal)}</span></div><div><span>Delivery</span><span class="num">${money(o.fee)}</span></div>${o.igtf ? `<div><span>IGTF</span><span class="num">${money(o.igtf)}</span></div>` : ""}<div class="grand"><span>Total</span><span class="num">${money(o.total)}</span></div>${rate ? `<div><span>En bolívares</span><span class="num">${bs(o.total, rate)}</span></div>` : ""}</div>
     </section>
 
     ${o.delivery.type === "delivery" ? `<section class="od-sec">
@@ -1898,8 +2128,9 @@ async function act(name, id) {
     if (name === "deliver") return await changeStatus(o, "entregado", {}, `${o.code} entregado`);
     if (name === "cancel") {
       if (!confirmStep(id, "cancel", "Toca otra vez para cancelar el pedido")) return;
-      await changeStatus(o, "cancelado", { stockApplied: false }, `${o.code} cancelado`);
-      if (o.stockApplied) {
+      await changeStatus(o, "cancelado", Backend.mode === "firebase" ? {} : { stockApplied: false }, `${o.code} cancelado`);
+      if (o.stockApplied && Backend.mode === "firebase") toast(`${o.code} cancelado. El stock volvió al inventario.`);
+      if (o.stockApplied && Backend.mode !== "firebase") {
         const stock = { ...(settings.stock || {}) };
         o.items.forEach((i) => { if (stock[i.id] != null && stock[i.id] !== "") stock[i.id] = Number(stock[i.id]) + i.qty; });
         saveSettings({ stock }, true, true);
@@ -2174,7 +2405,9 @@ function renderSettings() {
   el.innerHTML = `
     <div class="panel"><h3>Local</h3>
       <div class="setrow"><div><b>Recibir pedidos</b><small>Si lo apagas, la tienda muestra “Cerrado” y no deja pagar</small></div><label class="switch"><input type="checkbox" id="stOpen" ${s.open !== false ? "checked" : ""} aria-label="Recibir pedidos"><i></i></label></div>
-      <div class="setrow"><div><b>Tasa del día (Bs por ${CONFIG.currency}1)</b><small>Se usa para mostrar montos en bolívares</small></div><input class="input num" style="width:110px" type="number" step="0.01" min="0" id="stRate" value="${s.rate || 0}" aria-label="Tasa"></div>
+      <div class="setrow"><div><b>Tasa del día (Bs por ${CONFIG.currency.trim()} 1)</b><small>${s.autoRate && s.rateUpdatedAt ? `Tasa oficial BCV, actualizada ${ago(s.rateUpdatedAt)}` : "Se usa para mostrar montos en bolívares"}</small></div><input class="input num" style="width:110px" type="number" step="0.0001" min="0" id="stRate" value="${s.rate || 0}" aria-label="Tasa" ${s.autoRate ? "disabled" : ""}></div>
+      ${Backend.mode === "firebase" ? `<div class="setrow"><div><b>Tasa BCV automática</b><small>El servidor toma la tasa oficial de bcv.org.ve tres veces al día</small></div><div style="display:flex;gap:8px;align-items:center"><button class="btn sm ghost" id="stRateNow">Actualizar</button><label class="switch"><input type="checkbox" id="stAutoRate" ${s.autoRate ? "checked" : ""} aria-label="Tasa BCV automática"><i></i></label></div></div>` : ""}
+      <div class="setrow"><div><b>Cobrar IGTF</b><small>Suma el ${s.igtf?.pct ?? 3}% a los pagos en divisas (efectivo, Zelle, Binance). Confírmalo con tu contador.</small></div><div style="display:flex;gap:8px;align-items:center"><input class="input num" style="width:70px" type="number" step="0.5" min="0" max="10" id="stIgtfPct" value="${s.igtf?.pct ?? 3}" aria-label="Porcentaje IGTF"><label class="switch"><input type="checkbox" id="stIgtf" ${s.igtf?.enabled ? "checked" : ""} aria-label="Cobrar IGTF"><i></i></label></div></div>
       <div class="setrow"><div><b>Meta de preparación</b><small>Minutos antes de marcar un pedido como atrasado en cocina</small></div><input class="input num" style="width:110px" type="number" min="5" max="90" id="stPrep" value="${s.prepMinutes}" aria-label="Minutos"></div>
       <div class="setrow"><div><b>Ancho de etiqueta</b><small>Según tu impresora térmica</small></div><select class="select" style="width:120px" id="stWidth"><option value="80" ${s.ticketWidth == 80 ? "selected" : ""}>80 mm</option><option value="58" ${s.ticketWidth == 58 ? "selected" : ""}>58 mm</option></select></div>
     </div>
@@ -2195,7 +2428,17 @@ function renderSettings() {
       ${CONFIG.payMethods.filter((m) => m.infoKey).map((m) => `<label class="field"><span>${esc(m.name)}</span><input class="input" data-pay="${m.infoKey}" value="${esc(s.pay?.[m.infoKey] || "")}"></label>`).join("")}
     </div>
     <div class="panel" id="installPanel" ${IN_VIEWER ? "hidden" : ""}><h3>App en el teléfono</h3><p class="hint" id="installHint">${isStandalone() ? "Ya estás usando la app instalada." : "Instala el panel como app: ícono en la pantalla de inicio, pantalla completa y funciona aunque se caiga el internet un momento."}</p>${isStandalone() ? "" : `<div class="btn-row" style="margin-top:10px"><button class="btn sm purple" id="installBtn">Instalar app</button></div>`}</div>
-    <div class="panel"><h3>Conexión</h3><p class="hint">${Backend.mode === "db" ? "Conectado a la base de datos compartida: la tienda y este panel ven los mismos pedidos en tiempo real." : "Modo local: los pedidos se guardan en este navegador y se sincronizan entre pestañas. En producción se conecta a un servidor."}</p></div>`;
+    ${Backend.mode === "firebase" ? `<div class="panel"><h3>Equipo</h3><p class="hint">Cada persona entra con su correo. Caja, cocina y delivery solo ven pedidos; el administrador además cambia inventario, precios y ajustes.</p>
+      <div id="staffList"></div>
+      <form class="staff-form" id="staffForm" novalidate>
+        <input class="input" id="sfName" placeholder="Nombre" aria-label="Nombre">
+        <select class="select" id="sfRole" aria-label="Rol"><option value="caja">Caja</option><option value="cocina">Cocina</option><option value="delivery">Delivery</option>${Backend.role === "owner" ? `<option value="admin">Administrador</option>` : ""}</select>
+        <input class="input" id="sfEmail" type="email" placeholder="Correo" aria-label="Correo">
+        <input class="input" id="sfPass" type="text" placeholder="Contraseña temporal" aria-label="Contraseña temporal">
+        <button class="btn sm" type="submit">Agregar al equipo</button>
+      </form></div>
+    <div class="panel"><h3>Tu sesión</h3><p class="hint">${esc(Backend.user?.email || "")} · ${ROLE_NAMES[Backend.role] || ""}</p><div class="btn-row" style="margin-top:10px"><button class="btn sm ghost" id="logoutBtn">Cerrar sesión</button></div></div>` : ""}
+    <div class="panel"><h3>Conexión</h3><p class="hint">${Backend.mode === "firebase" ? "Conectado al servidor: la tienda y el panel comparten pedidos, comprobantes y stock en tiempo real, desde cualquier teléfono." : "Modo local: los pedidos se guardan en este navegador y se sincronizan entre pestañas. Pon la configuración de Firebase en firebase-config.js para conectarlo al servidor."}</p></div>`;
   const num = (v) => Math.max(0, parseFloat(v) || 0);
   $("#installBtn")?.addEventListener("click", installApp);
   const setAuto = (patch) => saveSettings({ auto: { ...CONFIG.defaults.auto, ...(settings.auto || {}), ...patch } }, true);
@@ -2206,6 +2449,27 @@ function renderSettings() {
   $("#auPrint").addEventListener("change", (e) => setAuto({ printOnReady: e.target.checked }));
   $("#stOpen").addEventListener("change", (e) => saveSettings({ open: e.target.checked }, true));
   $("#stRate").addEventListener("change", (e) => saveSettings({ rate: num(e.target.value) }, true));
+  $("#stAutoRate")?.addEventListener("change", (e) => saveSettings({ autoRate: e.target.checked }, true));
+  $("#stRateNow")?.addEventListener("click", async (e) => {
+    const b = e.currentTarget; b.disabled = true; b.textContent = "Leyendo…";
+    try { const r = await Backend.refreshRate(); toast(`Tasa BCV: Bs ${r.rate}`); } catch (ex) { toast(ex.message); }
+    finally { b.disabled = false; b.textContent = "Actualizar"; }
+  });
+  $("#stIgtf").addEventListener("change", (e) => saveSettings({ igtf: { ...CONFIG.defaults.igtf, ...(settings.igtf || {}), enabled: e.target.checked } }, true));
+  $("#stIgtfPct").addEventListener("change", (e) => saveSettings({ igtf: { ...CONFIG.defaults.igtf, ...(settings.igtf || {}), pct: Math.min(10, Math.max(0, parseFloat(e.target.value) || 0)) } }, true));
+  $("#logoutBtn")?.addEventListener("click", () => Backend.logout());
+  if ($("#staffForm")) {
+    renderStaffList();
+    $("#staffForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector("button");
+      const data = { name: $("#sfName").value.trim(), role: $("#sfRole").value, email: $("#sfEmail").value.trim(), password: $("#sfPass").value };
+      if (!data.email) { toast("Escribe el correo de la persona."); return; }
+      btn.disabled = true;
+      try { await Backend.addStaff(data); toast(`${data.name || data.email} ya puede entrar al panel`); e.target.reset(); }
+      catch (ex) { toast(ex.message); } finally { btn.disabled = false; }
+    });
+  }
   $("#stPrep").addEventListener("change", (e) => saveSettings({ prepMinutes: Math.min(90, Math.max(5, parseInt(e.target.value) || 20)) }, true));
   $("#stWidth").addEventListener("change", (e) => saveSettings({ ticketWidth: Number(e.target.value) }, true));
   $("#addZone").addEventListener("click", () => saveSettings({ zones: [...(s.zones || []), { id: "z" + uid(), name: "Nueva zona", fee: 2 }] }, true));
@@ -2225,6 +2489,18 @@ function renderSettings() {
   }));
   el.querySelectorAll("[data-drv-del]").forEach((b) => b.addEventListener("click", () => saveSettings({ drivers: settings.drivers.filter((_, i) => i !== Number(b.dataset.drvDel)) }, true)));
   el.querySelectorAll("[data-pay]").forEach((inp) => inp.addEventListener("change", () => saveSettings({ pay: { ...(settings.pay || {}), [inp.dataset.pay]: inp.value.trim() } })));
+}
+
+let staffList = [];
+Backend.onStaff((list) => { staffList = list; renderStaffList(); });
+function renderStaffList() {
+  const el = $("#staffList");
+  if (!el) return;
+  el.innerHTML = staffList.length ? staffList.sort((a, b) => (a.role === "owner" ? -1 : b.role === "owner" ? 1 : 0)).map((m) => `<div class="staff-row"><span class="avatar">${esc((m.name || m.email || "?").slice(0, 1).toUpperCase())}</span><div><b>${esc(m.name || m.email)}</b><small>${esc(m.email || "")} · ${ROLE_NAMES[m.role] || m.role}${(m.tokens || []).length ? " · avisos activos" : ""}</small></div>${m.role !== "owner" && m.uid !== Backend.user?.uid ? `<button class="del" data-staff-del="${esc(m.uid)}" aria-label="Quitar a ${esc(m.name || m.email)}">×</button>` : ""}</div>`).join("") : `<p class="hint" style="margin-top:8px">Todavía no agregaste a nadie.</p>`;
+  el.querySelectorAll("[data-staff-del]").forEach((b) => b.addEventListener("click", async () => {
+    if (!confirmStep(b.dataset.staffDel, "staff", "Toca otra vez para quitar a esta persona")) return;
+    try { await Backend.removeStaff(b.dataset.staffDel); toast("Persona quitada del equipo"); } catch (ex) { toast(ex.message); }
+  }));
 }
 
 /* Etiquetas */
@@ -2262,6 +2538,7 @@ function labelHTML(o) {
     <hr>
     <div class="l-row"><span>Subtotal</span><span>${money(o.subtotal)}</span></div>
     <div class="l-row"><span>Delivery</span><span>${money(o.fee)}</span></div>
+    ${o.igtf ? `<div class="l-row"><span>IGTF</span><span>${money(o.igtf)}</span></div>` : ""}
     <div class="l-row" style="font-weight:700;font-size:1.15em"><span>TOTAL</span><span>${money(o.total)}</span></div>
     ${rate ? `<div class="l-row"><span></span><span>${bs(o.total, rate)}</span></div>` : ""}
     <div style="text-align:center;font-weight:700;margin-top:6px;border:1px solid #000;padding:3px">${o.payment.method === "efectivo" ? "COBRAR " + money(o.total) + " EN EFECTIVO" : "PAGADO · " + esc(payName(o.payment.method)).toUpperCase()}</div>
@@ -2310,6 +2587,7 @@ function labelCanvas(o) {
   if (o.notes) T(`NOTA: ${o.notes}`, 22, { bold: true });
   ops.push({ hr: true });
   T("Subtotal", 24, { right: money(o.subtotal) }); T("Delivery", 24, { right: money(o.fee) });
+  if (o.igtf) T("IGTF", 24, { right: money(o.igtf) });
   T("TOTAL", 30, { bold: true, right: money(o.total) });
   if (rate) T("", 22, { right: bs(o.total, rate) });
   T(o.payment.method === "efectivo" ? `COBRAR ${money(o.total)} EN EFECTIVO` : `PAGADO · ${payName(o.payment.method).toUpperCase()}`, 24, { bold: true, align: "center", box: true });
@@ -2413,8 +2691,10 @@ setInterval(() => { if (route !== "panel") { $("#closedPill").hidden = isOpenNow
 setInterval(() => { if (route === "panel" && !document.querySelector(".sheet.open")) { renderHeader(); if (pane === "kitchen") renderKitchen(); if (pane === "orders") renderOrders(); } }, 30000);
 Backend.init().then((mode) => {
   setLive(true);
+  if (mode === "firebase" && route !== "panel") Backend.ensureCustomer().catch(() => {});
+  if (route === "panel") renderAdmin();
   if (window.claude?.use) window.claude.use("downloads").then((d) => (downloads = d)).catch(() => {});
-  if (!ordersLoaded && mode === "db") setTimeout(() => { if (!ordersLoaded) { ordersLoaded = true; if (route === "panel") renderAdmin(); } }, 4000);
+  if (!ordersLoaded && mode === "firebase") setTimeout(() => { if (!ordersLoaded) { ordersLoaded = true; if (route === "panel") renderAdmin(); } }, 4000);
 });
 </script>
 

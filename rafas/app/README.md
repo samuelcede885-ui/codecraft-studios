@@ -35,15 +35,7 @@ El panel es una app instalable (PWA): `manifest.webmanifest`, `sw.js` e `icons/`
 
 Cada vez que publiques cambios, sube el número de `CACHE` en `sw.js` (`rafas-panel-v2`, `v3`…) para que los teléfonos descarguen la versión nueva.
 
-## Cómo se conecta hoy
+## Cómo se conecta
 
-`Backend` (dentro del `<script>`) guarda en `localStorage` y sincroniza entre pestañas: abre la tienda en una pestaña y `#panel` en otra para probarlo. Arranca vacía: no trae pedidos ni cifras de ejemplo.
-
-## Para dárselo al dueño (producción)
-
-1. **Servidor**: cambiar los métodos de `Backend` (`addOrder`, `updateOrder`, `setReceipt`, `onOrders`, `onSettings`…) por Firebase Firestore o Supabase. La interfaz no cambia.
-2. **Comprobantes**: guardarlos en Firebase Storage / Supabase Storage en vez de dentro del pedido.
-3. **Acceso**: el panel debe ir detrás de un login (solo el dueño y su personal).
-4. **App instalable**: agregar `manifest.json` y un service worker para instalarla como app (PWA) en el teléfono o tablet del local. Si la quieren en Play Store, se empaqueta con Capacitor.
-5. **Notificaciones push**: Firebase Cloud Messaging, para que suene aunque la app esté cerrada.
-6. **Impresora térmica**: el botón *Imprimir* ya usa el diálogo del sistema (sirve con impresoras USB/Wi-Fi). Para Bluetooth en Android, la app RawBT recibe la etiqueta directo.
+- **Con Firebase** (cuando `firebase-config.js` tiene la configuración): la tienda y el panel comparten pedidos, comprobantes y stock en tiempo real desde cualquier teléfono. El servidor calcula precios, stock e IGTF; el panel pide inicio de sesión y cada empleado tiene su rol. Los pasos para publicarlo están en [`../PUBLICAR.md`](../PUBLICAR.md).
+- **Sin configuración** (modo local): guarda en `localStorage` y sincroniza entre pestañas del mismo navegador. Sirve para ver y probar el diseño.

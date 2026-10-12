@@ -362,6 +362,13 @@ textarea.input { resize: vertical; min-height: 70px; }
 .s-camino { --st: var(--st-road); --st-bg: var(--st-road-bg); }
 .s-entregado { --st: var(--st-done); --st-bg: var(--st-done-bg); }
 .s-cancelado { --st: var(--st-cancel); --st-bg: var(--st-cancel-bg); }
+.notif-card { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: center; background: var(--btn-bg); color: var(--btn-fg); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
+.notif-card .a-ico { width: 44px; height: 44px; background: rgba(164,141,220,.25); color: var(--purple-glow); }
+.notif-card b { display: block; font-size: .95rem; }
+.notif-card small { opacity: .75; font-size: .78rem; line-height: 1.35; display: block; }
+.notif-card .btn { grid-column: 1 / -1; background: var(--purple); color: #fff; }
+.ringing #bellBtn svg { animation: ring 1s ease-in-out infinite; transform-origin: 50% 10%; }
+@keyframes ring { 0%,100% { transform: rotate(0); } 20% { transform: rotate(14deg); } 40% { transform: rotate(-12deg); } 60% { transform: rotate(8deg); } 80% { transform: rotate(-4deg); } }
 .stock-alert { width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; text-align: left; background: var(--surface); border-radius: 18px; padding: 10px 12px; box-shadow: inset 3px 0 0 var(--st-pay), var(--shadow); margin-bottom: 12px; }
 .stock-alert b { display: block; font-size: .88rem; }
 .stock-alert small { color: var(--muted); font-size: .76rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -767,6 +774,7 @@ textarea.input { resize: vertical; min-height: 70px; }
     <section data-pane="orders">
       <div class="pane-head"><h2>Pedidos</h2><button class="btn sm ghost" id="printReadyBtn"><svg viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6h-3"/><path d="M7 14h10v7H7z"/></svg>Etiquetas de listos</button></div>
       <input type="search" class="a-search" id="oSearch" placeholder="Buscar por nombre, teléfono o número" aria-label="Buscar pedidos">
+      <div class="notif-card" id="notifCard" hidden></div>
       <button class="stock-alert" id="stockAlert" hidden></button>
       <div class="chips" id="oChips" role="group" aria-label="Filtrar por estado"></div>
       <div class="olist" id="oList"></div>
@@ -788,6 +796,9 @@ textarea.input { resize: vertical; min-height: 70px; }
       <div class="pane-head"><h2>Notificaciones</h2><button class="btn sm ghost" id="markRead">Marcar todo leído</button></div>
       <div class="panel" style="margin-bottom:14px">
         <div class="setrow"><div><b>Sonido de nuevo pedido</b><small>Suena y vibra cuando entra un pedido o un comprobante</small></div><label class="switch"><input type="checkbox" id="soundToggle" aria-label="Sonido"><i></i></label></div>
+        <div class="setrow"><div><b>Sonar hasta que lo vea</b><small>Repite el aviso cada 15 segundos mientras haya un pedido nuevo sin abrir</small></div><label class="switch"><input type="checkbox" id="ringToggle" aria-label="Sonar hasta que lo vea"><i></i></label></div>
+        <div class="setrow"><div><b>Pantalla siempre encendida</b><small>Para la tablet o el teléfono de la cocina: la pantalla no se apaga mientras el panel esté abierto</small></div><label class="switch"><input type="checkbox" id="wakeToggle" aria-label="Pantalla siempre encendida"><i></i></label></div>
+        <div class="setrow"><div><b>Probar el aviso</b><small>Escucha cómo suena un pedido nuevo</small></div><button class="btn sm ghost" id="testNotif">Probar</button></div>
         <div class="setrow" id="pushRow"><div><b>Avisos del sistema</b><small id="pushHint">Notificación del teléfono o computadora aunque la app esté en segundo plano</small></div><button class="btn sm ghost" id="pushBtn">Activar</button></div>
       </div>
       <ul class="alist" id="aList"></ul>
@@ -1492,7 +1503,7 @@ function renderAdmin() {
   if (pane === "orders") renderOrders();
   if (pane === "kitchen") renderKitchen();
   if (pane === "delivery") renderDelivery();
-  if (pane === "alerts") renderAlerts();
+  if (pane === "alerts") { renderAlerts(); updatePushHint(); }
   if (pane === "more") renderMore();
   if (pane === "metrics") renderMetrics();
   if ($("#orderSheet").classList.contains("open")) renderOrderSheet();
@@ -1559,6 +1570,7 @@ function renderStockAlert() {
 }
 $("#stockAlert").addEventListener("click", () => { sub = "catalog"; setPane("more"); });
 function renderOrders() {
+  renderNotifCard();
   renderStockAlert();
   $("#oChips").innerHTML = FILTERS.map((f) => `<button class="chip" data-filter="${f.id}" aria-pressed="${oFilter === f.id}">${f.label}<em>${orders.filter(f.test).length}</em></button>`).join("");
   const f = FILTERS.find((x) => x.id === oFilter);
@@ -1620,6 +1632,8 @@ const unreadCount = () => allEvents().filter(({ e }) => e.at > lastSeen && (e.ty
 function renderAlerts() {
   const ev = allEvents();
   $("#soundToggle").checked = lsGet("md-sound", true);
+  $("#ringToggle").checked = lsGet("md-ring", true);
+  $("#wakeToggle").checked = lsGet("md-wake", false);
   $("#aList").innerHTML = ev.length ? ev.map(({ o, e }) => {
     const x = EVENT_TEXT[e.type]?.(o, e);
     if (!x) return "";
@@ -1629,32 +1643,108 @@ function renderAlerts() {
 }
 $("#markRead").addEventListener("click", () => { lastSeen = Date.now(); lsSet("md-last-seen", lastSeen); renderAdmin(); });
 $("#soundToggle").addEventListener("change", (e) => lsSet("md-sound", e.target.checked));
-$("#pushBtn").addEventListener("click", async () => {
-  if (!("Notification" in window)) { $("#pushHint").textContent = "Este navegador no permite avisos del sistema. Usa el sonido de la app."; return; }
-  try {
-    const r = await Notification.requestPermission();
-    $("#pushHint").textContent = r === "granted" ? "Activados. Te avisaremos aunque tengas otra app abierta." : "No se activaron. En la app instalada del local se activan desde el teléfono.";
-  } catch { $("#pushHint").textContent = "Aquí no se pueden activar. En la app instalada del local sí funcionan."; }
-});
-
 let audioCtx = null;
-document.addEventListener("pointerdown", () => { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} } }, { once: true });
-function ding() {
-  if (!lsGet("md-sound", true) || !audioCtx) return;
+const audioReady = () => audioCtx && audioCtx.state === "running";
+function unlockAudio() {
   try {
-    [0, 0.18].forEach((d, i) => {
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type = "sine"; o.frequency.value = i ? 1320 : 880;
-      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + d);
-      g.gain.exponentialRampToValueAtTime(0.25, audioCtx.currentTime + d + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d + 0.35);
-      o.connect(g).connect(audioCtx.destination); o.start(audioCtx.currentTime + d); o.stop(audioCtx.currentTime + d + 0.4);
-    });
-    navigator.vibrate?.([120, 60, 120]);
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state !== "running") audioCtx.resume();
   } catch {}
 }
+document.addEventListener("pointerdown", () => { unlockAudio(); setTimeout(renderNotifCard, 50); });
+function ding(force = false) {
+  if (!force && !lsGet("md-sound", true)) return;
+  unlockAudio();
+  if (!audioCtx) return;
+  try {
+    [[0, 880], [0.16, 1175], [0.32, 1568]].forEach(([d, f]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + d);
+      g.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d + 0.4);
+      o.connect(g).connect(audioCtx.destination); o.start(audioCtx.currentTime + d); o.stop(audioCtx.currentTime + d + 0.45);
+    });
+  } catch {}
+  navigator.vibrate?.([200, 80, 200, 80, 200]);
+}
+const canSystemNotify = () => { try { return "Notification" in window && Notification.permission === "granted"; } catch { return false; } };
+async function systemNotify(title, body, id) {
+  if (!canSystemNotify()) return;
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration?.();
+    const opts = { body, tag: "pedido-" + (id || Date.now()), renotify: true, icon: "icons/icon-192.png", badge: "icons/icon-192.png", vibrate: [200, 80, 200], data: { id } };
+    if (reg) reg.showNotification(title, opts); else new Notification(title, opts);
+  } catch {}
+}
+async function enableNotifications() {
+  unlockAudio();
+  lsSet("md-notif-on", true);
+  lsSet("md-sound", true);
+  ding(true);
+  let sys = "unsupported";
+  try { if ("Notification" in window) sys = await Notification.requestPermission(); } catch { sys = "blocked"; }
+  if (lsGet("md-wake", false)) keepAwake(true);
+  toast(sys === "granted" ? "Notificaciones activadas: sonido, vibración y avisos del sistema" : "Notificaciones activadas: sonido, vibración y aviso en pantalla");
+  renderNotifCard(); if (pane === "alerts") renderAlerts();
+  updatePushHint();
+}
+function renderNotifCard() {
+  const el = $("#notifCard");
+  if (!el) return;
+  const on = lsGet("md-notif-on", false);
+  el.hidden = on && audioReady();
+  if (el.hidden) return;
+  el.innerHTML = on
+    ? `<span class="a-ico">${ICON.bell}</span><span><b>Toca para reactivar el sonido</b><small>El navegador silencia la página al abrirla. Un toque y vuelve a sonar cada pedido.</small></span><button class="btn" id="notifBtn">Activar sonido</button>`
+    : `<span class="a-ico">${ICON.bell}</span><span><b>Activa las notificaciones de pedidos</b><small>Suena, vibra y avisa en pantalla cada vez que entra un pedido o un comprobante.</small></span><button class="btn" id="notifBtn">Activar notificaciones</button>`;
+  $("#notifBtn").addEventListener("click", enableNotifications);
+}
+function updatePushHint() {
+  const h = $("#pushHint"), btn = $("#pushBtn");
+  if (!h) return;
+  let perm = "unsupported";
+  try { if ("Notification" in window) perm = Notification.permission; } catch {}
+  if (IN_VIEWER) { h.textContent = "Dentro de claude.ai no se permiten. En la app instalada llegan aunque estés en otra app."; btn.hidden = true; return; }
+  if (perm === "granted") { h.textContent = "Activados: te avisamos aunque tengas otra app abierta."; btn.hidden = true; }
+  else if (perm === "denied") { h.textContent = "Están bloqueados. Actívalos en los ajustes del navegador para este sitio."; btn.hidden = true; }
+  else if (perm === "unsupported") { h.textContent = "Este navegador no los permite. Instala la app para recibirlos."; btn.hidden = true; }
+}
+$("#pushBtn").addEventListener("click", enableNotifications);
+$("#testNotif").addEventListener("click", () => { ding(true); showBanner({ id: "", code: "#PRUEBA", customer: { name: "Cliente de prueba" }, total: 0, delivery: { type: "pickup" } }, { type: "created" }, true); systemNotify("Nuevo pedido #PRUEBA", "Así te llegará cada pedido"); });
+$("#ringToggle").addEventListener("change", (e) => lsSet("md-ring", e.target.checked));
+$("#wakeToggle").addEventListener("change", (e) => { lsSet("md-wake", e.target.checked); keepAwake(e.target.checked); });
+
+/* Pantalla encendida */
+let wakeLock = null;
+async function keepAwake(on) {
+  try {
+    if (on && "wakeLock" in navigator) { wakeLock = await navigator.wakeLock.request("screen"); }
+    else if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch { if (on) toast("Este dispositivo no permite mantener la pantalla encendida desde aquí."); }
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && route === "panel") document.title = `${CONFIG.brand} · Panel`; });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && lsGet("md-wake", false) && route === "panel") keepAwake(true); });
+
+/* Sonar hasta que lo vea */
+const acked = new Set(lsGet("md-acked", []));
+function ackOrder(id) { if (!id || acked.has(id)) return; acked.add(id); lsSet("md-acked", [...acked].slice(-300)); updateRinging(); }
+const unacked = () => orders.filter((o) => (o.status === "nuevo" || (o.status === "verificar" && o.payment?.status === "pending")) && !acked.has(o.id) && Date.now() - o.createdAt < 6 * 3600000);
+function updateRinging() {
+  const n = route === "panel" ? unacked().length : 0;
+  document.body.classList.toggle("ringing", n > 0);
+}
+setInterval(() => {
+  updateRinging();
+  if (route !== "panel" || !lsGet("md-ring", true)) return;
+  const list = unacked();
+  if (!list.length) return;
+  ding();
+  if (document.hidden) document.title = `🔔 (${list.length}) Pedido nuevo · ${CONFIG.brand}`;
+}, 15000);
+
 let bannerTimer;
-function showBanner(o, e) {
+function showBanner(o, e, test = false) {
   const x = EVENT_TEXT[e.type](o, e);
   const b = $("#banner");
   b.dataset.order = o.id;
@@ -1662,9 +1752,9 @@ function showBanner(o, e) {
   b.classList.add("show");
   clearTimeout(bannerTimer);
   bannerTimer = setTimeout(() => b.classList.remove("show"), 6000);
-  try { if (document.hidden && Notification?.permission === "granted") new Notification(x.t, { body: x.s }); } catch {}
+  if (!test && document.hidden) systemNotify(x.t, x.s, o.id);
 }
-$("#banner").addEventListener("click", () => { $("#banner").classList.remove("show"); if (route !== "panel") location.hash = "panel"; openOrder($("#banner").dataset.order); });
+$("#banner").addEventListener("click", () => { $("#banner").classList.remove("show"); if (!$("#banner").dataset.order) return; if (route !== "panel") location.hash = "panel"; openOrder($("#banner").dataset.order); });
 
 const loadedAt = Date.now();
 let notifiedUpTo = loadedAt;
@@ -1684,6 +1774,7 @@ let openOrderId = null;
 let receiptCache = {};
 function openOrder(id) {
   openOrderId = id;
+  ackOrder(id);
   renderOrderSheet();
   open($("#orderSheet"));
   const o = orderById(id);
@@ -2296,7 +2387,7 @@ function applyRoute(first) {
   $("#storeView").hidden = route === "panel";
   $("#adminView").hidden = route !== "panel";
   $$(".sheet.open, .drawer.open").forEach(close);
-  if (route === "panel") { renderAdmin(); document.title = `${CONFIG.brand} · Panel`; }
+  if (route === "panel") { renderAdmin(); document.title = `${CONFIG.brand} · Panel`; if (lsGet("md-wake", false)) keepAwake(true); }
   else { document.title = `${CONFIG.brand} Casual Food`; renderTrackPill(); }
   window.scrollTo({ top: 0 });
 }
@@ -2305,6 +2396,7 @@ window.addEventListener("hashchange", applyRoute);
 Backend.onOrders((list) => {
   orders = list; ordersLoaded = true;
   checkNewEvents();
+  updateRinging();
   renderTrackPill();
   if ($("#track").classList.contains("open")) renderTracking();
   if (route === "panel") renderAdmin();

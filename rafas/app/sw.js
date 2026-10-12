@@ -1,6 +1,6 @@
 // Service worker: deja la app abrir sin conexión y carga más rápido.
 // Sube CACHE (v2, v3…) cada vez que publiques cambios para que los teléfonos tomen la versión nueva.
-const CACHE = "rafas-panel-v3";
+const CACHE = "rafas-panel-v4";
 const SHELL = [
   "./",
   "./index.html",
@@ -46,4 +46,16 @@ self.addEventListener("fetch", (e) => {
       }))
     );
   }
+});
+
+// Al tocar una notificación de pedido, abre (o enfoca) el panel.
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      const win = list.find((c) => c.url.includes("/app/"));
+      if (win) { win.focus(); return win.navigate ? win.navigate("./#panel") : null; }
+      return self.clients.openWindow("./#panel");
+    })
+  );
 });

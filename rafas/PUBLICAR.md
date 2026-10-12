@@ -54,7 +54,7 @@ En el menú de la izquierda:
 
 ## 4. Publicar
 
-Necesitas una computadora con [Node.js 20](https://nodejs.org) instalado. En una terminal:
+Necesitas una computadora con [Node.js 22](https://nodejs.org) instalado. En una terminal:
 
 ```bash
 npm install -g firebase-tools

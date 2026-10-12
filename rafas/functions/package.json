@@ -3,7 +3,7 @@
   "description": "Funciones del servidor: pedidos, stock, avisos, tasa BCV y equipo",
   "private": true,
   "main": "index.js",
-  "engines": { "node": "20" },
+  "engines": { "node": "22" },
   "scripts": {
     "test": "node --test"
   },

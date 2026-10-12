@@ -886,6 +886,7 @@ const CONFIG = {
     prices: {},
     stock: {},
     lowStock: 3,
+    auto: { acceptCash: false, schedule: false, openAt: "11:00", closeAt: "23:00", printOnReady: false },
   },
 };
 
@@ -1094,6 +1095,14 @@ let orders = [];
 let ordersLoaded = false;
 const priceOf = (p) => (settings.prices?.[p.id] != null && settings.prices[p.id] !== "" ? Number(settings.prices[p.id]) : p.price);
 const stockOf = (p) => { const v = settings.stock?.[p.id]; return v == null || v === "" ? null : Math.max(0, Number(v) || 0); };
+function isOpenNow() {
+  if (settings.open === false) return false;
+  const a = settings.auto || {};
+  if (!a.schedule) return true;
+  const toMin = (t) => { const [h, m] = String(t || "0:0").split(":").map(Number); return (h || 0) * 60 + (m || 0); };
+  const d = new Date(), now = d.getHours() * 60 + d.getMinutes(), o = toMin(a.openAt), c = toMin(a.closeAt);
+  return o <= c ? now >= o && now < c : now >= o || now < c;
+}
 const isSoldOut = (p) => (settings.soldOut || []).includes(p.id) || stockOf(p) === 0;
 const isLow = (p) => { const v = stockOf(p); return v != null && v > 0 && v <= (settings.lowStock ?? 3); };
 const inCart = (id) => cart.reduce((n, l) => n + (l.id === id ? l.qty : 0), 0);
@@ -1111,10 +1120,11 @@ function saveSettings(patch, immediate = false, silent = false) {
   if (immediate) go(); else settingsSaveTimer = setTimeout(go, 700);
 }
 function applySettings() {
-  $("#closedPill").hidden = settings.open !== false;
+  $("#closedPill").hidden = isOpenNow();
+  $("#closedPill").textContent = settings.open !== false && settings.auto?.schedule ? `● Cerrado ahora · abrimos a las ${settings.auto.openAt}` : "● Cerrado ahora · vuelve pronto";
   const sw = $("#openSwitch");
   sw.setAttribute("aria-pressed", String(settings.open !== false));
-  sw.querySelector("span").textContent = settings.open !== false ? "Abierto" : "Cerrado";
+  sw.querySelector("span").textContent = settings.open === false ? "Cerrado" : isOpenNow() ? "Abierto" : "Fuera de horario";
   renderGrid(); renderFeatured(); renderSlides();
   if (route === "panel") renderAdmin();
 }
@@ -1317,7 +1327,7 @@ $("#cartList").addEventListener("click", (e) => {
 /* Checkout */
 const co = { dtype: "delivery", method: "pagomovil", receipt: null };
 $("#checkoutBtn").addEventListener("click", () => {
-  if (settings.open === false) { toast("El local está cerrado ahora. Vuelve en el horario de atención."); return; }
+  if (!isOpenNow()) { toast(settings.auto?.schedule ? `Estamos cerrados. Abrimos a las ${settings.auto.openAt}.` : "El local está cerrado ahora. Vuelve en el horario de atención."); return; }
   const saved = lsGet("md-customer", {});
   $("#coName").value ||= saved.name || "";
   $("#coPhone").value ||= saved.phone || "";
@@ -1417,11 +1427,12 @@ $("#coForm").addEventListener("submit", async (e) => {
   const fee = zone ? zone.fee : 0;
   const timeline = [{ at: createdAt, type: "created" }];
   if (m.proof) timeline.push({ at: createdAt + 1, type: "receipt" });
+  else if (settings.auto?.acceptCash) timeline.push({ at: createdAt + 1, type: "status", status: "cocina", auto: true });
   const newStock = { ...(settings.stock || {}) };
   let stockApplied = false;
   items.forEach((i) => { if (newStock[i.id] != null && newStock[i.id] !== "") { newStock[i.id] = Math.max(0, Number(newStock[i.id]) - i.qty); stockApplied = true; } });
   const order = {
-    code: codeFor(createdAt), createdAt, status: m.proof ? "verificar" : "nuevo", example: false,
+    code: codeFor(createdAt), createdAt, status: m.proof ? "verificar" : settings.auto?.acceptCash ? "cocina" : "nuevo", example: false,
     customer: { name, phone },
     delivery: zone ? { type: "delivery", zoneId: zone.id, zoneName: zone.name, address: $("#coAddress").value.trim(), reference: $("#coRef").value.trim() } : { type: "pickup" },
     items, subtotal, fee, total: subtotal + fee, rate: settings.rate || 0,
@@ -1618,7 +1629,7 @@ const EVENT_TEXT = {
   created: (o) => ({ t: `Nuevo pedido ${o.code}`, s: `${o.customer.name} · ${money(o.total)} · ${o.delivery.type === "delivery" ? o.delivery.zoneName : "Retiro"}`, cls: "s-nuevo", icon: ICON.bell }),
   receipt: (o) => ({ t: `Comprobante recibido ${o.code}`, s: `${payName(o.payment.method)}${o.payment.ref ? " · Ref. " + o.payment.ref : ""} · ${money(o.total)}`, cls: "s-verificar", icon: ICON.photo }),
   payment: (o, e) => ({ t: e.ok ? `Pago verificado ${o.code}` : `Pago rechazado ${o.code}`, s: o.customer.name, cls: e.ok ? "s-entregado" : "s-cancelado", icon: e.ok ? ICON.check : ICON.x }),
-  status: (o, e) => ({ t: `${o.code} · ${STATUS[e.status]?.label}`, s: o.customer.name + (e.status === "camino" && o.driverId ? " · " + driverName(o.driverId) : ""), cls: "s-" + e.status, icon: e.status === "camino" ? ICON.bike : e.status === "cocina" ? ICON.pot : ICON.check }),
+  status: (o, e) => ({ t: `${o.code} · ${STATUS[e.status]?.label}${e.auto ? " (automático)" : ""}`, s: o.customer.name + (e.status === "camino" && o.driverId ? " · " + driverName(o.driverId) : ""), cls: "s-" + e.status, icon: e.status === "camino" ? ICON.bike : e.status === "cocina" ? ICON.pot : ICON.check }),
 };
 function allEvents() {
   const ev = [];
@@ -1803,7 +1814,11 @@ async function act(name, id) {
       await Backend.updateOrder(o.id, { payment: { ...o.payment, status: "rejected" }, timeline });
       return toast("Pago rechazado. Avísale al cliente por WhatsApp.");
     }
-    if (name === "ready") return await changeStatus(o, "listo", {}, `${o.code} listo`);
+    if (name === "ready") {
+      await changeStatus(o, "listo", {}, `${o.code} listo`);
+      if (settings.auto?.printOnReady) { openLabel([id]); if (!IN_VIEWER) setTimeout(() => $("#lbPrint").click(), 300); }
+      return;
+    }
     if (name === "dispatch") {
       const sel = document.querySelector(`[data-driver-for="${id}"]`) || $("#odDriver");
       const driverId = sel?.value || o.driverId;
@@ -2030,6 +2045,13 @@ function renderSettings() {
       <div class="setrow"><div><b>Meta de preparación</b><small>Minutos antes de marcar un pedido como atrasado en cocina</small></div><input class="input num" style="width:110px" type="number" min="5" max="90" id="stPrep" value="${s.prepMinutes}" aria-label="Minutos"></div>
       <div class="setrow"><div><b>Ancho de etiqueta</b><small>Según tu impresora térmica</small></div><select class="select" style="width:120px" id="stWidth"><option value="80" ${s.ticketWidth == 80 ? "selected" : ""}>80 mm</option><option value="58" ${s.ticketWidth == 58 ? "selected" : ""}>58 mm</option></select></div>
     </div>
+    <div class="panel"><h3>Automático</h3><p class="hint">Lo que la app hace sola, sin que tengas que tocar nada.</p>
+      <div class="setrow"><div><b>Aceptar solos los pedidos en efectivo</b><small>Entran directo a cocina, aunque el panel esté cerrado</small></div><label class="switch"><input type="checkbox" id="auCash" ${s.auto?.acceptCash ? "checked" : ""} aria-label="Aceptar pedidos en efectivo"><i></i></label></div>
+      <div class="setrow"><div><b>Abrir y cerrar por horario</b><small>La tienda se abre y se cierra sola a estas horas</small></div><label class="switch"><input type="checkbox" id="auSched" ${s.auto?.schedule ? "checked" : ""} aria-label="Horario automático"><i></i></label></div>
+      <div class="setrow" ${s.auto?.schedule ? "" : "hidden"}><div><b>Horario</b><small>Si cierra después de medianoche, también funciona</small></div><div style="display:flex;gap:6px;align-items:center"><input class="input num" style="width:104px" type="time" id="auOpen" value="${esc(s.auto?.openAt || "11:00")}" aria-label="Abre"><span>a</span><input class="input num" style="width:104px" type="time" id="auClose" value="${esc(s.auto?.closeAt || "23:00")}" aria-label="Cierra"></div></div>
+      <div class="setrow"><div><b>Etiqueta al marcar listo</b><small>${IN_VIEWER ? "Abre la etiqueta lista para descargar" : "Manda la etiqueta a la impresora sola"} cada vez que cocina termina un pedido</small></div><label class="switch"><input type="checkbox" id="auPrint" ${s.auto?.printOnReady ? "checked" : ""} aria-label="Imprimir al marcar listo"><i></i></label></div>
+      <div class="setrow"><div><b>Siempre automático</b><small>Al confirmar un pago el pedido pasa a cocina, el stock se descuenta y se devuelve solo, los productos en 0 se marcan agotados y el cliente ve cada cambio al instante</small></div></div>
+    </div>
     <div class="panel"><h3>Zonas de delivery <button class="btn sm ghost" id="addZone">${ICON.plus}Zona</button></h3><p class="hint">El cliente elige la zona y se suma el costo al total.</p>
       ${(s.zones || []).map((z, i) => `<div class="listrow"><input class="input" data-zone-name="${i}" value="${esc(z.name)}" aria-label="Nombre de zona"><input class="input num" type="number" step="0.5" min="0" data-zone-fee="${i}" value="${z.fee}" aria-label="Costo"><button class="del" data-zone-del="${i}" aria-label="Quitar zona">×</button></div>`).join("")}
     </div>
@@ -2043,6 +2065,12 @@ function renderSettings() {
     <div class="panel"><h3>Conexión</h3><p class="hint">${Backend.mode === "db" ? "Conectado a la base de datos compartida: la tienda y este panel ven los mismos pedidos en tiempo real." : "Modo local: los pedidos se guardan en este navegador y se sincronizan entre pestañas. En producción se conecta a un servidor."}</p></div>`;
   const num = (v) => Math.max(0, parseFloat(v) || 0);
   $("#installBtn")?.addEventListener("click", installApp);
+  const setAuto = (patch) => saveSettings({ auto: { ...CONFIG.defaults.auto, ...(settings.auto || {}), ...patch } }, true);
+  $("#auCash").addEventListener("change", (e) => setAuto({ acceptCash: e.target.checked }));
+  $("#auSched").addEventListener("change", (e) => setAuto({ schedule: e.target.checked }));
+  $("#auOpen")?.addEventListener("change", (e) => setAuto({ openAt: e.target.value || "11:00" }));
+  $("#auClose")?.addEventListener("change", (e) => setAuto({ closeAt: e.target.value || "23:00" }));
+  $("#auPrint").addEventListener("change", (e) => setAuto({ printOnReady: e.target.checked }));
   $("#stOpen").addEventListener("change", (e) => saveSettings({ open: e.target.checked }, true));
   $("#stRate").addEventListener("change", (e) => saveSettings({ rate: num(e.target.value) }, true));
   $("#stPrep").addEventListener("change", (e) => saveSettings({ prepMinutes: Math.min(90, Math.max(5, parseInt(e.target.value) || 20)) }, true));
@@ -2247,6 +2275,7 @@ Backend.onSettings((s) => {
 });
 
 renderTiles(); renderGrid(); renderCart(); applyRoute(true);
+setInterval(() => { if (route !== "panel") { $("#closedPill").hidden = isOpenNow(); } else { const sw = $("#openSwitch"); sw.querySelector("span").textContent = settings.open === false ? "Cerrado" : isOpenNow() ? "Abierto" : "Fuera de horario"; } }, 60000);
 setInterval(() => { if (route === "panel" && !document.querySelector(".sheet.open")) { renderHeader(); if (pane === "kitchen") renderKitchen(); if (pane === "orders") renderOrders(); } }, 30000);
 Backend.init().then((mode) => {
   setLive(true);

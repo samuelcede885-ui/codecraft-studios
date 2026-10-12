@@ -18,6 +18,7 @@ Un solo archivo (`index.html`) con dos caras:
 | **Reportes** | Ventas, ticket promedio, ventas por hora, más vendidos, métodos de pago y zonas. Exporta la tabla para Excel. |
 | **Inventario** | Stock por producto con botones −/+/+10, “Sin límite” para lo que no se cuenta, aviso de poco stock (umbral configurable), pausar un producto y cambiar precios. Cada pedido descuenta el stock, cada cancelación lo devuelve, y en 0 la tienda lo muestra “Agotado” y no deja comprarlo. |
 | **Clientes** | Quién compra más, cuántos pedidos lleva y acceso directo a WhatsApp. |
+| **Automático** | Aceptar solos los pedidos en efectivo (van directo a cocina aunque el panel esté cerrado), abrir y cerrar la tienda por horario, e imprimir la etiqueta sola al marcar listo. |
 | **Ajustes** | Abrir/cerrar el local, tasa del día, meta de cocina, ancho de etiqueta, zonas con su costo, repartidores y datos de pago que ve el cliente. |
 
 Desde el pedido también se manda un **WhatsApp al cliente** con el mensaje según el estado, y al **repartidor** con la dirección y el link del mapa.

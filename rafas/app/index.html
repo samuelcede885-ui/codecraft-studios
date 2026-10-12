@@ -1223,12 +1223,12 @@ const Backend = (() => {
     async removeStaff(uid) { try { return await call("removeStaff", { uid }); } catch (e) { throw fbError(e, "No pudimos quitar a esa persona."); } },
     async refreshRate() { try { return await call("refreshRate", {}); } catch (e) { throw fbError(e, "No pudimos leer la tasa del BCV."); } },
     async registerPush() {
-      if (mode !== "firebase" || !role || !window.FIREBASE_VAPID_KEY || !("serviceWorker" in navigator)) return false;
+      if (mode !== "firebase" || !role || !("serviceWorker" in navigator)) return false;
       try {
         const m = await import(SDK + "firebase-messaging.js");
         if (!(await m.isSupported())) return false;
         const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.register("sw.js"));
-        const token = await m.getToken(m.getMessaging(app), { vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
+        const token = await m.getToken(m.getMessaging(app), { ...(window.FIREBASE_VAPID_KEY ? { vapidKey: window.FIREBASE_VAPID_KEY } : {}), serviceWorkerRegistration: reg });
         if (!token) return false;
         await F.fs.updateDoc(F.fs.doc(fs, "stores", sid, "staff", user.uid), { tokens: F.fs.arrayUnion(token), lastSeen: Date.now() });
         return true;

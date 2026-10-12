@@ -51,7 +51,7 @@ exports.createOrder = onCall({ enforceAppCheck: false }, async (req) => {
   const receiptPath = typeof req.data?.receiptPath === "string" ? req.data.receiptPath : "";
   if (receiptPath) {
     if (!receiptPath.startsWith(`stores/${sid}/uploads/${uid}/`) || receiptPath.includes("..")) throw new HttpsError("permission-denied", "Comprobante no válido.");
-    const [exists] = await admin.storage().bucket().file(receiptPath).exists();
+    const [exists] = await admin.storage().bucket(process.env.RECEIPTS_BUCKET || undefined).file(receiptPath).exists();
     if (!exists) throw new HttpsError("failed-precondition", "No recibimos el comprobante. Súbelo otra vez.");
   }
 

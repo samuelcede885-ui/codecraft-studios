@@ -1,0 +1,74 @@
+name: Publicar Rafa's
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [rafas-landing]
+    paths: ["rafas/**", ".github/workflows/rafas-publicar.yml"]
+
+concurrency:
+  group: rafas-publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: rafas
+    env:
+      SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SETUP_CODE: ${{ secrets.SETUP_CODE }}
+      FIREBASE_VAPID_KEY: ${{ secrets.FIREBASE_VAPID_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ¿Ya está la llave del proyecto?
+        id: check
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "::warning::Falta el secreto FIREBASE_SERVICE_ACCOUNT. Agrégalo en Settings › Secrets and variables › Actions y vuelve a correr."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.ready == 'true'
+        with:
+          node-version: 22
+
+      - name: Probar la lógica de pedidos
+        if: steps.check.outputs.ready == 'true'
+        working-directory: rafas/functions
+        run: |
+          npm ci
+          npm test
+
+      - name: Configurar el proyecto de Firebase
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npm install --prefix deploy --no-audit --no-fund
+          node deploy/setup.mjs
+
+      - name: Publicar (base de datos, reglas, servidor y página)
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          FB="$PWD/deploy/node_modules/.bin/firebase"
+          for i in 1 2 3; do
+            if "$FB" deploy --project "$PROJECT_ID" --non-interactive --force; then exit 0; fi
+            echo "::notice::Intento $i falló; los permisos de un proyecto nuevo tardan unos minutos. Reintento en 90 s."
+            sleep 90
+          done
+          exit 1
+
+      - name: Dirección
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          echo "### Publicado ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tienda: https://$PROJECT_ID.web.app" >> "$GITHUB_STEP_SUMMARY"
+          echo "- App del dueño: https://$PROJECT_ID.web.app/#panel" >> "$GITHUB_STEP_SUMMARY"

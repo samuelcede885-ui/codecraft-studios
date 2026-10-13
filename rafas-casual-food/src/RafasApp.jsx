@@ -923,18 +923,29 @@ export default function RafasApp() {
           aria-roledescription="carrusel"
           aria-label="Hamburguesas insignia"
         >
-          <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-8 sm:px-6 lg:min-h-[calc(100vh-76px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8 lg:py-10">
+          {/* Desktop: giant word spans the whole banner, behind everything */}
+          <div className="pointer-events-none absolute inset-x-0 top-8 hidden select-none justify-center lg:flex" aria-hidden="true">
+            <span
+              key={heroProduct.heroWord}
+              className="rf-word-in font-display whitespace-nowrap uppercase leading-[0.8] text-[#6D28D9]"
+              style={{ fontSize: `min(${Math.round(1180 / (heroProduct.heroWord.length * 0.6))}px, 19vw, 16rem)` }}
+            >
+              {heroProduct.heroWord}
+            </span>
+          </div>
+
+          <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-8 sm:px-6 lg:min-h-[calc(100vh-76px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] lg:items-end lg:gap-8 lg:pb-12 lg:pt-[260px]">
             {/* Center: giant word + burger */}
-            <div className="order-1 [container-type:inline-size] lg:order-2">
+            <div className="order-1 [container-type:inline-size] lg:order-2 lg:-mt-[150px] lg:self-start">
               <h2
                 key={heroProduct.heroWord}
-                className="rf-word-in font-display select-none whitespace-nowrap text-center uppercase leading-[0.8] text-[#6D28D9]"
+                className="rf-word-in font-display select-none whitespace-nowrap text-center uppercase leading-[0.8] text-[#6D28D9] lg:hidden"
                 style={{ fontSize: `min(${(118 / (heroProduct.heroWord.length * 0.6)).toFixed(2)}cqw, 15rem)` }}
                 aria-hidden="true"
               >
                 {heroProduct.heroWord}
               </h2>
-              <div className="relative mx-auto -mt-[13%] w-[80%] max-w-[460px]">
+              <div className="relative mx-auto -mt-[13%] w-[80%] max-w-[460px] lg:mt-0 lg:w-full lg:max-w-[560px]">
                 <div style={{ transform: 'translate3d(calc(var(--mx) * 10px), calc(var(--my) * 6px), 0)' }} className="transition-transform duration-300 ease-out">
                   <img
                     key={heroProduct.id}
@@ -1001,7 +1012,7 @@ export default function RafasApp() {
             </div>
 
             {/* Right: active product */}
-            <div key={heroProduct.id} className="rf-fade-up order-3 text-center lg:text-left">
+            <div key={heroProduct.id} className="rf-fade-up order-3 text-center lg:self-center lg:text-left">
               <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6D28D9]">
                 {heroProduct.heroTag} · 0{heroIndex + 1}/0{HERO_SLIDES.length}
               </p>

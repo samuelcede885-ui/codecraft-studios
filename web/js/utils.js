@@ -24,14 +24,10 @@ export function initials(name = '') {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
 }
 
-/** Sustituye las imágenes que no cargan por un marcador neutro. */
-export function fallbackOnError(root, emptyClass) {
+/** Sustituye las imágenes que no cargan por el nodo que devuelva `makeFallback(img)`. */
+export function fallbackOnError(root, makeFallback) {
   root.querySelectorAll('img').forEach((img) => img.addEventListener('error', () => {
-    const empty = document.createElement('div');
-    empty.className = `${img.className} ${emptyClass}`;
-    empty.setAttribute('aria-hidden', 'true');
-    empty.textContent = '🍽️';
-    img.replaceWith(empty);
+    img.replaceWith(makeFallback(img));
   }, { once: true }));
   return root;
 }

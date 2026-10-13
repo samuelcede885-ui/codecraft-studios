@@ -1,15 +1,14 @@
 /** Componentes del panel administrativo. */
 import { escapeHtml, fallbackOnError, formatPrice, html } from '../utils.js';
+import { foodPlaceholder, foodVisual } from '../food.js';
 
 export function ProductRow(product, category, currency) {
-  const thumb = product.image_url
-    ? `<img class="thumb" src="${escapeHtml(product.image_url)}" alt="">`
-    : `<span class="thumb thumb--empty" aria-hidden="true">🍽️</span>`;
-  return fallbackOnError(html(`
+  const visual = foodVisual(product, category?.name);
+  const row = html(`
     <tr data-id="${product.id}">
       <td>
         <div class="cell-product">
-          ${thumb}
+          <span class="thumb-slot"></span>
           <div>
             <strong>${escapeHtml(product.name)}</strong>
             <small>${escapeHtml(product.description ?? '')}</small>
@@ -28,7 +27,12 @@ export function ProductRow(product, category, currency) {
         <button class="btn btn--ghost btn--sm" data-action="edit">Editar</button>
         <button class="btn btn--danger btn--sm" data-action="delete" aria-label="Eliminar ${escapeHtml(product.name)}">✕</button>
       </td>
-    </tr>`), 'thumb--empty');
+    </tr>`);
+
+  row.querySelector('.thumb-slot').replaceWith(product.image_url
+    ? html(`<img class="thumb" src="${escapeHtml(product.image_url)}" alt="">`)
+    : foodPlaceholder('thumb', visual));
+  return fallbackOnError(row, () => foodPlaceholder('thumb', visual));
 }
 
 /**

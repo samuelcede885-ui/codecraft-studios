@@ -1,5 +1,6 @@
 /** Componentes de la vista pública (catálogo móvil). */
 import { escapeHtml, fallbackOnError, formatPrice, html, initials } from '../utils.js';
+import { categoryEmoji, foodPlaceholder, foodVisual } from '../food.js';
 
 export function MenuHeader(restaurant, branding) {
   const logo = branding.logo_url
@@ -19,7 +20,7 @@ export function MenuHeader(restaurant, branding) {
 export function CategoryTabs(categories) {
   const nav = html(`
     <nav class="category-tabs" aria-label="Categorías">
-      ${categories.map((c) => `<a class="category-tabs__item" href="#cat-${c.id}" data-id="${c.id}">${escapeHtml(c.name)}</a>`).join('')}
+      ${categories.map((c) => `<a class="category-tabs__item" href="#cat-${c.id}" data-id="${c.id}"><span aria-hidden="true">${categoryEmoji(c.name)}</span> ${escapeHtml(c.name)}</a>`).join('')}
     </nav>`);
 
   nav.setActive = (id) => {
@@ -32,12 +33,11 @@ export function CategoryTabs(categories) {
   return nav;
 }
 
-export function ProductCard(product, currency) {
-  const image = product.image_url
-    ? `<img class="product-card__img" src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy">`
-    : `<div class="product-card__img product-card__img--empty" aria-hidden="true">🍽️</div>`;
+/** Tarjeta de plato. Sin foto (o si no carga) muestra una ilustración acorde al plato. */
+export function ProductCard(product, currency, categoryName = '') {
+  const visual = foodVisual(product, categoryName);
   const tags = product.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
-  return fallbackOnError(html(`
+  const card = html(`
     <article class="product-card">
       <div class="product-card__body">
         <h3 class="product-card__name">${escapeHtml(product.name)}</h3>
@@ -45,17 +45,21 @@ export function ProductCard(product, currency) {
         ${tags ? `<div class="product-card__tags">${tags}</div>` : ''}
         <strong class="product-card__price">${formatPrice(product.price, currency)}</strong>
       </div>
-      ${image}
-    </article>`), 'product-card__img--empty');
+    </article>`);
+
+  card.append(product.image_url
+    ? html(`<img class="product-card__img" src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy">`)
+    : foodPlaceholder('product-card__img', visual));
+  return fallbackOnError(card, () => foodPlaceholder('product-card__img', visual));
 }
 
 export function CategorySection(category, products, currency) {
   const section = html(`
     <section class="menu-section" id="cat-${category.id}" data-id="${category.id}">
-      <h2 class="menu-section__title">${escapeHtml(category.name)}</h2>
+      <h2 class="menu-section__title"><span aria-hidden="true">${categoryEmoji(category.name)}</span> ${escapeHtml(category.name)}</h2>
       <div class="menu-section__list"></div>
     </section>`);
   const list = section.querySelector('.menu-section__list');
-  products.forEach((p) => list.append(ProductCard(p, currency)));
+  products.forEach((p) => list.append(ProductCard(p, currency, category.name)));
   return section;
 }

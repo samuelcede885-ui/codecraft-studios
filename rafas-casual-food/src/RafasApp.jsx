@@ -923,18 +923,18 @@ export default function RafasApp() {
           aria-roledescription="carrusel"
           aria-label="Hamburguesas insignia"
         >
-          <div className="mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6 lg:pb-14 lg:pt-8">
-            {/* Giant word + burger */}
-            <div className="relative">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-8 sm:px-6 lg:min-h-[calc(100vh-76px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-8 lg:py-10">
+            {/* Center: giant word + burger */}
+            <div className="order-1 [container-type:inline-size] lg:order-2">
               <h2
                 key={heroProduct.heroWord}
                 className="rf-word-in font-display select-none whitespace-nowrap text-center uppercase leading-[0.8] text-[#6D28D9]"
-                style={{ fontSize: `min(${(92 / (heroProduct.heroWord.length * 0.6)).toFixed(2)}vw, ${Math.round(1180 / (heroProduct.heroWord.length * 0.6))}px, 15rem)` }}
+                style={{ fontSize: `min(${(118 / (heroProduct.heroWord.length * 0.6)).toFixed(2)}cqw, 15rem)` }}
                 aria-hidden="true"
               >
                 {heroProduct.heroWord}
               </h2>
-              <div className="relative mx-auto -mt-[14%] w-[82%] max-w-[460px] sm:-mt-[12%] lg:-mt-[105px]">
+              <div className="relative mx-auto -mt-[13%] w-[80%] max-w-[460px]">
                 <div style={{ transform: 'translate3d(calc(var(--mx) * 10px), calc(var(--my) * 6px), 0)' }} className="transition-transform duration-300 ease-out">
                   <img
                     key={heroProduct.id}
@@ -946,83 +946,82 @@ export default function RafasApp() {
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Slider controls */}
-            <div className="mt-4 flex items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={() => heroGo(-1)}
-                aria-label="Hamburguesa anterior"
-                className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <div className="flex items-center gap-2" role="tablist" aria-label="Seleccionar hamburguesa">
-                {HERO_SLIDES.map((p, i) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={i === heroIndex}
-                    aria-label={p.name}
-                    onClick={() => setHeroIndex(i)}
-                    className={`h-1.5 rounded-full transition-all duration-500 ${i === heroIndex ? 'w-8 bg-[#5B21B6]' : 'w-3 bg-[#1E1035]/15 hover:bg-[#1E1035]/30'}`}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() => heroGo(1)}
-                aria-label="Siguiente hamburguesa"
-                className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Copy */}
-            <div className="mt-8 grid gap-10 border-t border-[#1E1035]/10 pt-8 md:grid-cols-2 md:gap-16">
-              <div>
-                <h1 className="font-display text-[2.4rem] uppercase leading-[0.95] text-[#1E1035] sm:text-5xl">
-                  Más que una burger, <span className="text-[#5B21B6]">un concepto de locos.</span>
-                </h1>
-                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65">
-                  Smash burgers con costra crujiente y pan brioche, hechas al momento. <span className="font-script text-lg text-[#6D28D9]">by @rafacheff</span>
-                </p>
-                <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold text-[#1E1035]/70">
-                  <Trophy className="h-4 w-4 text-[#F59E0B]" />
-                  {AWARDS.map((a, i) => (
-                    <span key={a.label}>
-                      {a.label} {a.year}
-                      {i < AWARDS.length - 1 && <span className="ml-3 text-[#1E1035]/25">·</span>}
-                    </span>
+              {/* Slider controls */}
+              <div className="mt-4 flex items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => heroGo(-1)}
+                  aria-label="Hamburguesa anterior"
+                  className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <div className="flex items-center gap-2" role="tablist" aria-label="Seleccionar hamburguesa">
+                  {HERO_SLIDES.map((p, i) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={i === heroIndex}
+                      aria-label={p.name}
+                      onClick={() => setHeroIndex(i)}
+                      className={`h-1.5 rounded-full transition-all duration-500 ${i === heroIndex ? 'w-8 bg-[#5B21B6]' : 'w-3 bg-[#1E1035]/15 hover:bg-[#1E1035]/30'}`}
+                    />
                   ))}
-                </p>
-              </div>
-
-              <div key={heroProduct.id} className="rf-fade-up md:pt-1">
-                <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6D28D9]">
-                  {heroProduct.heroTag} · 0{heroIndex + 1}/0{HERO_SLIDES.length}
-                </p>
-                <h2 className="mt-2 text-2xl font-extrabold leading-tight sm:text-3xl">{heroProduct.name}</h2>
-                <p className="mt-2 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65">{heroProduct.description}</p>
-                <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-                  <button
-                    type="button"
-                    onClick={() => openProduct(heroProduct)}
-                    className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#5B21B6] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#6D28D9]"
-                  >
-                    Ordenar Ahora — {fmtUSD(heroProduct.price)}
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <p className="text-sm text-[#1E1035]/55">
-                    {fmtBs(heroProduct.price, rate)}
-                    <button type="button" onClick={() => addToCart(heroProduct)} className="ml-4 font-bold text-[#5B21B6] underline-offset-4 hover:underline">
-                      {justAdded === heroProduct.id ? 'Agregada ✓' : 'Agregar rápido'}
-                    </button>
-                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => heroGo(1)}
+                  aria-label="Siguiente hamburguesa"
+                  className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Left: headline + awards */}
+            <div className="order-2 text-center lg:order-1 lg:text-left">
+              <p className="font-script text-3xl leading-none text-[#6D28D9] sm:text-4xl">Casual Food</p>
+              <h1 className="font-display mt-3 text-[2.6rem] uppercase leading-[0.92] text-[#1E1035] sm:text-6xl lg:text-[3.6rem] xl:text-[4.2rem]">
+                Más que una burger, <span className="text-[#5B21B6]">un concepto</span> de locos.
+              </h1>
+              <p className="mx-auto mt-5 max-w-sm text-[15px] leading-relaxed text-[#1E1035]/65 lg:mx-0">
+                Smash burgers con costra crujiente, pan brioche y salsas de la casa. <span className="font-script text-xl text-[#6D28D9]">by @rafacheff</span>
+              </p>
+              <ul className="mt-6 space-y-1.5 text-[13px] font-semibold text-[#1E1035]/70">
+                {AWARDS.map((a) => (
+                  <li key={a.label} className="flex items-center justify-center gap-2 lg:justify-start">
+                    <Trophy className="h-3.5 w-3.5 text-[#F59E0B]" />
+                    {a.label} {a.year}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right: active product */}
+            <div key={heroProduct.id} className="rf-fade-up order-3 text-center lg:text-left">
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6D28D9]">
+                {heroProduct.heroTag} · 0{heroIndex + 1}/0{HERO_SLIDES.length}
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold leading-tight sm:text-3xl">{heroProduct.name}</h2>
+              <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65 lg:mx-0">{heroProduct.description}</p>
+              <p className="mt-5 font-display text-4xl leading-none text-[#5B21B6]">
+                {fmtUSD(heroProduct.price)} <span className="font-sans text-sm font-semibold text-[#1E1035]/50">≈ {fmtBs(heroProduct.price, rate)}</span>
+              </p>
+              <div className="mt-6 flex flex-col items-center gap-3 lg:items-start">
+                <button
+                  type="button"
+                  onClick={() => openProduct(heroProduct)}
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#5B21B6] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#6D28D9]"
+                >
+                  Ordenar Ahora — {fmtUSD(heroProduct.price)}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button type="button" onClick={() => addToCart(heroProduct)} className="text-sm font-bold text-[#5B21B6] underline-offset-4 hover:underline">
+                  {justAdded === heroProduct.id ? 'Agregada ✓' : 'Agregar rápido'}
+                </button>
               </div>
             </div>
           </div>

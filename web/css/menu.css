@@ -1,0 +1,74 @@
+/* =========================================================================
+   Catálogo móvil (vista pública). Diseñado mobile-first; en pantallas
+   grandes se centra en una columna de ancho de teléfono.
+   ========================================================================= */
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+.menu-page { background: var(--surface); }
+.menu-app { max-width: 560px; margin: 0 auto; min-height: 100dvh; background: var(--surface); }
+
+/* ---------- Cabecera ---------- */
+.menu-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 28px 20px 20px;
+  background: linear-gradient(180deg, var(--brand-soft), transparent);
+}
+.menu-header__logo {
+  width: 60px; height: 60px; flex: none;
+  border-radius: 16px; object-fit: cover;
+  box-shadow: var(--shadow);
+}
+.menu-header__logo--fallback {
+  display: grid; place-items: center;
+  background: var(--brand); color: var(--brand-contrast);
+  font-weight: 700; font-size: 1.3rem;
+}
+.menu-header__name { font-size: 1.45rem; line-height: 1.2; letter-spacing: -.02em; }
+.menu-header__desc { color: var(--muted); font-size: .9rem; }
+
+/* ---------- Pestañas de categoría ---------- */
+.category-tabs {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; gap: 8px; overflow-x: auto;
+  padding: 12px 20px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.category-tabs__item {
+  flex: none; padding: 7px 16px;
+  border-radius: 999px; border: 1px solid var(--border);
+  font-size: .88rem; font-weight: 600;
+  color: var(--text); text-decoration: none;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.category-tabs__item.is-active {
+  background: var(--brand); border-color: var(--brand); color: var(--brand-contrast);
+}
+
+/* ---------- Secciones y tarjetas ---------- */
+.menu-body { padding: 8px 20px 48px; }
+.menu-section { padding-top: 20px; }
+.menu-section__title { font-size: 1.15rem; margin-bottom: 4px; }
+.menu-section__list { display: flex; flex-direction: column; }
+
+.product-card {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.product-card:last-child { border-bottom: 0; }
+.product-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.product-card__name { font-size: 1rem; font-weight: 600; }
+.product-card__desc {
+  color: var(--muted); font-size: .86rem;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.product-card__tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.product-card__price { color: var(--brand); font-size: 1rem; margin-top: 2px; }
+.product-card__img {
+  width: 96px; height: 96px; flex: none;
+  border-radius: var(--radius); object-fit: cover; background: var(--bg);
+}
+.product-card__img--empty { display: grid; place-items: center; font-size: 2rem; }

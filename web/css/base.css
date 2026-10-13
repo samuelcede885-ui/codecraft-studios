@@ -1,0 +1,83 @@
+/* =========================================================================
+   Tokens y estilos compartidos. --brand* los sobrescribe theme.js con el
+   color principal guardado en la base de datos.
+   ========================================================================= */
+:root {
+  --brand: #c2410c;
+  --brand-contrast: #ffffff;
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+  --accent: #f59e0b;
+
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --danger: #dc2626;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 1px 2px rgb(0 0 0 / .04), 0 4px 16px rgb(0 0 0 / .06);
+  --font-brand: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-brand);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+h1, h2, h3, p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+.muted { color: var(--muted); }
+.empty { padding: 32px 16px; text-align: center; color: var(--muted); }
+
+/* ---------- Botones ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 16px;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  font-weight: 600; font-size: .9rem;
+  cursor: pointer; white-space: nowrap;
+  transition: background .15s, border-color .15s, transform .05s;
+}
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.btn--primary { background: var(--brand); color: var(--brand-contrast); }
+.btn--primary:hover { background: color-mix(in srgb, var(--brand) 88%, #000); }
+.btn--ghost { background: var(--surface); border-color: var(--border); }
+.btn--ghost:hover { background: var(--bg); }
+.btn--danger { background: transparent; color: var(--danger); }
+.btn--danger:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.btn--sm { padding: 5px 10px; font-size: .8rem; }
+.btn--block { width: 100%; }
+
+/* ---------- Etiquetas ---------- */
+.tag {
+  display: inline-block; padding: 1px 8px;
+  border-radius: 999px; font-size: .72rem; font-weight: 600;
+  background: var(--brand-soft); color: var(--brand);
+}
+
+/* ---------- Skeleton de carga ---------- */
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%) 0 0 / 200% 100%;
+  animation: shimmer 1.2s infinite;
+  margin: 16px;
+}
+.skeleton--header { height: 72px; }
+.skeleton--card { height: 112px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

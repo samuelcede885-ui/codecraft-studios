@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel · Menú digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script type="module" src="js/pages/admin.js"></script>
+</head>
+<body class="admin-page">
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="logo-badge" id="sidebar-logo"></span>
+      <strong id="restaurant-name">Cargando…</strong>
+    </div>
+    <nav class="sidebar__nav">
+      <a class="sidebar__link" href="#products">🍽️ <span>Productos</span></a>
+      <a class="sidebar__link" href="#branding">🎨 <span>Personalización</span></a>
+    </nav>
+    <a class="sidebar__link sidebar__external" id="menu-link" href="menu.html" target="_blank" rel="noopener">↗ <span>Ver menú público</span></a>
+  </aside>
+
+  <main class="content">
+    <!-- ================= Productos ================= -->
+    <section data-view="products">
+      <header class="page-header">
+        <div>
+          <h1>Productos</h1>
+          <p class="muted">Gestiona los platos, precios e imágenes de tu menú.</p>
+        </div>
+        <div class="page-header__actions">
+          <button class="btn btn--ghost" id="btn-new-category">+ Categoría</button>
+          <button class="btn btn--primary" id="btn-new-product">+ Nuevo plato</button>
+        </div>
+      </header>
+
+      <div class="stats">
+        <div class="stat"><span class="muted">Platos</span><strong id="stat-total">–</strong></div>
+        <div class="stat"><span class="muted">Disponibles</span><strong id="stat-available">–</strong></div>
+        <div class="stat"><span class="muted">Categorías</span><strong id="stat-categories">–</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <input type="search" id="filter-search" placeholder="Buscar plato…" aria-label="Buscar plato">
+          <select id="filter-category" aria-label="Filtrar por categoría"></select>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr><th>Plato</th><th>Categoría</th><th class="num">Precio</th><th>Disponible</th><th></th></tr>
+            </thead>
+            <tbody id="products-body"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="products-empty" hidden>No hay platos que coincidan.</p>
+      </div>
+    </section>
+
+    <!-- ================= Personalización ================= -->
+    <section data-view="branding" hidden>
+      <header class="page-header">
+        <div>
+          <h1>Personalización</h1>
+          <p class="muted">Logo y color principal de tu marca.</p>
+        </div>
+      </header>
+
+      <div class="branding-grid">
+        <form class="card form" id="branding-form">
+          <label>Nombre del restaurante <input name="restaurant_name" required></label>
+
+          <fieldset>
+            <legend>Logo</legend>
+            <div class="logo-field">
+              <span class="logo-badge logo-badge--lg" id="logo-preview"></span>
+              <label class="btn btn--ghost">Cambiar logo
+                <input type="file" name="logo" accept="image/*" hidden>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Color principal</legend>
+            <div class="color-field">
+              <input type="color" name="primary_color" aria-label="Selector de color">
+              <input name="primary_color_hex" pattern="#[0-9A-Fa-f]{6}" maxlength="7" aria-label="Código hexadecimal">
+            </div>
+            <div class="swatches">
+              <button type="button" data-swatch="#C2410C" style="--c:#C2410C" aria-label="Terracota"></button>
+              <button type="button" data-swatch="#B91C1C" style="--c:#B91C1C" aria-label="Rojo"></button>
+              <button type="button" data-swatch="#15803D" style="--c:#15803D" aria-label="Verde"></button>
+              <button type="button" data-swatch="#1D4ED8" style="--c:#1D4ED8" aria-label="Azul"></button>
+              <button type="button" data-swatch="#7C3AED" style="--c:#7C3AED" aria-label="Violeta"></button>
+              <button type="button" data-swatch="#111827" style="--c:#111827" aria-label="Negro"></button>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+        </form>
+
+        <div class="phone-preview" aria-label="Vista previa">
+          <div class="phone-preview__screen">
+            <div class="mini-header">
+              <span class="logo-badge" id="preview-logo"></span>
+              <strong id="preview-name"></strong>
+            </div>
+            <div class="mini-tabs"><span class="is-active">Entradas</span><span>Pizzas</span><span>Pastas</span></div>
+            <div class="mini-card"><div><b>Bruschetta</b><small>Pan, tomate, albahaca</small><em>$6.50</em></div><i></i></div>
+            <div class="mini-card"><div><b>Burrata</b><small>Con tomates cherry</small><em>$11.00</em></div><i></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

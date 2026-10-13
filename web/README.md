@@ -62,3 +62,11 @@ exigen las políticas de Storage.
 Todas lanzan un `Error` con mensaje en español (y el `code` del error original)
 cuando Supabase rechaza la operación. Los borrados comprueban que se eliminó
 una fila, porque RLS filtra un `DELETE` ajeno sin devolver error.
+
+## Ejemplo autocontenido: `examples/`
+
+`examples/productos-supabase.js` usa el SDK directamente (sin `api.js`) para
+cargar productos en el DOM, agregar uno desde un formulario y cambiar precio o
+marcarlo como agotado (`is_available = false`). Incluye manejo de errores con
+tiempo límite, reintentos solo para fallos de red y mensajes por tipo de error.
+Demo: `examples/productos.html?id=<uuid-del-restaurante>`.

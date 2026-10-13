@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Productos · Ejemplo Supabase</title>
+  <style>
+    :root { --brand: #c2410c; --border: #e5e7eb; --muted: #6b7280; }
+    body { margin: 0 auto; max-width: 720px; padding: 24px 16px; font-family: system-ui, sans-serif; color: #111827; background: #fff; }
+    h1 { font-size: 1.4rem; } h2 { font-size: 1.1rem; margin-top: 32px; }
+    .productos { list-style: none; padding: 0; margin: 0; }
+    .producto { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .producto small { grid-column: 1; color: var(--muted); }
+    .producto__precio { font-weight: 700; color: var(--brand); }
+    .producto__estado { font-size: .8rem; padding: 2px 8px; border-radius: 999px; background: #dcfce7; color: #166534; }
+    .producto--agotado { opacity: .6; }
+    .producto--agotado .producto__estado { background: #fee2e2; color: #991b1b; }
+    .producto__acciones { grid-column: 1 / -1; display: flex; gap: 8px; }
+    .producto__acciones input { width: 90px; }
+    .alerta { padding: 12px; border-radius: 8px; background: #fef2f2; color: #991b1b; }
+    .alerta--conexion, .alerta--timeout { background: #fffbeb; color: #92400e; }
+    form { display: grid; gap: 10px; }
+    label { display: grid; gap: 4px; font-size: .9rem; }
+    input, select, textarea, button { font: inherit; padding: 8px; border: 1px solid var(--border); border-radius: 6px; }
+    button { cursor: pointer; background: #fff; }
+    button[type=submit] { background: var(--brand); color: #fff; border-color: var(--brand); }
+    #estado:empty { display: none; }
+    #estado { padding: 10px; border-radius: 8px; background: #f3f4f6; }
+  </style>
+</head>
+<body>
+  <h1>Productos del restaurante</h1>
+  <form id="form-restaurante" style="grid-template-columns: 1fr auto">
+    <input name="restaurant_id" aria-label="ID del restaurante" required>
+    <button>Cargar</button>
+  </form>
+
+  <p id="estado" role="status"></p>
+  <div id="productos"></div>
+
+  <h2>Agregar producto (requiere sesión del dueño en <a href="../admin.html">admin.html</a>)</h2>
+  <form id="form-producto">
+    <label>Nombre <input name="name" required maxlength="120"></label>
+    <label>Descripción <textarea name="description" rows="2"></textarea></label>
+    <label>Precio <input name="price" type="number" min="0" step="0.01" required></label>
+    <label>Categoría <select name="category_id" required></select></label>
+    <label style="display:flex;gap:8px"><input type="checkbox" name="is_available" checked> Disponible</label>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <script type="module">
+    import { cargarProductos, agregarProducto, actualizarProducto, RESTAURANT_ID } from './productos-supabase.js';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+    import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../js/config.js';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const contenedor = document.querySelector('#productos');
+    const estado = document.querySelector('#estado');
+    const formRestaurante = document.querySelector('#form-restaurante');
+    const formProducto = document.querySelector('#form-producto');
+    let restaurantId = new URLSearchParams(location.search).get('id') ?? RESTAURANT_ID;
+    formRestaurante.restaurant_id.value = restaurantId;
+
+    const avisar = (texto) => { estado.textContent = texto; };
+
+    /** Añade a cada producto controles de precio / agotado. */
+    function agregarControles(productos) {
+      for (const p of productos) {
+        const li = contenedor.querySelector(`[data-id="${p.id}"]`);
+        const acciones = document.createElement('div');
+        acciones.className = 'producto__acciones';
+        acciones.innerHTML = `
+          <input type="number" min="0" step="0.01" aria-label="Nuevo precio" value="${p.price}">
+          <button type="button" data-accion="precio">Actualizar precio</button>
+          <button type="button" data-accion="agotado">${p.is_available ? 'Marcar agotado' : 'Volver a disponible'}</button>`;
+        acciones.dataset.agotado = String(!p.is_available);
+        li.append(acciones);
+      }
+    }
+
+    const refrescar = () => cargarProductos(contenedor, restaurantId, { alMostrar: agregarControles });
+
+    async function cargarCategorias() {
+      // Consulta simple sin envoltorio: muestra el patrón básico { data, error }.
+      const { data, error } = await supabase
+        .from('categories').select('id, name').eq('restaurant_id', restaurantId).order('position');
+      const select = formProducto.category_id;
+      if (error) {
+        // No vaciamos el <select>: si ya había categorías, el dueño puede seguir trabajando.
+        console.error('[categorías]', error);
+        avisar('⚠️ No se pudieron cargar las categorías. Se reintentará al recuperar la conexión.');
+        window.addEventListener('online', cargarCategorias, { once: true });
+        return;
+      }
+      select.replaceChildren(...data.map((c) => new Option(c.name, c.id)));
+    }
+
+    // ---- 1) Cargar ----
+    formRestaurante.addEventListener('submit', (e) => {
+      e.preventDefault();
+      restaurantId = formRestaurante.restaurant_id.value.trim();
+      avisar('');
+      refrescar();
+      cargarCategorias();
+    });
+
+    // ---- 2) Agregar ----
+    formProducto.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const boton = formProducto.querySelector('[type=submit]');
+      boton.disabled = true;
+      try {
+        const nuevo = await agregarProducto(formProducto, restaurantId);
+        formProducto.reset();
+        avisar(`✅ "${nuevo.name}" agregado.`);
+        await refrescar();
+      } catch (error) {
+        // El formulario NO se limpia: si falló la conexión, el dueño no pierde lo escrito.
+        avisar(`❌ ${error.message}${error.reintentable ? ' Tus datos siguen en el formulario.' : ''}`);
+        console.error('[agregarProducto]', error.tipo, error.cause ?? error);
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    // ---- 3) Actualizar precio / agotado ----
+    contenedor.addEventListener('click', async (e) => {
+      const accion = e.target.dataset.accion;
+      if (!accion) return;
+      const li = e.target.closest('[data-id]');
+      const acciones = e.target.parentElement;
+      try {
+        e.target.disabled = true;
+        if (accion === 'precio') {
+          const p = await actualizarProducto(li.dataset.id, { precio: acciones.querySelector('input').value });
+          avisar(`✅ Precio de "${p.name}" actualizado.`);
+        } else {
+          const agotadoAhora = acciones.dataset.agotado === 'true';
+          const p = await actualizarProducto(li.dataset.id, { agotado: !agotadoAhora });
+          avisar(`✅ "${p.name}" ahora está ${p.is_available ? 'disponible' : 'agotado'}.`);
+        }
+        await refrescar();
+      } catch (error) {
+        avisar(`❌ ${error.message}`);
+        console.error('[actualizarProducto]', error.tipo, error.cause ?? error);
+        e.target.disabled = false;
+      }
+    });
+
+    refrescar();
+    cargarCategorias();
+  </script>
+</body>
+</html>

@@ -5,7 +5,11 @@ import { MenuHeader, CategoryTabs, CategorySection } from '../components/menu-co
 
 async function init() {
   const app = document.getElementById('app');
-  const slug = new URLSearchParams(location.search).get('r') ?? 'la-trattoria';
+  const slug = new URLSearchParams(location.search).get('r');
+  if (!slug) {
+    app.innerHTML = '<p class="empty">Falta el restaurante en la URL (menu.html?r=slug).</p>';
+    return;
+  }
 
   try {
     const restaurant = await getRestaurantBySlug(slug);

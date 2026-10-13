@@ -1,5 +1,6 @@
 /** Entrada del panel administrativo (admin.html). */
 import * as api from '../services/api.js';
+import * as auth from '../services/auth.js';
 import { applyBranding } from '../theme.js';
 import { escapeHtml, initials } from '../utils.js';
 import { ProductRow, ProductDialog, toast } from '../components/admin-components.js';
@@ -16,10 +17,38 @@ const state = {
 const $ = (sel) => document.querySelector(sel);
 
 // ---------------------------------------------------------------------------
-// Carga inicial
+// Arranque: sesión → restaurante → panel
 // ---------------------------------------------------------------------------
+function showScreen(id) {
+  ['auth-screen', 'onboarding-screen', 'admin-app'].forEach((s) => ($(`#${s}`).hidden = s !== id));
+}
+
+/** Ejecuta una acción mostrando el error de Supabase si falla. */
+async function run(action) {
+  try {
+    return await action();
+  } catch (err) {
+    console.error(err);
+    toast(err.message ?? 'Algo salió mal', 'error');
+  }
+}
+
 async function init() {
+  bindAuthEvents();
+  await run(route);
+}
+
+async function route() {
+  if (!(await auth.getCurrentUser())) return showScreen('auth-screen');
+
   state.restaurant = await api.getMyRestaurant();
+  if (!state.restaurant) return showScreen('onboarding-screen');
+
+  await loadDashboard();
+  showScreen('admin-app');
+}
+
+async function loadDashboard() {
   const id = state.restaurant.id;
   [state.branding, state.categories, state.products] = await Promise.all([
     api.getBranding(id),
@@ -34,6 +63,47 @@ async function init() {
   renderBranding();
   bindEvents();
   showView(location.hash.slice(1) || 'products');
+}
+
+function bindAuthEvents() {
+  $('#auth-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { email, password } = e.target;
+    const mode = e.submitter?.value;
+    run(async () => {
+      if (mode === 'signup') {
+        const { session } = await auth.signUp(email.value, password.value);
+        if (!session) return toast('Revisa tu email para confirmar la cuenta');
+      } else {
+        await auth.signIn(email.value, password.value);
+      }
+      await route();
+    });
+  });
+
+  const onboarding = $('#onboarding-form');
+  onboarding.name.addEventListener('input', () => {
+    onboarding.slug.value = onboarding.name.value
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  });
+  onboarding.addEventListener('submit', (e) => {
+    e.preventDefault();
+    run(async () => {
+      await api.createRestaurant({
+        name: onboarding.name.value.trim(),
+        slug: onboarding.slug.value,
+        currency: onboarding.currency.value.toUpperCase(),
+      });
+      await route();
+    });
+  });
+
+  document.querySelectorAll('[data-signout]').forEach((b) =>
+    b.addEventListener('click', () => run(async () => {
+      await auth.signOut();
+      location.reload();
+    })));
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +167,8 @@ async function saveProduct(data, file) {
 
 async function handleRowAction(e) {
   const action = e.target.dataset.action;
-  if (!action) return;
+  // El interruptor dispara click y change: solo atendemos change.
+  if (!action || (action === 'toggle') !== (e.type === 'change')) return;
   const id = e.target.closest('tr').dataset.id;
   const product = state.products.find((p) => p.id === id);
 
@@ -110,9 +181,11 @@ async function handleRowAction(e) {
     renderProducts();
     toast('Plato eliminado');
   } else if (action === 'toggle') {
-    const updated = await api.updateProduct(id, { is_available: e.target.checked });
-    Object.assign(product, updated);
-    renderProducts();
+    try {
+      Object.assign(product, await api.updateProduct(id, { is_available: e.target.checked }));
+    } finally {
+      renderProducts(); // si falla, el interruptor vuelve a su estado real
+    }
   }
 }
 
@@ -137,6 +210,7 @@ function renderBranding() {
   form.primary_color.value = state.branding.primary_color;
   form.primary_color_hex.value = state.branding.primary_color;
   form.restaurant_name.value = state.restaurant.name;
+  form.is_published.checked = state.restaurant.is_published;
   $('#preview-name').textContent = state.restaurant.name;
   renderLogo($('#logo-preview'));
   renderLogo($('#preview-logo'));
@@ -159,13 +233,19 @@ async function saveBranding(e) {
   const logo = form.logo.files[0];
   if (logo) changes.logo_url = await api.uploadImage(id, logo, 'logo');
 
+  const restaurantChanges = {};
   const name = form.restaurant_name.value.trim();
-  if (name && name !== state.restaurant.name) {
-    state.restaurant = await api.updateRestaurant(id, { name });
+  if (name && name !== state.restaurant.name) restaurantChanges.name = name;
+  if (form.is_published.checked !== state.restaurant.is_published) {
+    restaurantChanges.is_published = form.is_published.checked;
+  }
+  if (Object.keys(restaurantChanges).length) {
+    state.restaurant = await api.updateRestaurant(id, restaurantChanges);
   }
 
   state.branding = await api.updateBranding(id, changes);
   applyBranding(state.branding);
+  form.logo.value = '';
   renderSidebar();
   renderBranding();
   toast('Personalización guardada');
@@ -189,9 +269,9 @@ function bindEvents() {
     state.editingId = null;
     productDialog.openWith();
   });
-  $('#btn-new-category').addEventListener('click', addCategory);
-  $('#products-body').addEventListener('click', handleRowAction);
-  $('#products-body').addEventListener('change', handleRowAction);
+  $('#btn-new-category').addEventListener('click', () => run(addCategory));
+  $('#products-body').addEventListener('click', (e) => run(() => handleRowAction(e)));
+  $('#products-body').addEventListener('change', (e) => run(() => handleRowAction(e)));
   $('#filter-search').addEventListener('input', (e) => { state.filter.search = e.target.value; renderProducts(); });
   $('#filter-category').addEventListener('change', (e) => { state.filter.categoryId = e.target.value; renderProducts(); });
 
@@ -208,7 +288,7 @@ function bindEvents() {
   });
   form.querySelectorAll('[data-swatch]').forEach((b) =>
     b.addEventListener('click', () => previewColor(b.dataset.swatch)));
-  form.addEventListener('submit', saveBranding);
+  form.addEventListener('submit', (e) => run(() => saveBranding(e)));
 }
 
 init();

@@ -1,24 +1,34 @@
 /**
- * Capa de datos.
- *
- * Todas las funciones son PLACEHOLDERS: devuelven datos de ejemplo
- * (mock-data.js) para que la interfaz funcione sin backend. Sustituye el
- * cuerpo de cada una por la llamada real (p. ej. Supabase) manteniendo la
- * misma firma y forma de retorno; el resto de la app no necesita cambios.
+ * Capa de datos sobre Supabase.
  *
  * Las formas de los objetos siguen el esquema SQL en
- * supabase/migrations/20261013000000_menu_saas_schema.sql.
+ * supabase/migrations/20261013000000_menu_saas_schema.sql. La autorización
+ * la imponen las políticas RLS: el público solo lee menús publicados y cada
+ * dueño solo puede modificar sus propios datos.
  *
- * @typedef {{ id: string, name: string, slug: string, description?: string, currency: string, is_published: boolean }} Restaurant
+ * @typedef {{ id: string, owner_id: string, name: string, slug: string, description?: string, currency: string, is_published: boolean }} Restaurant
  * @typedef {{ restaurant_id: string, logo_url: string|null, primary_color: string, secondary_color: string, accent_color: string, background_color: string, text_color: string, font_family: string }} Branding
  * @typedef {{ id: string, restaurant_id: string, name: string, description?: string, position: number, is_active: boolean }} Category
  * @typedef {{ id: string, restaurant_id: string, category_id: string, name: string, description?: string, price: number, image_url: string|null, tags: string[], position: number, is_available: boolean }} Product
  */
 
-import { mockDb } from './mock-data.js';
+import { supabase, unwrap, unwrapAffected } from './supabase.js';
+import { getCurrentUser } from './auth.js';
+import { ASSETS_BUCKET } from '../config.js';
 
-const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms));
-const clone = (v) => structuredClone(v);
+/** Postgres devuelve numeric como string; la UI trabaja con number. */
+const toProduct = (row) => ({ ...row, price: Number(row.price) });
+
+/** Siguiente `position` libre para añadir al final de una lista. */
+async function nextPosition(table, restaurantId) {
+  const rows = unwrap(await supabase
+    .from(table)
+    .select('position')
+    .eq('restaurant_id', restaurantId)
+    .order('position', { ascending: false })
+    .limit(1));
+  return rows.length ? rows[0].position + 1 : 0;
+}
 
 // ---------------------------------------------------------------------------
 // Restaurante
@@ -26,24 +36,48 @@ const clone = (v) => structuredClone(v);
 
 /** @returns {Promise<Restaurant>} Restaurante por slug (vista pública). */
 export async function getRestaurantBySlug(slug) {
-  // TODO: supabase.from('restaurants').select('*').eq('slug', slug).single()
-  await delay();
-  return clone(mockDb.restaurant);
+  const restaurant = unwrap(await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('slug', slug)
+    .maybeSingle());
+  if (!restaurant) throw new Error(`Restaurante no encontrado: ${slug}`);
+  return restaurant;
 }
 
-/** @returns {Promise<Restaurant>} Restaurante del dueño autenticado (panel). */
+/**
+ * Restaurante del dueño autenticado (panel). Si tiene varios, el más antiguo.
+ * @returns {Promise<Restaurant|null>} null si aún no ha creado ninguno.
+ */
 export async function getMyRestaurant() {
-  // TODO: supabase.from('restaurants').select('*').eq('owner_id', user.id).single()
-  await delay();
-  return clone(mockDb.restaurant);
+  const user = await getCurrentUser();
+  if (!user) throw new Error('No hay sesión iniciada');
+  return unwrap(await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('owner_id', user.id)
+    .order('created_at')
+    .limit(1)
+    .maybeSingle());
+}
+
+/**
+ * Crea un restaurante para el usuario actual (owner_id lo pone la BD con
+ * auth.uid()). Un trigger crea su fila de personalización por defecto.
+ * @returns {Promise<Restaurant>}
+ */
+export async function createRestaurant(data) {
+  return unwrap(await supabase.from('restaurants').insert(data).select().single());
 }
 
 /** @returns {Promise<Restaurant>} */
 export async function updateRestaurant(restaurantId, changes) {
-  // TODO: supabase.from('restaurants').update(changes).eq('id', restaurantId).select().single()
-  await delay();
-  Object.assign(mockDb.restaurant, changes);
-  return clone(mockDb.restaurant);
+  return unwrap(await supabase
+    .from('restaurants')
+    .update(changes)
+    .eq('id', restaurantId)
+    .select()
+    .single());
 }
 
 // ---------------------------------------------------------------------------
@@ -52,17 +86,21 @@ export async function updateRestaurant(restaurantId, changes) {
 
 /** @returns {Promise<Branding>} */
 export async function getBranding(restaurantId) {
-  // TODO: supabase.from('restaurant_branding').select('*').eq('restaurant_id', restaurantId).single()
-  await delay();
-  return clone(mockDb.branding);
+  return unwrap(await supabase
+    .from('restaurant_branding')
+    .select('*')
+    .eq('restaurant_id', restaurantId)
+    .single());
 }
 
 /** @returns {Promise<Branding>} */
 export async function updateBranding(restaurantId, changes) {
-  // TODO: supabase.from('restaurant_branding').update(changes).eq('restaurant_id', restaurantId).select().single()
-  await delay();
-  Object.assign(mockDb.branding, changes);
-  return clone(mockDb.branding);
+  return unwrap(await supabase
+    .from('restaurant_branding')
+    .update(changes)
+    .eq('restaurant_id', restaurantId)
+    .select()
+    .single());
 }
 
 // ---------------------------------------------------------------------------
@@ -71,32 +109,29 @@ export async function updateBranding(restaurantId, changes) {
 
 /** @returns {Promise<Category[]>} */
 export async function getCategories(restaurantId) {
-  // TODO: supabase.from('categories').select('*').eq('restaurant_id', restaurantId).order('position')
-  await delay();
-  return clone(mockDb.categories).sort((a, b) => a.position - b.position);
+  return unwrap(await supabase
+    .from('categories')
+    .select('*')
+    .eq('restaurant_id', restaurantId)
+    .order('position'));
 }
 
 /** @returns {Promise<Category>} */
 export async function createCategory(restaurantId, data) {
-  // TODO: supabase.from('categories').insert({ ...data, restaurant_id: restaurantId }).select().single()
-  await delay();
-  const category = {
-    id: crypto.randomUUID(),
-    restaurant_id: restaurantId,
-    position: mockDb.categories.length,
-    is_active: true,
-    ...data,
-  };
-  mockDb.categories.push(category);
-  return clone(category);
+  const position = await nextPosition('categories', restaurantId);
+  return unwrap(await supabase
+    .from('categories')
+    .insert({ position, ...data, restaurant_id: restaurantId })
+    .select()
+    .single());
 }
 
-/** @returns {Promise<void>} */
+/**
+ * Borra la categoría; sus productos se eliminan en cascada (FK).
+ * RLS no da error al filtrar un DELETE, así que se comprueba que se borró una fila.
+ */
 export async function deleteCategory(categoryId) {
-  // TODO: supabase.from('categories').delete().eq('id', categoryId)
-  await delay();
-  mockDb.categories = mockDb.categories.filter((c) => c.id !== categoryId);
-  mockDb.products = mockDb.products.filter((p) => p.category_id !== categoryId);
+  unwrapAffected(await supabase.from('categories').delete().eq('id', categoryId).select('id'));
 }
 
 // ---------------------------------------------------------------------------
@@ -105,41 +140,38 @@ export async function deleteCategory(categoryId) {
 
 /** @returns {Promise<Product[]>} */
 export async function getProducts(restaurantId) {
-  // TODO: supabase.from('products').select('*').eq('restaurant_id', restaurantId).order('position')
-  await delay();
-  return clone(mockDb.products).sort((a, b) => a.position - b.position);
+  const rows = unwrap(await supabase
+    .from('products')
+    .select('*')
+    .eq('restaurant_id', restaurantId)
+    .order('position'));
+  return rows.map(toProduct);
 }
 
 /** @returns {Promise<Product>} */
 export async function createProduct(restaurantId, data) {
-  // TODO: supabase.from('products').insert({ ...data, restaurant_id: restaurantId }).select().single()
-  await delay();
-  const product = {
-    id: crypto.randomUUID(),
-    restaurant_id: restaurantId,
-    tags: [],
-    position: mockDb.products.length,
-    is_available: true,
-    ...data,
-  };
-  mockDb.products.push(product);
-  return clone(product);
+  const position = await nextPosition('products', restaurantId);
+  const row = unwrap(await supabase
+    .from('products')
+    .insert({ position, ...data, restaurant_id: restaurantId })
+    .select()
+    .single());
+  return toProduct(row);
 }
 
 /** @returns {Promise<Product>} */
 export async function updateProduct(productId, changes) {
-  // TODO: supabase.from('products').update(changes).eq('id', productId).select().single()
-  await delay();
-  const product = mockDb.products.find((p) => p.id === productId);
-  Object.assign(product, changes);
-  return clone(product);
+  const row = unwrap(await supabase
+    .from('products')
+    .update(changes)
+    .eq('id', productId)
+    .select()
+    .single());
+  return toProduct(row);
 }
 
-/** @returns {Promise<void>} */
 export async function deleteProduct(productId) {
-  // TODO: supabase.from('products').delete().eq('id', productId)
-  await delay();
-  mockDb.products = mockDb.products.filter((p) => p.id !== productId);
+  unwrapAffected(await supabase.from('products').delete().eq('id', productId).select('id'));
 }
 
 // ---------------------------------------------------------------------------
@@ -147,16 +179,17 @@ export async function deleteProduct(productId) {
 // ---------------------------------------------------------------------------
 
 /**
- * Sube un archivo y devuelve su URL pública.
+ * Sube un archivo a `<restaurantId>/<folder>/<uuid>.<ext>` (ruta que exigen
+ * las políticas de Storage) y devuelve su URL pública.
  * @param {string} restaurantId
  * @param {File} file
  * @param {'logo'|'products'} folder
  * @returns {Promise<string>}
  */
 export async function uploadImage(restaurantId, file, folder) {
-  // TODO: const path = `${restaurantId}/${folder}/${crypto.randomUUID()}-${file.name}`;
-  //       await supabase.storage.from('restaurant-assets').upload(path, file);
-  //       return supabase.storage.from('restaurant-assets').getPublicUrl(path).data.publicUrl;
-  await delay();
-  return URL.createObjectURL(file); // vista previa local mientras no hay backend
+  const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : 'bin';
+  const path = `${restaurantId}/${folder}/${crypto.randomUUID()}.${ext}`;
+  const bucket = supabase.storage.from(ASSETS_BUCKET);
+  unwrap(await bucket.upload(path, file, { contentType: file.type, cacheControl: '31536000' }));
+  return bucket.getPublicUrl(path).data.publicUrl;
 }

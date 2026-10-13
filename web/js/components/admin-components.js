@@ -85,8 +85,17 @@ export function ProductDialog({ categories, onSubmit }) {
       tags: form.tags.value.split(',').map((t) => t.trim()).filter(Boolean),
       is_available: form.is_available.checked,
     };
-    await onSubmit(data, file);
-    dialog.close();
+    const submit = form.querySelector('[type=submit]');
+    submit.disabled = true;
+    try {
+      await onSubmit(data, file);
+      dialog.close();
+    } catch (err) {
+      console.error(err);
+      toast(err.message ?? 'No se pudo guardar', 'error'); // el diálogo sigue abierto
+    } finally {
+      submit.disabled = false;
+    }
   });
 
   /** Abre el diálogo vacío (crear) o con un producto (editar). */
@@ -109,6 +118,7 @@ export function ProductDialog({ categories, onSubmit }) {
 
 /** Notificación temporal. */
 export function toast(message, type = 'ok') {
+  document.querySelectorAll('.toast').forEach((t) => t.remove()); // solo uno a la vez
   const el = html(`<div class="toast toast--${type}" role="status">${escapeHtml(message)}</div>`);
   document.body.append(el);
   setTimeout(() => el.remove(), 2600);

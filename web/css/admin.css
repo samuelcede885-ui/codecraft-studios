@@ -1,7 +1,12 @@
 /* =========================================================================
    Panel administrativo
    ========================================================================= */
-.admin-page { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.admin-layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+/* ---------- Acceso / alta ---------- */
+.auth-screen { display: grid; place-items: center; min-height: 100vh; padding: 16px; }
+.auth-card { width: min(400px, 100%); }
+.auth-card h1 { font-size: 1.4rem; }
 
 /* ---------- Sidebar ---------- */
 .sidebar {
@@ -20,6 +25,7 @@
 .sidebar__link:hover { background: var(--bg); color: var(--text); }
 .sidebar__link.is-active { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
 .sidebar__external { margin-top: auto; }
+.sidebar__signout { border: 0; background: none; cursor: pointer; text-align: left; font: inherit; }
 
 .logo-badge {
   width: 36px; height: 36px; flex: none; overflow: hidden;
@@ -118,6 +124,8 @@
   background: #111827; color: #fff; font-size: .9rem; box-shadow: var(--shadow);
   animation: toast-in .2s ease-out;
 }
+
+.toast--error { background: var(--danger); }
 @keyframes toast-in { from { opacity: 0; translate: -50% 8px; } }
 
 /* ---------- Responsive ---------- */
@@ -126,11 +134,12 @@
   .phone-preview { position: static; max-width: 300px; margin: 0 auto; }
 }
 @media (max-width: 720px) {
-  .admin-page { grid-template-columns: 1fr; }
+  .admin-layout { grid-template-columns: 1fr; }
   .sidebar { position: sticky; z-index: 20; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
   .sidebar__brand strong, .sidebar__link span { display: none; }
   .sidebar__nav { flex-direction: row; }
   .sidebar__external { margin: 0 0 0 auto; }
+  .sidebar__signout { flex: none; }
   .content { padding: 20px 16px; }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .stat { padding: 12px; }

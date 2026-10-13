@@ -11,6 +11,33 @@
   <script type="module" src="js/pages/admin.js"></script>
 </head>
 <body class="admin-page">
+  <!-- ================= Acceso ================= -->
+  <main class="auth-screen" id="auth-screen" hidden>
+    <form class="card form auth-card" id="auth-form">
+      <h1>Panel de tu menú</h1>
+      <p class="muted">Inicia sesión para gestionar tu restaurante.</p>
+      <label>Email <input type="email" name="email" autocomplete="email" required></label>
+      <label>Contraseña <input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
+      <button type="submit" class="btn btn--primary" value="signin">Entrar</button>
+      <button type="submit" class="btn btn--ghost" value="signup">Crear cuenta</button>
+    </form>
+  </main>
+
+  <!-- ================= Primer restaurante ================= -->
+  <main class="auth-screen" id="onboarding-screen" hidden>
+    <form class="card form auth-card" id="onboarding-form">
+      <h1>Crea tu restaurante</h1>
+      <label>Nombre <input name="name" required maxlength="120"></label>
+      <label>Dirección del menú (slug)
+        <input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="mi-restaurante">
+      </label>
+      <label>Moneda <input name="currency" value="USD" pattern="[A-Z]{3}" maxlength="3" required></label>
+      <button type="submit" class="btn btn--primary">Crear restaurante</button>
+      <button type="button" class="btn btn--ghost" data-signout>Cerrar sesión</button>
+    </form>
+  </main>
+
+  <div class="admin-layout" id="admin-app" hidden>
   <aside class="sidebar">
     <div class="sidebar__brand">
       <span class="logo-badge" id="sidebar-logo"></span>
@@ -21,6 +48,7 @@
       <a class="sidebar__link" href="#branding">🎨 <span>Personalización</span></a>
     </nav>
     <a class="sidebar__link sidebar__external" id="menu-link" href="menu.html" target="_blank" rel="noopener">↗ <span>Ver menú público</span></a>
+    <button type="button" class="sidebar__link sidebar__signout" data-signout>⎋ <span>Cerrar sesión</span></button>
   </aside>
 
   <main class="content">
@@ -72,6 +100,7 @@
       <div class="branding-grid">
         <form class="card form" id="branding-form">
           <label>Nombre del restaurante <input name="restaurant_name" required></label>
+          <label class="checkbox"><input type="checkbox" name="is_published"> Menú publicado (visible para el público)</label>
 
           <fieldset>
             <legend>Logo</legend>
@@ -116,5 +145,6 @@
       </div>
     </section>
   </main>
+  </div>
 </body>
 </html>

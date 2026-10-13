@@ -15,7 +15,7 @@ npm run build    # genera dist/ listo para deploy estático
 ## Qué incluye
 
 - Header con selector de sede, switch Delivery / Pick-up, tasa BCV editable y carrito con contador animado.
-- Hero tipo carrusel con palabra gigante de fondo, parallax con el mouse e ingredientes flotantes.
+- Hero tipo carrusel: palabra gigante en morado detrás de la burger, flechas y puntos para cambiar de producto.
 - Menú con filtros por categoría, tarjetas con precio en USD y Bs.
 - Personalizador: tamaño (Simple/Doble/Triple), extras pagos, ingredientes a quitar, combo, notas y cantidad.
 - Checkout como ticket de impresora térmica: Pago Móvil, Zelle, Efectivo/Punto, validación y código de barras.

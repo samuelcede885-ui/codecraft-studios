@@ -247,12 +247,6 @@ const PRODUCTS = [
 
 const HERO_SLIDES = ['original', 'bulldog', 'chefs'].map((id) => PRODUCTS.find((p) => p.id === id));
 
-const HERO_THEMES = {
-  original: { from: '#6D28D9', to: '#C4B5FD', glow: 'rgba(109,40,217,0.35)' },
-  bulldog: { from: '#1E1035', to: '#7C3AED', glow: 'rgba(245,158,11,0.30)' },
-  chefs: { from: '#5B21B6', to: '#F0ABFC', glow: 'rgba(91,33,182,0.35)' },
-};
-
 const AWARDS = [
   { label: 'B FEST', year: '2023' },
   { label: 'B Master', year: '2024' },
@@ -429,68 +423,6 @@ function BulldogMark({ color = BRAND.ink, className = '' }) {
   );
 }
 
-/* ---------------------------- floating bits ------------------------------ */
-
-const Pickle = ({ className = '', style }) => (
-  <svg viewBox="0 0 100 100" className={className} style={style} aria-hidden="true">
-    <defs>
-      <radialGradient id="pk" cx="45%" cy="40%" r="60%">
-        <stop offset="0%" stopColor="#D9F99D" />
-        <stop offset="65%" stopColor="#84CC16" />
-        <stop offset="100%" stopColor="#3F6212" />
-      </radialGradient>
-    </defs>
-    <ellipse cx="50" cy="50" rx="46" ry="42" fill="#365314" />
-    <ellipse cx="50" cy="50" rx="40" ry="36" fill="url(#pk)" />
-    {Array.from({ length: 9 }).map((_, i) => {
-      const a = (i / 9) * Math.PI * 2;
-      return <ellipse key={i} cx={50 + Math.cos(a) * 20} cy={50 + Math.sin(a) * 18} rx="4" ry="2.4" fill="#FEF9C3" opacity=".85" transform={`rotate(${(a * 180) / Math.PI} ${50 + Math.cos(a) * 20} ${50 + Math.sin(a) * 18})`} />;
-    })}
-    <ellipse cx="38" cy="34" rx="12" ry="5" fill="#fff" opacity=".35" />
-  </svg>
-);
-
-const OnionRing = ({ className = '', style }) => (
-  <svg viewBox="0 0 120 120" className={className} style={style} aria-hidden="true">
-    <defs>
-      <radialGradient id="or" cx="40%" cy="35%" r="70%">
-        <stop offset="0%" stopColor="#FCD34D" />
-        <stop offset="55%" stopColor="#D97706" />
-        <stop offset="100%" stopColor="#92400E" />
-      </radialGradient>
-      <filter id="orn">
-        <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" />
-        <feColorMatrix values="0 0 0 0 .55  0 0 0 0 .3  0 0 0 0 .05  0 0 0 .55 0" />
-        <feComposite in2="SourceGraphic" operator="in" />
-      </filter>
-    </defs>
-    <path d="M60 8a52 52 0 1 0 0.01 0Zm0 28a24 24 0 1 1-0.01 0Z" fill="url(#or)" fillRule="evenodd" />
-    <path d="M60 8a52 52 0 1 0 0.01 0Zm0 28a24 24 0 1 1-0.01 0Z" fillRule="evenodd" filter="url(#orn)" />
-    <path d="M30 34c8-10 20-15 32-14" stroke="#FEF3C7" strokeWidth="5" strokeLinecap="round" fill="none" opacity=".5" />
-  </svg>
-);
-
-const Bacon = ({ className = '', style }) => (
-  <svg viewBox="0 0 160 60" className={className} style={style} aria-hidden="true">
-    <path d="M6 30c18-22 34 18 52-4s34 18 52-4 30 14 44 0v18c-14 14-26-10-44 4s-34-22-52 4-34-18-52 4Z" fill="#7F1D1D" />
-    <path d="M6 30c18-22 34 18 52-4s34 18 52-4 30 14 44 0v8c-14 14-26-10-44 4s-34-22-52 4-34-18-52 4Z" fill="#DC2626" />
-    <path d="M10 36c16-16 32 12 48-4s32 12 50-4 26 10 40 0" stroke="#FECACA" strokeWidth="3.5" fill="none" strokeLinecap="round" opacity=".85" />
-  </svg>
-);
-
-const SauceDrop = ({ className = '', style, color = '#FFFBEB' }) => (
-  <svg viewBox="0 0 60 80" className={className} style={style} aria-hidden="true">
-    <path d="M30 4C22 22 8 36 8 52a22 22 0 0 0 44 0C52 36 38 22 30 4Z" fill={color} stroke="#E9D5FF" strokeWidth="1.5" />
-    <ellipse cx="22" cy="50" rx="5" ry="9" fill="#fff" opacity=".8" />
-  </svg>
-);
-
-const Sesame = ({ className = '', style }) => (
-  <svg viewBox="0 0 20 30" className={className} style={style} aria-hidden="true">
-    <ellipse cx="10" cy="15" rx="6" ry="12" fill="#FEF3C7" stroke="#D6A85C" strokeWidth="1.5" />
-  </svg>
-);
-
 /* ------------------------------- barcode --------------------------------- */
 
 function Barcode({ value }) {
@@ -594,7 +526,6 @@ export default function RafasApp() {
 
   const city = CITIES.find((c) => c.id === cityId) || CITIES[0];
   const heroProduct = HERO_SLIDES[heroIndex];
-  const theme = HERO_THEMES[heroProduct.id];
   const heroRef = useRef(null);
   const cityRef = useRef(null);
   const menuRef = useRef(null);
@@ -987,129 +918,47 @@ export default function RafasApp() {
           onMouseMove={onHeroMove}
           onMouseEnter={() => setHeroPaused(true)}
           onMouseLeave={onHeroLeave}
-          className="relative isolate overflow-hidden bg-[#F8F7FC]"
+          className="relative overflow-hidden bg-[#F8F7FC]"
           style={{ '--mx': 0, '--my': 0 }}
           aria-roledescription="carrusel"
           aria-label="Hamburguesas insignia"
         >
-          {/* backdrop glow */}
-          <div
-            className="pointer-events-none absolute inset-0 -z-10 transition-[background] duration-700"
-            style={{
-              background: `radial-gradient(60% 55% at 50% 55%, ${theme.glow}, transparent 70%), radial-gradient(40% 40% at 85% 10%, rgba(237,233,254,1), transparent 70%)`,
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-0 -z-10 opacity-[.35]"
-            style={{
-              backgroundImage: 'radial-gradient(rgba(91,33,182,.18) 1px, transparent 1px)',
-              backgroundSize: '22px 22px',
-              maskImage: 'linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent)',
-              WebkitMaskImage: 'linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent)',
-            }}
-          />
-
-          {/* Giant background word */}
-          <div className="pointer-events-none absolute inset-x-0 top-[150px] -z-10 select-none sm:top-[250px] lg:top-1/2 lg:-translate-y-1/2" aria-hidden="true">
-            <div className="flex justify-center transition-transform duration-500 ease-out" style={{ transform: 'translate3d(calc(var(--mx) * -18px), calc(var(--my) * -10px), 0)' }}>
-            <span
-              key={heroProduct.heroWord}
-              className="rf-word-in rf-edge-fade font-display whitespace-nowrap text-[34vw] uppercase leading-[0.82] sm:text-[28vw] lg:text-[15vw] 2xl:text-[14rem]"
-              style={{
-                backgroundImage: `linear-gradient(180deg, ${theme.from} 10%, ${theme.to} 95%)`,
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
-              }}
-            >
-              {heroProduct.heroWord}
-            </span>
-            </div>
-          </div>
-
-          <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-6 px-4 pb-14 pt-6 sm:px-6 lg:min-h-[calc(100vh-76px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-4 lg:py-10">
-            {/* Center: product */}
-            <div className="relative order-1 lg:order-2">
-              <div className="relative mx-auto aspect-square w-full max-w-[560px]">
-                {/* Floating ingredients */}
-                <FloatLayer depth={34} className="left-[2%] top-[6%] w-[16%]" delay="0s" r="-18deg">
-                  <OnionRing className="w-full drop-shadow-[0_14px_14px_rgba(146,64,14,.35)]" />
-                </FloatLayer>
-                <FloatLayer depth={-26} className="right-[4%] top-[10%] w-[12%]" delay="-1.2s" r="22deg">
-                  <Pickle className="w-full drop-shadow-[0_12px_12px_rgba(54,83,20,.35)]" />
-                </FloatLayer>
-                <FloatLayer depth={22} className="right-[0%] bottom-[22%] w-[22%]" delay="-2.4s" r="-8deg">
-                  <Bacon className="w-full drop-shadow-[0_12px_12px_rgba(127,29,29,.35)]" />
-                </FloatLayer>
-                <FloatLayer depth={-30} className="left-[0%] bottom-[24%] w-[11%]" delay="-3.1s" r="12deg">
-                  <Pickle className="w-full drop-shadow-[0_12px_12px_rgba(54,83,20,.35)]" />
-                </FloatLayer>
-                <FloatLayer depth={40} className="left-[14%] bottom-[6%] w-[7%]" delay="-0.6s" r="0deg">
-                  <SauceDrop className="w-full drop-shadow-[0_10px_10px_rgba(91,33,182,.3)]" />
-                </FloatLayer>
-                <FloatLayer depth={-18} className="right-[22%] top-[14%] w-[5%]" delay="-4s" r="0deg">
-                  <SauceDrop className="w-full drop-shadow-[0_10px_10px_rgba(91,33,182,.3)]" color="#FCA5A5" />
-                </FloatLayer>
-                <FloatLayer depth={16} className="left-[22%] top-[0%] w-[3%]" delay="-2s" r="30deg">
-                  <Sesame className="w-full" />
-                </FloatLayer>
-                <FloatLayer depth={-12} className="right-[30%] bottom-[4%] w-[3%]" delay="-3.5s" r="-40deg">
-                  <Sesame className="w-full" />
-                </FloatLayer>
-                <FloatLayer depth={28} className="right-[6%] top-[38%] hidden w-[13%] sm:block" delay="-1.8s" r="10deg">
-                  <img src={`${ASSET}/f-lettuce.webp`} alt="" className="w-full drop-shadow-[0_10px_10px_rgba(22,101,52,.3)]" />
-                </FloatLayer>
-                <FloatLayer depth={-36} className="left-[3%] top-[40%] hidden w-[12%] sm:block" delay="-4.4s" r="-6deg">
-                  <img src={`${ASSET}/f-relish.webp`} alt="" className="w-full drop-shadow-[0_10px_10px_rgba(153,27,27,.3)]" />
-                </FloatLayer>
-
-                {/* Burger */}
-                <div
-                  className="absolute inset-[10%] transition-transform duration-300 ease-out"
-                  style={{ transform: 'translate3d(calc(var(--mx) * 14px), calc(var(--my) * 10px), 0) rotate(calc(var(--mx) * 2deg))' }}
-                >
-                  <div key={heroProduct.id} className="rf-burger-in h-full w-full">
-                    <div className="rf-float-slow h-full w-full">
-                      <img
-                        src={heroProduct.image}
-                        alt={heroProduct.name}
-                        draggable="false"
-                        className="h-full w-full select-none object-contain"
-                        style={{ filter: 'drop-shadow(0 40px 36px rgba(30,16,53,.35)) drop-shadow(0 12px 14px rgba(91,33,182,.25))' }}
-                      />
-                    </div>
-                  </div>
-                  {/* contact shadow */}
-                  <div className="absolute -bottom-2 left-1/2 h-6 w-2/3 -translate-x-1/2 rounded-[50%] bg-[#1E1035]/25 blur-xl" />
+          <div className="mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6 lg:pb-14 lg:pt-8">
+            {/* Giant word + burger */}
+            <div className="relative">
+              <h2
+                key={heroProduct.heroWord}
+                className="rf-word-in font-display select-none whitespace-nowrap text-center uppercase leading-[0.8] text-[#6D28D9]"
+                style={{ fontSize: `min(${(92 / (heroProduct.heroWord.length * 0.6)).toFixed(2)}vw, ${Math.round(1180 / (heroProduct.heroWord.length * 0.6))}px, 15rem)` }}
+                aria-hidden="true"
+              >
+                {heroProduct.heroWord}
+              </h2>
+              <div className="relative mx-auto -mt-[14%] w-[82%] max-w-[460px] sm:-mt-[12%] lg:-mt-[105px]">
+                <div style={{ transform: 'translate3d(calc(var(--mx) * 10px), calc(var(--my) * 6px), 0)' }} className="transition-transform duration-300 ease-out">
+                  <img
+                    key={heroProduct.id}
+                    src={heroProduct.image}
+                    alt={heroProduct.name}
+                    draggable="false"
+                    className="rf-burger-in mx-auto aspect-[4/3] w-full select-none object-contain"
+                    style={{ filter: 'drop-shadow(0 28px 24px rgba(30,16,53,.22))' }}
+                  />
                 </div>
-
-                {/* Award ribbon */}
-                <div key={`tag-${heroProduct.id}`} className="rf-fade-up absolute left-1/2 top-[2%] -translate-x-1/2 rotate-[-4deg] rounded-full bg-[#1E1035] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.2em] text-[#F59E0B] shadow-lg shadow-purple-900/30 sm:text-xs">
-                  <Trophy className="mr-1 inline h-3.5 w-3.5 -translate-y-px" />
-                  {heroProduct.heroTag}
-                </div>
-
-                {/* Arrows */}
-                <button
-                  type="button"
-                  onClick={() => heroGo(-1)}
-                  aria-label="Hamburguesa anterior"
-                  className="absolute left-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-[#EDE9FE] bg-white/90 text-[#1E1035] shadow-lg shadow-purple-500/20 backdrop-blur transition hover:scale-110 hover:bg-[#5B21B6] hover:text-white active:scale-95 sm:h-12 sm:w-12 lg:-left-4"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => heroGo(1)}
-                  aria-label="Siguiente hamburguesa"
-                  className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-[#EDE9FE] bg-white/90 text-[#1E1035] shadow-lg shadow-purple-500/20 backdrop-blur transition hover:scale-110 hover:bg-[#5B21B6] hover:text-white active:scale-95 sm:h-12 sm:w-12 lg:-right-4"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
               </div>
+            </div>
 
-              {/* Dots */}
-              <div className="mt-1 flex items-center justify-center gap-2" role="tablist" aria-label="Seleccionar hamburguesa">
+            {/* Slider controls */}
+            <div className="mt-4 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => heroGo(-1)}
+                aria-label="Hamburguesa anterior"
+                className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-2" role="tablist" aria-label="Seleccionar hamburguesa">
                 {HERO_SLIDES.map((p, i) => (
                   <button
                     key={p.id}
@@ -1118,90 +967,62 @@ export default function RafasApp() {
                     aria-selected={i === heroIndex}
                     aria-label={p.name}
                     onClick={() => setHeroIndex(i)}
-                    className={`relative h-2.5 overflow-hidden rounded-full transition-all duration-500 ${i === heroIndex ? 'w-12 bg-[#EDE9FE]' : 'w-2.5 bg-[#1E1035]/15 hover:bg-[#1E1035]/30'}`}
-                  >
-                    {i === heroIndex && (
-                      <span
-                        key={`${heroIndex}-${heroPaused}`}
-                        className="absolute inset-y-0 left-0 bg-[#5B21B6]"
-                        style={{ width: heroPaused ? '100%' : undefined, animation: heroPaused ? 'none' : 'rf-grow 6.5s linear both' }}
-                      />
-                    )}
-                  </button>
+                    className={`h-1.5 rounded-full transition-all duration-500 ${i === heroIndex ? 'w-8 bg-[#5B21B6]' : 'w-3 bg-[#1E1035]/15 hover:bg-[#1E1035]/30'}`}
+                  />
                 ))}
-                <style>{`@keyframes rf-grow { from { width: 0 } to { width: 100% } }`}</style>
               </div>
+              <button
+                type="button"
+                onClick={() => heroGo(1)}
+                aria-label="Siguiente hamburguesa"
+                className="grid h-10 w-10 place-items-center rounded-full border border-[#1E1035]/15 text-[#1E1035] transition hover:border-[#5B21B6] hover:bg-[#5B21B6] hover:text-white"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
 
-            {/* Left: headline + awards */}
-            <div className="order-2 text-center lg:order-1 lg:text-left">
-              <p className="font-script text-3xl leading-none text-[#6D28D9] sm:text-4xl">Casual Food</p>
-              <h1 className="font-display mt-3 text-[2.6rem] uppercase leading-[0.92] text-[#1E1035] sm:text-6xl lg:text-[3.6rem] xl:text-[4.2rem]">
-                Más que una burger,{' '}
-                <span className="relative inline-block text-[#5B21B6]">
-                  un concepto
-                  <svg viewBox="0 0 300 20" className="absolute -bottom-2 left-0 w-full" aria-hidden="true">
-                    <path d="M4 14c60-10 160-12 292-6" stroke="#F59E0B" strokeWidth="6" fill="none" strokeLinecap="round" />
-                  </svg>
-                </span>{' '}
-                de locos.
-              </h1>
-              <p className="mx-auto mt-5 max-w-sm text-[15px] leading-relaxed text-[#1E1035]/70 lg:mx-0">
-                Smash burgers con costra crujiente, pan brioche y salsas de la casa. <span className="font-script text-xl text-[#6D28D9]">by @rafacheff</span>
-              </p>
-              <ul className="mt-6 flex flex-wrap justify-center gap-2 lg:justify-start">
-                {AWARDS.map((a) => (
-                  <li key={a.label} className="flex items-center gap-2 rounded-full border border-[#EDE9FE] bg-white px-3 py-1.5 text-xs font-bold shadow-sm shadow-purple-500/10">
-                    <span className="grid h-6 w-6 place-items-center rounded-full bg-[#F59E0B]/15 text-[#F59E0B]">
-                      <Trophy className="h-3.5 w-3.5" />
-                    </span>
-                    {a.label} <span className="text-[#6D28D9]">{a.year}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 hidden items-center gap-3 lg:flex">
-                <div className="flex text-[#F59E0B]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-                <p className="text-xs font-semibold text-[#1E1035]/60">4.9 · +12.000 reseñas en 5 ciudades</p>
-              </div>
-            </div>
-
-            {/* Right: active product */}
-            <div className="order-3 lg:pl-6">
-              <div key={heroProduct.id} className="rf-fade-up mx-auto max-w-md rounded-[2rem] border border-white/80 bg-white/75 p-6 text-center shadow-xl shadow-purple-500/15 backdrop-blur-xl lg:p-7 lg:text-left">
-                <p className="font-mono-ticket text-xs font-bold tracking-widest text-[#6D28D9]">
-                  0{heroIndex + 1} <span className="text-[#1E1035]/30">/ 0{HERO_SLIDES.length}</span>
+            {/* Copy */}
+            <div className="mt-8 grid gap-10 border-t border-[#1E1035]/10 pt-8 md:grid-cols-2 md:gap-16">
+              <div>
+                <h1 className="font-display text-[2.4rem] uppercase leading-[0.95] text-[#1E1035] sm:text-5xl">
+                  Más que una burger, <span className="text-[#5B21B6]">un concepto de locos.</span>
+                </h1>
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65">
+                  Smash burgers con costra crujiente y pan brioche, hechas al momento. <span className="font-script text-lg text-[#6D28D9]">by @rafacheff</span>
                 </p>
-                <h2 className="font-display mt-2 text-3xl uppercase leading-none sm:text-4xl">{heroProduct.name}</h2>
-                <p className="mt-3 text-[15px] leading-relaxed text-[#1E1035]/70">{heroProduct.description}</p>
-                <div className="mt-5 flex items-end justify-center gap-3 lg:justify-start">
-                  <span className="font-display text-5xl leading-none text-[#5B21B6]">{fmtUSD(heroProduct.price)}</span>
-                  <span className="pb-1 text-sm font-semibold text-[#1E1035]/50">≈ {fmtBs(heroProduct.price, rate)}</span>
-                </div>
-                <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center lg:flex-col lg:items-stretch">
+                <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold text-[#1E1035]/70">
+                  <Trophy className="h-4 w-4 text-[#F59E0B]" />
+                  {AWARDS.map((a, i) => (
+                    <span key={a.label}>
+                      {a.label} {a.year}
+                      {i < AWARDS.length - 1 && <span className="ml-3 text-[#1E1035]/25">·</span>}
+                    </span>
+                  ))}
+                </p>
+              </div>
+
+              <div key={heroProduct.id} className="rf-fade-up md:pt-1">
+                <p className="text-xs font-bold uppercase tracking-[.2em] text-[#6D28D9]">
+                  {heroProduct.heroTag} · 0{heroIndex + 1}/0{HERO_SLIDES.length}
+                </p>
+                <h2 className="mt-2 text-2xl font-extrabold leading-tight sm:text-3xl">{heroProduct.name}</h2>
+                <p className="mt-2 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65">{heroProduct.description}</p>
+                <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
                   <button
                     type="button"
                     onClick={() => openProduct(heroProduct)}
-                    className="group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#5B21B6] px-6 py-4 text-sm font-extrabold uppercase tracking-wide text-white shadow-xl shadow-purple-600/40 transition hover:-translate-y-0.5 hover:bg-[#6D28D9] active:translate-y-0 active:scale-[.98]"
+                    className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#5B21B6] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#6D28D9]"
                   >
                     Ordenar Ahora — {fmtUSD(heroProduct.price)}
-                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => addToCart(heroProduct)}
-                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-[#EDE9FE] bg-white px-5 py-3.5 text-sm font-bold text-[#1E1035] transition hover:border-[#5B21B6] hover:text-[#5B21B6]"
-                  >
-                    {justAdded === heroProduct.id ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    Agregar rápido
-                  </button>
+                  <p className="text-sm text-[#1E1035]/55">
+                    {fmtBs(heroProduct.price, rate)}
+                    <button type="button" onClick={() => addToCart(heroProduct)} className="ml-4 font-bold text-[#5B21B6] underline-offset-4 hover:underline">
+                      {justAdded === heroProduct.id ? 'Agregada ✓' : 'Agregar rápido'}
+                    </button>
+                  </p>
                 </div>
-                <p className="mt-4 flex items-center justify-center gap-2 text-xs font-medium text-[#1E1035]/50 lg:justify-start">
-                  <Flame className="h-3.5 w-3.5 text-[#F59E0B]" /> {heroProduct.kcal} kcal · Lista en ~12 min
-                </p>
               </div>
             </div>
           </div>
@@ -1907,20 +1728,6 @@ export default function RafasApp() {
 }
 
 /* ============================ SUB-COMPONENTS ============================== */
-
-function FloatLayer({ children, depth, className, delay, r }) {
-  return (
-    <div
-      className={`pointer-events-none absolute z-10 ${className}`}
-      style={{ transform: `translate3d(calc(var(--mx) * ${depth}px), calc(var(--my) * ${depth * 0.7}px), 0)`, transition: 'transform .35s ease-out' }}
-      aria-hidden="true"
-    >
-      <div className="rf-float" style={{ animationDelay: delay, '--r': r }}>
-        {children}
-      </div>
-    </div>
-  );
-}
 
 function CityList({ current, onPick }) {
   return (

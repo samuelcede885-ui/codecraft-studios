@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Banknote,
+  Beef,
   Bike,
   Check,
   CheckCircle2,
@@ -14,6 +15,8 @@ import {
   Copy,
   CreditCard,
   Flame,
+  Heart,
+  House,
   Info,
   Instagram,
   Loader2,
@@ -22,13 +25,19 @@ import {
   Minus,
   Pencil,
   Plus,
+  Popcorn,
   Receipt,
+  RotateCcw,
+  Sandwich,
+  Search,
   ShieldCheck,
   ShoppingBag,
   Star,
   Store,
   Trash2,
   Trophy,
+  UtensilsCrossed,
+  WheatOff,
   X,
 } from 'lucide-react';
 
@@ -79,12 +88,26 @@ const VE_BANKS = [
 ];
 
 const CATEGORIES = [
+  { id: 'todos', label: 'Todos', emoji: '🍽️' },
   { id: 'top', label: 'Más Vendidos', emoji: '🔥' },
   { id: 'burgers', label: 'Smash Burgers', emoji: '🍔' },
   { id: 'fajitas', label: 'Las Fajitas', emoji: '🌮' },
   { id: 'sides', label: 'Combos & Sides', emoji: '🍟' },
   { id: 'drinks', label: 'Bebidas & Postres', emoji: '🥤' },
+  { id: 'fav', label: 'Favoritos', emoji: '❤️' },
 ];
+
+// Product whose photo illustrates each category tile.
+const CATEGORY_THUMB = { todos: 'original', top: 'bulldog', burgers: 'chefs', fajitas: 'fajitas', sides: 'papas', drinks: 'shake' };
+
+const FEATURES = [
+  { label: 'Carne de res especial', icon: Beef },
+  { label: 'Pan artesanal', icon: Sandwich },
+  { label: 'Opción sin gluten', icon: WheatOff },
+  { label: 'Papas o aros', icon: Popcorn },
+];
+
+const PROMO_ID = 'bulldog';
 
 const SIZES = [
   { id: 'simple', label: 'Simple', patties: 1, delta: -2.0, note: '1 carne · 90g' },
@@ -256,6 +279,8 @@ const AWARDS = [
 /* --------------------------------- utils --------------------------------- */
 
 const fmtUSD = (n) => `$${(Math.round(n * 100) / 100).toFixed(2)}`;
+// Menu prices use the local "REF" convention (reference price in USD).
+const fmtREF = (n) => `REF ${(Math.round(n * 100) / 100).toFixed(2)}`;
 const fmtBs = (n, rate) =>
   `Bs. ${(n * rate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtBsPlain = (n, rate) =>
@@ -378,7 +403,7 @@ const GlobalStyles = () => (
     .rf-burger-in { animation: rf-burger-in .9s cubic-bezier(.2,.8,.2,1) both; }
     .rf-fade-up { animation: rf-fade-up .6s cubic-bezier(.2,.8,.2,1) both; }
     .rf-bump { animation: rf-bump .5s cubic-bezier(.2,.8,.2,1); }
-    .rf-print { animation: rf-print 1.5s cubic-bezier(.3,.7,.2,1) both; }
+    .rf-print { animation: rf-print .8s cubic-bezier(.3,.7,.2,1) both; }
     .rf-marquee { animation: rf-marquee 28s linear infinite; }
     .rf-sheet-in { animation: rf-sheet-in .45s cubic-bezier(.2,.8,.2,1) both; }
     .rf-pop-in { animation: rf-pop-in .4s cubic-bezier(.2,.8,.2,1) both; }
@@ -492,7 +517,7 @@ export default function RafasApp() {
     const saved = storage.get('rafas.cart', []);
     return Array.isArray(saved) ? saved.filter((l) => PRODUCTS.some((p) => p.id === l.productId)) : [];
   });
-  const [category, setCategory] = useState('top');
+  const [category, setCategory] = useState('todos');
   const [heroIndex, setHeroIndex] = useState(0);
   const [heroPaused, setHeroPaused] = useState(false);
   const [modal, setModal] = useState(null); // { product, cfg, qty, editKey? }
@@ -503,7 +528,17 @@ export default function RafasApp() {
   const [toasts, setToasts] = useState([]);
   const [bumpKey, setBumpKey] = useState(0);
   const [justAdded, setJustAdded] = useState(null);
-  const [payMethod, setPayMethod] = useState('pagomovil');
+  const [payMethod, setPayMethod] = useState(() => storage.get('rafas.payMethod', 'pagomovil'));
+  const [favorites, setFavorites] = useState(() => {
+    const saved = storage.get('rafas.favorites', []);
+    return Array.isArray(saved) ? saved : [];
+  });
+  const [query, setQuery] = useState('');
+  const [navTab, setNavTab] = useState('inicio');
+  const [lastOrder, setLastOrder] = useState(() => {
+    const saved = storage.get('rafas.lastOrder', null);
+    return saved && Array.isArray(saved.lines) && saved.lines.length ? saved : null;
+  });
   const [cashKind, setCashKind] = useState('efectivo');
   const [form, setForm] = useState(() => ({
     name: '',
@@ -529,12 +564,16 @@ export default function RafasApp() {
   const heroRef = useRef(null);
   const cityRef = useRef(null);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
+  const touchX = useRef(null);
 
   /* ---------------------------- persistence ------------------------------ */
   useEffect(() => storage.set('rafas.rate', rate), [rate]);
   useEffect(() => storage.set('rafas.city', cityId), [cityId]);
   useEffect(() => storage.set('rafas.mode', mode), [mode]);
   useEffect(() => storage.set('rafas.cart', cart), [cart]);
+  useEffect(() => storage.set('rafas.payMethod', payMethod), [payMethod]);
+  useEffect(() => storage.set('rafas.favorites', favorites), [favorites]);
   useEffect(() => {
     const { name, phone, address, reference } = form;
     storage.set('rafas.customer', { name, phone, address, reference });
@@ -557,7 +596,13 @@ export default function RafasApp() {
   const total = Math.round((subtotal + deliveryFee) * 100) / 100;
   const totalBs = Math.round(total * rate * 100) / 100;
 
-  const filtered = useMemo(() => PRODUCTS.filter((p) => p.categories.includes(category)), [category]);
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q) return PRODUCTS.filter((p) => `${p.name} ${p.description}`.toLowerCase().includes(q));
+    if (category === 'todos') return PRODUCTS;
+    if (category === 'fav') return PRODUCTS.filter((p) => favorites.includes(p.id));
+    return PRODUCTS.filter((p) => p.categories.includes(category));
+  }, [category, query, favorites]);
 
   /* ------------------------------ effects -------------------------------- */
   // Hero autoplay
@@ -618,6 +663,11 @@ export default function RafasApp() {
     return () => clearInterval(t);
   }, [drawer, order]);
 
+  // An emptied checkout falls back to the (empty) cart view
+  useEffect(() => {
+    if (drawer === 'checkout' && cart.length === 0) setDrawer('cart');
+  }, [drawer, cart.length]);
+
   // If pickup, cash payments allow "Punto"; if delivery, force cash
   useEffect(() => {
     if (mode === 'delivery') setCashKind('efectivo');
@@ -661,9 +711,43 @@ export default function RafasApp() {
     });
   };
 
-  const quickAdd = (product) => {
-    if (product.kind === 'burger') openProduct(product);
-    else addToCart(product);
+  // One tap adds the product as it comes; tapping the card opens the customizer.
+  const defaultKey = (product) => configKey(product.id, defaultConfig(product));
+  const qtyInCart = (product) => cart.find((l) => l.key === defaultKey(product))?.qty || 0;
+  const decDefault = (product) => {
+    const key = defaultKey(product);
+    setCart((prev) => prev.flatMap((l) => (l.key !== key ? [l] : l.qty > 1 ? [{ ...l, qty: l.qty - 1 }] : [])));
+  };
+  const toggleFav = (id) => setFavorites((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
+  const openOrder = () => setDrawer(cart.length ? 'checkout' : 'cart');
+  const orderNow = (product) => {
+    addToCart(product);
+    setDrawer('checkout');
+  };
+  const repeatLast = () => {
+    if (!lastOrder) return;
+    setCart((prev) => {
+      let next = [...prev];
+      lastOrder.lines.forEach((l) => {
+        if (!products[l.productId]) return;
+        const key = configKey(l.productId, l.cfg);
+        const existing = next.find((x) => x.key === key);
+        next = existing ? next.map((x) => (x.key === key ? { ...x, qty: x.qty + l.qty } : x)) : [...next, { key, productId: l.productId, cfg: l.cfg, qty: l.qty }];
+      });
+      return next;
+    });
+    setBumpKey((k) => k + 1);
+    toast('Tu último pedido está listo para pagar');
+    setDrawer('checkout');
+  };
+  const goToMenu = (cat) => {
+    if (cat) setCategory(cat);
+    setQuery('');
+    document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+  };
+  const goSearch = () => {
+    document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => searchRef.current?.focus({ preventScroll: true }), 450);
   };
 
   const doCopy = async (text, label) => {
@@ -762,9 +846,12 @@ export default function RafasApp() {
         payment: paymentSummary(),
         customer: { name: form.name, phone: form.phone, address: form.address, reference: form.reference },
       });
+      const remembered = { lines: cart.map(({ productId, cfg, qty }) => ({ productId, cfg, qty })), total };
+      storage.set('rafas.lastOrder', remembered);
+      setLastOrder(remembered);
       setSubmitting(false);
       setDrawer('success');
-    }, 1400);
+    }, 700);
   };
 
   const whatsappLink = (o) => {
@@ -860,8 +947,17 @@ export default function RafasApp() {
 
           <button
             type="button"
-            onClick={() => setDrawer('cart')}
-            className="group relative flex items-center gap-2 rounded-full bg-[#5B21B6] py-2 pl-3 pr-4 text-white shadow-lg shadow-purple-600/30 transition hover:bg-[#6D28D9] active:scale-95 md:ml-0"
+            onClick={goSearch}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#EDE9FE] bg-white text-[#1E1035] transition hover:border-[#C4B5FD]"
+            aria-label="Buscar en el menú"
+          >
+            <Search className="h-[18px] w-[18px]" />
+          </button>
+
+          <button
+            type="button"
+            onClick={openOrder}
+            className="group relative flex items-center gap-2 rounded-full bg-[#5B21B6] py-2.5 pl-3 pr-3.5 text-white md:py-2 md:pr-4 shadow-lg shadow-purple-600/30 transition hover:bg-[#6D28D9] active:scale-95 md:ml-0"
             aria-label={`Abrir carrito, ${itemCount} productos`}
           >
             <span className="relative">
@@ -873,7 +969,7 @@ export default function RafasApp() {
                 {itemCount}
               </span>
             </span>
-            <span className="text-sm font-bold tabular-nums">{fmtUSD(total)}</span>
+            <span className="hidden text-sm font-bold tabular-nums md:inline">{fmtUSD(total)}</span>
           </button>
         </div>
 
@@ -912,13 +1008,85 @@ export default function RafasApp() {
       )}
 
       <main id="top">
+        {/* ==================== MOBILE / TABLET HERO (app style) ==================== */}
+        <section className="px-3 pt-3 sm:px-6 lg:hidden" aria-roledescription="carrusel" aria-label="Hamburguesas insignia">
+          <div
+            className="relative overflow-hidden rounded-[2rem] bg-[#6D28D9] px-5 pb-5 pt-6 text-white sm:px-8"
+            onTouchStart={(e) => {
+              touchX.current = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              if (touchX.current == null) return;
+              const dx = e.changedTouches[0].clientX - touchX.current;
+              if (Math.abs(dx) > 40) heroGo(dx < 0 ? 1 : -1);
+              touchX.current = null;
+            }}
+          >
+            <span
+              key={heroProduct.heroWord}
+              aria-hidden="true"
+              className="rf-word-in pointer-events-none absolute inset-x-0 top-[50%] select-none whitespace-nowrap text-center font-display uppercase leading-none text-white/10"
+              style={{ fontSize: `${(100 / (heroProduct.heroWord.length * 0.6)).toFixed(1)}vw` }}
+            >
+              {heroProduct.heroWord}
+            </span>
+            <p className="font-script relative text-2xl leading-none text-[#DDD6FE]">Casual Food</p>
+            <h1 className="font-display relative mt-2 text-[2.35rem] uppercase leading-[0.92] sm:text-6xl">
+              Más que una burger, <span className="text-[#DDD6FE]">un concepto</span> de locos.
+            </h1>
+            <p className="relative mt-2 text-sm text-white/75">Hamburguesas de autor para cada antojo.</p>
+
+            <button type="button" onClick={() => openProduct(heroProduct)} className="relative mx-auto mt-1 block w-full max-w-[440px]" aria-label={`Personalizar ${heroProduct.name}`}>
+              <img
+                key={heroProduct.id}
+                src={heroProduct.image}
+                alt={heroProduct.name}
+                draggable="false"
+                className="rf-burger-in aspect-[4/3] w-full select-none object-contain"
+                style={{ filter: 'drop-shadow(0 24px 22px rgba(20,8,40,.45))' }}
+              />
+            </button>
+
+            <div className="relative flex items-center gap-2">
+              <div key={heroProduct.id} className="rf-fade-up min-w-0 flex-1 rounded-full border border-white/25 bg-white/15 px-4 py-2 backdrop-blur">
+                <p className="truncate text-sm font-bold">{heroProduct.name}</p>
+                <p className="text-[12px] font-medium text-white/75 tabular-nums">
+                  <span className="font-extrabold text-white">{fmtREF(heroProduct.price)}</span> · {fmtBs(heroProduct.price, rate)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => addToCart(heroProduct)}
+                className={`grid h-12 w-12 shrink-0 place-items-center rounded-full shadow-lg transition active:scale-90 ${justAdded === heroProduct.id ? 'bg-emerald-400 text-white' : 'bg-white text-[#5B21B6]'}`}
+                aria-label={`Agregar ${heroProduct.name}`}
+              >
+                {justAdded === heroProduct.id ? <Check className="h-6 w-6" /> : <Plus className="h-6 w-6" />}
+              </button>
+            </div>
+
+            <div className="relative mt-4 flex justify-center gap-1.5" role="tablist" aria-label="Seleccionar hamburguesa">
+              {HERO_SLIDES.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === heroIndex}
+                  aria-label={p.name}
+                  onClick={() => setHeroIndex(i)}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${i === heroIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/40'}`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ============================== HERO ============================== */}
         <section
           ref={heroRef}
           onMouseMove={onHeroMove}
           onMouseEnter={() => setHeroPaused(true)}
           onMouseLeave={onHeroLeave}
-          className="relative overflow-hidden bg-[#F8F7FC]"
+          className="relative hidden overflow-hidden bg-[#F8F7FC] lg:block"
           style={{ '--mx': 0, '--my': 0 }}
           aria-roledescription="carrusel"
           aria-label="Hamburguesas insignia"
@@ -1019,23 +1187,79 @@ export default function RafasApp() {
               <h2 className="mt-2 text-2xl font-extrabold leading-tight sm:text-3xl">{heroProduct.name}</h2>
               <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-[#1E1035]/65 lg:mx-0">{heroProduct.description}</p>
               <p className="mt-5 font-display text-4xl leading-none text-[#5B21B6]">
-                {fmtUSD(heroProduct.price)} <span className="font-sans text-sm font-semibold text-[#1E1035]/50">≈ {fmtBs(heroProduct.price, rate)}</span>
+                {fmtREF(heroProduct.price)} <span className="font-sans text-sm font-semibold text-[#1E1035]/50">≈ {fmtBs(heroProduct.price, rate)}</span>
               </p>
               <div className="mt-6 flex flex-col items-center gap-3 lg:items-start">
                 <button
                   type="button"
-                  onClick={() => openProduct(heroProduct)}
+                  onClick={() => orderNow(heroProduct)}
                   className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[#5B21B6] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#6D28D9]"
                 >
-                  Ordenar Ahora — {fmtUSD(heroProduct.price)}
+                  Ordenar Ahora — {fmtREF(heroProduct.price)}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-                <button type="button" onClick={() => addToCart(heroProduct)} className="text-sm font-bold text-[#5B21B6] underline-offset-4 hover:underline">
-                  {justAdded === heroProduct.id ? 'Agregada ✓' : 'Agregar rápido'}
+                <button type="button" onClick={() => openProduct(heroProduct)} className="text-sm font-bold text-[#5B21B6] underline-offset-4 hover:underline">
+                  Personalizar antes de pedir
                 </button>
               </div>
             </div>
           </div>
+        </section>
+
+        {/* ==================== FEATURES · PROMO · REPEAT ==================== */}
+        <section className="mx-auto max-w-7xl px-3 pt-4 sm:px-6 lg:pt-0" aria-label="Destacados">
+          <div className="grid gap-3 lg:grid-cols-[1.3fr_1fr] lg:gap-6">
+            <ul className="grid grid-cols-4 divide-x divide-[#EDE9FE] rounded-[1.75rem] border border-[#EDE9FE] bg-white py-4 lg:py-6">
+              {FEATURES.map((f) => (
+                <li key={f.label} className="flex flex-col items-center justify-center gap-2 px-1 text-center">
+                  <f.icon className="h-6 w-6 text-[#1E1035] lg:h-7 lg:w-7" strokeWidth={1.5} />
+                  <span className="text-[11px] leading-tight text-[#1E1035]/70 sm:text-xs">{f.label}</span>
+                </li>
+              ))}
+            </ul>
+
+            {(() => {
+              const promo = products[PROMO_ID];
+              return (
+                <article className="grid grid-cols-[44%_1fr] overflow-hidden rounded-[1.75rem] border border-[#EDE9FE] bg-white">
+                  <button type="button" onClick={() => openProduct(promo)} className="relative bg-[#6D28D9] p-3" aria-label={`Personalizar ${promo.name}`}>
+                    <ProductArt product={promo} />
+                  </button>
+                  <div className="flex min-w-0 flex-col p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[.2em] text-[#1E1035]/50">Promo</p>
+                    <h3 className="mt-1 text-lg font-extrabold leading-tight">{promo.name}</h3>
+                    <p className="mt-1 line-clamp-2 text-xs leading-snug text-[#1E1035]/60">{promo.description}</p>
+                    <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+                      <div>
+                        <p className="font-extrabold tabular-nums">{fmtREF(promo.price)}</p>
+                        <p className="text-[10px] font-medium text-[#1E1035]/50 tabular-nums">{fmtBs(promo.price, rate)}</p>
+                      </div>
+                      <AddControl label={promo.name} qty={qtyInCart(promo)} onAdd={() => addToCart(promo)} onDec={() => decDefault(promo)} />
+                    </div>
+                  </div>
+                </article>
+              );
+            })()}
+          </div>
+
+          {lastOrder && (
+            <button
+              type="button"
+              onClick={repeatLast}
+              className="mt-3 flex w-full items-center gap-3 rounded-[1.75rem] border border-dashed border-[#C4B5FD] bg-white px-4 py-3 text-left transition hover:border-[#5B21B6]"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#EDE9FE] text-[#5B21B6]">
+                <RotateCcw className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-extrabold">Repetir mi último pedido</span>
+                <span className="block truncate text-xs text-[#1E1035]/55">
+                  {lastOrder.lines.map((l) => `${l.qty}× ${products[l.productId]?.name ?? ''}`).join(' · ')}
+                </span>
+              </span>
+              <span className="shrink-0 text-sm font-extrabold text-[#5B21B6]">{fmtREF(lastOrder.total)}</span>
+            </button>
+          )}
         </section>
 
         {/* ============================ MARQUEE ============================= */}
@@ -1055,62 +1279,110 @@ export default function RafasApp() {
         </div>
 
         {/* ============================== MENU ============================== */}
-        <section id="menu" ref={menuRef} className="scroll-mt-28 bg-[#F8F7FC] py-16 sm:py-20">
+        <section id="menu" ref={menuRef} className="scroll-mt-28 bg-[#F8F7FC] pb-16 pt-10 sm:pb-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-              <div>
-                <p className="font-script text-3xl leading-none text-[#6D28D9]">El menú</p>
-                <h2 className="font-display mt-2 text-5xl uppercase leading-[0.9] sm:text-7xl">
-                  Elige tu <span className="text-[#5B21B6]">locura</span>
-                </h2>
-              </div>
-              <p className="max-w-sm text-sm leading-relaxed text-[#1E1035]/60">
-                Precios en USD con su equivalente en Bolívares a la tasa BCV del día ({rate.toFixed(2)} Bs.). Sede activa:{' '}
-                <span className="font-bold text-[#1E1035]">{city.name}</span>.
-              </p>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-extrabold">Explora por categoría</h2>
+              <button type="button" onClick={() => goToMenu('todos')} className="text-sm font-semibold text-[#1E1035]/70 hover:text-[#5B21B6]">
+                Ver todo ›
+              </button>
             </div>
 
-            {/* Category pills */}
-            <div className="no-scrollbar -mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0" role="tablist" aria-label="Categorías">
-              {CATEGORIES.map((c) => {
-                const active = c.id === category;
-                const count = PRODUCTS.filter((p) => p.categories.includes(c.id)).length;
+            {/* Category tiles */}
+            <div className="no-scrollbar -mx-4 mt-4 flex items-start gap-3 overflow-x-auto px-4 pb-2 pt-1 sm:mx-0 sm:px-0" role="tablist" aria-label="Categorías">
+              {CATEGORIES.filter((c) => c.id !== 'fav' || favorites.length > 0 || category === 'fav').map((c) => {
+                const active = !query && c.id === category;
+                const thumb = products[CATEGORY_THUMB[c.id]];
                 return (
                   <button
                     key={c.id}
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => setCategory(c.id)}
-                    className={`flex shrink-0 items-center gap-2 rounded-full px-5 py-3 text-sm font-bold transition-all duration-300 ${
-                      active
-                        ? 'bg-[#5B21B6] text-white shadow-lg shadow-purple-600/30'
-                        : 'bg-[#EDE9FE] text-[#1E1035] hover:bg-[#DDD6FE]'
-                    }`}
+                    onClick={() => {
+                      setCategory(c.id);
+                      setQuery('');
+                    }}
+                    className="w-[84px] shrink-0 text-left sm:w-[104px]"
                   >
-                    <span className="text-base leading-none">{c.emoji}</span>
-                    {c.label}
-                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${active ? 'bg-white/20' : 'bg-white/70 text-[#6D28D9]'}`}>{count}</span>
+                    <span
+                      className={`block aspect-square overflow-hidden rounded-2xl bg-[#6D28D9] p-1.5 transition ${
+                        active ? 'ring-[3px] ring-[#1E1035] ring-offset-2 ring-offset-[#F8F7FC]' : 'opacity-85 hover:opacity-100'
+                      }`}
+                    >
+                      {thumb ? (
+                        <ProductArt product={thumb} size="sm" />
+                      ) : (
+                        <span className="grid h-full place-items-center">
+                          <Heart className="h-8 w-8 fill-white text-white" />
+                        </span>
+                      )}
+                    </span>
+                    <span className={`mt-1.5 block text-[12px] font-bold leading-tight ${active ? 'text-[#5B21B6]' : 'text-[#1E1035]'}`}>{c.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Product grid */}
-            <div key={category} className="mt-8 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((p, i) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  featured={i % 3 === 1}
-                  index={i}
-                  rate={rate}
-                  added={justAdded === p.id}
-                  onOpen={() => openProduct(p)}
-                  onQuick={() => quickAdd(p)}
-                />
-              ))}
+            {/* Search */}
+            <label className="mt-5 flex items-center gap-3 rounded-full border border-[#EDE9FE] bg-white px-4 py-3 focus-within:border-[#5B21B6] focus-within:ring-4 focus-within:ring-[#5B21B6]/10">
+              <Search className="h-4 w-4 shrink-0 text-[#1E1035]/45" />
+              <input
+                id="menu-search"
+                ref={searchRef}
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Busca tu burger, papas, malteada…"
+                className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-[#1E1035]/35"
+                aria-label="Buscar en el menú"
+              />
+              {query && (
+                <button type="button" onClick={() => setQuery('')} className="text-[#1E1035]/45 hover:text-[#1E1035]" aria-label="Borrar búsqueda">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </label>
+
+            <div className="mt-8 flex items-end justify-between gap-4">
+              <h2 className="font-display text-7xl uppercase leading-[0.8] text-[#6D28D9] sm:text-8xl">Menú</h2>
+              <p className="pb-1 text-right text-sm font-semibold text-[#1E1035]/50">
+                {query ? `${filtered.length} resultado${filtered.length === 1 ? '' : 's'}` : CATEGORIES.find((c) => c.id === category)?.label}
+              </p>
             </div>
+            <p className="mt-3 text-xs text-[#1E1035]/50">
+              Precios REF en USD · Bs. a tasa BCV {rate.toFixed(2)} · Sede {city.name}. Toca <b>+</b> para agregar al momento, o la foto para personalizar.
+            </p>
+
+            {/* Product grid */}
+            {filtered.length > 0 ? (
+              <div key={`${category}-${query}`} className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+                {filtered.map((p, i) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    index={i}
+                    rate={rate}
+                    qty={qtyInCart(p)}
+                    fav={favorites.includes(p.id)}
+                    onOpen={() => openProduct(p)}
+                    onAdd={() => addToCart(p)}
+                    onDec={() => decDefault(p)}
+                    onFav={() => toggleFav(p.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-[1.75rem] border border-dashed border-[#C4B5FD] bg-white px-6 py-10 text-center">
+                <p className="text-base font-extrabold">{query ? `Nada con "${query}"` : 'Aún no tienes favoritos'}</p>
+                <p className="mt-1 text-sm text-[#1E1035]/55">
+                  {query ? 'Prueba con otra palabra, como "papas" o "bacon".' : 'Toca el corazón de cualquier producto para guardarlo aquí.'}
+                </p>
+                <button type="button" onClick={() => goToMenu('todos')} className="mt-4 rounded-full bg-[#5B21B6] px-5 py-2.5 text-sm font-bold text-white">
+                  Ver todo el menú
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
@@ -1239,30 +1511,51 @@ export default function RafasApp() {
         </div>
       </footer>
 
-      {/* ===================== MOBILE FLOATING CART BAR ===================== */}
-      {itemCount > 0 && !drawer && !modal && (
-        <div className="fixed inset-x-3 bottom-3 z-30 md:hidden rf-pop-in" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <button
-            type="button"
-            onClick={() => setDrawer('cart')}
-            className="flex w-full items-center gap-3 rounded-full bg-[#1E1035] p-2 pr-5 text-left text-white shadow-2xl shadow-purple-900/40"
-          >
-            <span key={bumpKey} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#5B21B6] text-base font-extrabold rf-bump">
-              {itemCount}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[11px] font-semibold uppercase tracking-widest text-white/60">
-                {mode === 'delivery' ? 'Delivery' : 'Pick-up'} · {city.name}
-              </span>
-              <span className="block truncate text-sm font-bold tabular-nums">
-                {fmtUSD(total)} <span className="font-medium text-white/60">· {fmtBs(total, rate)}</span>
-              </span>
-            </span>
-            <span className="flex items-center gap-1 text-sm font-extrabold">
-              Ver pedido <ArrowRight className="h-4 w-4" />
-            </span>
-          </button>
-        </div>
+      {/* ======================= MOBILE BOTTOM TAB BAR ======================= */}
+      {!drawer && !modal && (
+        <nav className="fixed inset-x-3 bottom-3 z-30 md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} aria-label="Navegación principal">
+          <div className="flex items-center gap-1 rounded-[1.75rem] border border-[#EDE9FE] bg-white/95 p-1.5 shadow-2xl shadow-purple-900/20 backdrop-blur">
+            {[
+              { id: 'inicio', label: 'Inicio', icon: House, go: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+              { id: 'menu', label: 'Menú', icon: UtensilsCrossed, go: () => goToMenu('todos') },
+              { id: 'fav', label: 'Favoritos', icon: Heart, go: () => goToMenu('fav') },
+            ].map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => {
+                  setNavTab(t.id);
+                  t.go();
+                }}
+                className={`flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-bold transition ${navTab === t.id ? 'text-[#5B21B6]' : 'text-[#1E1035]/45'}`}
+                aria-current={navTab === t.id ? 'page' : undefined}
+              >
+                <t.icon className={`h-5 w-5 ${t.id === 'fav' && navTab === 'fav' ? 'fill-current' : ''}`} />
+                {t.label}
+              </button>
+            ))}
+            {itemCount > 0 ? (
+              <button
+                type="button"
+                onClick={openOrder}
+                className="rf-pop-in flex shrink-0 items-center gap-2 rounded-[1.4rem] bg-[#5B21B6] py-2 pl-2 pr-4 text-left text-white shadow-lg shadow-purple-600/30"
+              >
+                <span key={bumpKey} className="rf-bump grid h-8 min-w-8 place-items-center rounded-full bg-white px-1 text-xs font-extrabold text-[#5B21B6]">
+                  {itemCount}
+                </span>
+                <span className="leading-tight">
+                  <span className="block text-sm font-extrabold tabular-nums">Pagar {fmtREF(total)}</span>
+                  <span className="block text-[10px] font-medium text-white/70 tabular-nums">{fmtBs(total, rate)}</span>
+                </span>
+              </button>
+            ) : (
+              <button type="button" onClick={openOrder} className="flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-bold text-[#1E1035]/45">
+                <ShoppingBag className="h-5 w-5" />
+                Carrito
+              </button>
+            )}
+          </div>
+        </nav>
       )}
 
       {/* ========================= PRODUCT MODAL ============================ */}
@@ -1453,13 +1746,31 @@ export default function RafasApp() {
                           <div className="space-y-2.5">
                             {cartLines.map((l) => (
                               <div key={l.key}>
-                                <div className="flex gap-2">
-                                  <span className="shrink-0 font-bold">{l.qty}×</span>
+                                <div className="flex items-start gap-2">
+                                  <span className="flex shrink-0 items-center gap-1 font-sans">
+                                    <button
+                                      type="button"
+                                      onClick={() => (l.qty === 1 ? removeLine(l.key) : changeQty(l.key, -1))}
+                                      className="grid h-5 w-5 place-items-center rounded-full border border-[#1E1035]/30 transition hover:bg-[#EDE9FE]"
+                                      aria-label={`Quitar uno de ${l.product.name}`}
+                                    >
+                                      <Minus className="h-3 w-3" />
+                                    </button>
+                                    <span className="min-w-4 text-center font-mono-ticket font-bold">{l.qty}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => changeQty(l.key, 1)}
+                                      className="grid h-5 w-5 place-items-center rounded-full border border-[#1E1035]/30 transition hover:bg-[#EDE9FE]"
+                                      aria-label={`Sumar uno de ${l.product.name}`}
+                                    >
+                                      <Plus className="h-3 w-3" />
+                                    </button>
+                                  </span>
                                   <span className="flex-1 font-bold uppercase leading-tight">{l.product.name}</span>
                                   <span className="shrink-0 font-bold tabular-nums">{fmtUSD(l.total)}</span>
                                 </div>
                                 {describeConfig(l.product, l.cfg).map((d) => (
-                                  <p key={d} className="pl-6 text-[11px] leading-snug text-[#1E1035]/60">
+                                  <p key={d} className="pl-[4.75rem] text-[11px] leading-snug text-[#1E1035]/60">
                                     {d}
                                   </p>
                                 ))}
@@ -1872,71 +2183,78 @@ function RateBadge({ rate, editing, draft, setDraft, onEdit, onSave, onCancel, c
   );
 }
 
-function ProductCard({ product, featured, index, rate, added, onOpen, onQuick }) {
-  const isBurger = product.kind === 'burger';
+function AddControl({ label, qty, onAdd, onDec }) {
+  if (!qty) {
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAdd();
+        }}
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#1E1035] text-white transition hover:bg-[#5B21B6] active:scale-90"
+        aria-label={`Agregar ${label}`}
+      >
+        <Plus className="h-5 w-5" />
+      </button>
+    );
+  }
+  return (
+    <div onClick={(e) => e.stopPropagation()} className="rf-pop-in flex shrink-0 items-center gap-0.5 rounded-full bg-[#1E1035] p-1 text-white">
+      <button type="button" onClick={onDec} className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/15" aria-label={`Quitar uno de ${label}`}>
+        <Minus className="h-4 w-4" />
+      </button>
+      <span className="min-w-5 text-center text-sm font-extrabold tabular-nums">{qty}</span>
+      <button type="button" onClick={onAdd} className="grid h-8 w-8 place-items-center rounded-full bg-[#5B21B6] transition hover:bg-[#6D28D9]" aria-label={`Sumar uno de ${label}`}>
+        <Plus className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function ProductCard({ product, index, rate, qty, fav, onOpen, onAdd, onDec, onFav }) {
+  const cat = CATEGORIES.find((c) => c.id !== 'top' && c.id !== 'todos' && product.categories.includes(c.id));
   return (
     <article
-      className={`group relative flex cursor-pointer flex-col rounded-[2rem] p-5 pb-6 transition-all duration-300 hover:-translate-y-1.5 rf-fade-up ${
-        featured
-          ? 'bg-[#5B21B6] text-white shadow-xl shadow-purple-700/30 hover:shadow-2xl hover:shadow-purple-700/40'
-          : 'border border-[#EDE9FE] bg-white shadow-lg shadow-purple-500/10 hover:shadow-xl hover:shadow-purple-500/20'
-      }`}
-      style={{ animationDelay: `${index * 60}ms` }}
+      className="rf-fade-up group flex cursor-pointer flex-col rounded-[1.75rem] border border-[#EDE9FE] bg-white p-2 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10 sm:p-2.5"
+      style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
       onClick={onOpen}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onOpen())}
       tabIndex={0}
       role="button"
-      aria-label={`${product.name}, ${fmtUSD(product.price)}`}
+      aria-label={`${product.name}, ${fmtREF(product.price)}. Toca para personalizar`}
     >
-      {featured && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]" aria-hidden="true">
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#7C3AED] opacity-70 blur-2xl" />
-          <span className="absolute -left-2 top-2 font-display text-8xl uppercase leading-none text-white/[.06]">Rafa's</span>
-        </div>
-      )}
-      <div className="relative flex items-center justify-between">
-        {product.badge ? (
-          <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider ${featured ? 'bg-white/15 text-white' : 'bg-[#EDE9FE] text-[#5B21B6]'}`}>
-            {product.badge}
-          </span>
-        ) : (
-          <span />
-        )}
-        <span className={`flex items-center gap-1 text-[11px] font-bold ${featured ? 'text-white/70' : 'text-[#1E1035]/45'}`}>
-          <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" /> 4.{9 - (index % 3)}
-        </span>
-      </div>
-
-      <div className="relative mx-auto my-3 aspect-[4/3] w-full">
-        <div className={`absolute inset-x-[18%] bottom-[6%] h-[14%] rounded-[50%] blur-xl ${featured ? 'bg-black/30' : 'bg-[#5B21B6]/20'}`} />
-        <div className="relative h-full w-full transition-transform duration-500 ease-out group-hover:-rotate-3 group-hover:scale-[1.07]">
+      <div className="relative aspect-square overflow-hidden rounded-[1.35rem] bg-[#6D28D9] p-3">
+        <div className="h-full w-full transition-transform duration-500 ease-out group-hover:scale-[1.06]">
           <ProductArt product={product} />
         </div>
-      </div>
-
-      <h3 className="relative font-display text-[1.6rem] uppercase leading-[0.95]">{product.name}</h3>
-      <p className={`relative mt-2 line-clamp-2 text-[13px] leading-snug ${featured ? 'text-white/75' : 'text-[#1E1035]/60'}`}>{product.description}</p>
-
-      <div className="relative mt-4 pr-20">
-        <p className={`font-display text-3xl leading-none ${featured ? 'text-white' : 'text-[#5B21B6]'}`}>{fmtUSD(product.price)}</p>
-        <p className={`mt-1 text-xs font-semibold tabular-nums ${featured ? 'text-white/60' : 'text-[#1E1035]/45'}`}>{fmtBs(product.price, rate)}</p>
-      </div>
-
-      {/* circular cut-out + action */}
-      <div className="absolute -bottom-3 -right-3 grid h-[92px] w-[92px] place-items-center rounded-full bg-[#F8F7FC]">
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onQuick();
+            onFav();
           }}
-          className={`grid h-14 w-14 place-items-center rounded-full text-white shadow-lg transition-all duration-300 hover:scale-110 active:scale-90 ${
-            added ? 'bg-emerald-500 shadow-emerald-500/40' : featured ? 'bg-[#1E1035] shadow-purple-900/40 hover:bg-[#2D1B4E]' : 'bg-[#5B21B6] shadow-purple-600/40 hover:bg-[#6D28D9]'
-          }`}
-          aria-label={isBurger ? `Personalizar ${product.name}` : `Agregar ${product.name}`}
+          className={`absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-white shadow-sm transition active:scale-90 ${fav ? 'text-[#DB2777]' : 'text-[#1E1035]'}`}
+          aria-label={fav ? `Quitar ${product.name} de favoritos` : `Guardar ${product.name} en favoritos`}
+          aria-pressed={fav}
         >
-          {added ? <Check className="h-6 w-6" /> : isBurger ? <ArrowRight className="h-6 w-6 transition group-hover:-rotate-45" /> : <Plus className="h-6 w-6" />}
+          <Heart className={`h-4 w-4 ${fav ? 'fill-current' : ''}`} />
         </button>
+        {product.badge && (
+          <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-[#5B21B6]">{product.badge}</span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col px-1.5 pb-1 pt-3 sm:px-2">
+        <p className="text-[9px] font-bold uppercase tracking-[.18em] text-[#1E1035]/45 sm:text-[10px]">{cat?.label}</p>
+        <h3 className="mt-0.5 line-clamp-2 text-[14px] font-extrabold leading-tight sm:text-base">{product.name}</h3>
+        <p className="mt-1 hidden line-clamp-2 text-xs leading-snug text-[#1E1035]/55 sm:block">{product.description}</p>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <div className="min-w-0">
+            <p className="text-[15px] font-extrabold tabular-nums">{fmtREF(product.price)}</p>
+            <p className="truncate text-[10px] font-medium text-[#1E1035]/45 tabular-nums">{fmtBs(product.price, rate)}</p>
+          </div>
+          <AddControl label={product.name} qty={qty} onAdd={onAdd} onDec={onDec} />
+        </div>
       </div>
     </article>
   );

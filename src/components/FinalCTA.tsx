@@ -2,15 +2,23 @@
 
 import { useState } from "react";
 import { site } from "@/config/site";
-import { services } from "@/data/content";
-import { LogoMark } from "./Logo";
+import { services } from "@/data/services";
+import { Logo } from "./Logo";
 import { ArrowRight } from "./Icon";
 
 type Status = { kind: "idle" } | { kind: "error"; message: string } | { kind: "pending" } | { kind: "sent" };
 
-const { email, whatsapp } = site.contact;
+const { email, whatsapp, instagram } = site.contact;
 
-export function Contact() {
+/** Canales del cierre. Sin dato configurado se muestran como "próximamente", nunca con un enlace inventado. */
+const channels = [
+  { label: "Instagram", href: instagram ? `https://instagram.com/${instagram}` : "" },
+  { label: "WhatsApp", href: whatsapp ? `https://wa.me/${whatsapp}` : "" },
+  { label: "Email", href: email ? `mailto:${email}` : "" },
+];
+
+/** Cierre de la página: llamada a la acción, formulario de proyecto y canales. Sustituye al footer. */
+export function FinalCTA() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -42,47 +50,20 @@ export function Contact() {
   }
 
   return (
-    <section id="contacto" className="contact" aria-labelledby="contacto-title">
-      <div className="container contact__intro">
-        <div data-reveal>
-          <span className="contact__rule" aria-hidden="true" />
-          <h2 id="contacto-title" className="contact__title">
-            ¿Listo para crear
-            <br />
-            lo próximo?
-          </h2>
-          <p className="contact__sub">Hablemos de tu idea y llevémosla a un producto digital real.</p>
-          <a href="#formulario" className="btn btn--light">
-            Comenzar proyecto <ArrowRight className="btn__arrow" />
-          </a>
-        </div>
-        <div className="contact__visual" aria-hidden="true">
-          <LogoMark className="contact__mark" />
-        </div>
+    <section id="contacto" className="final" aria-labelledby="final-title">
+      <div className="container final__intro" data-reveal>
+        <Logo className="logo--light final__logo" />
+        <h2 id="final-title" className="final__title">
+          Hagamos algo que valga la pena recordar.
+        </h2>
+        <p className="final__sub">Cuéntanos tu idea y construyamos lo próximo.</p>
+        <a href="#formulario" className="btn btn--light">
+          Comenzar proyecto <ArrowRight className="btn__arrow" />
+        </a>
       </div>
 
-      <div className="container contact__body">
-        <div className="contact__aside" data-reveal>
-          <h3>Cuéntanos tu proyecto</h3>
-          <p>Respondemos con una propuesta clara de alcance, tiempos y siguientes pasos.</p>
-          <ul className="contact__channels">
-            {email && (
-              <li>
-                <a href={`mailto:${email}`}>{email}</a>
-              </li>
-            )}
-            {whatsapp && (
-              <li>
-                <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer">
-                  Escríbenos por WhatsApp
-                </a>
-              </li>
-            )}
-            {!email && !whatsapp && <li className="contact__pending">Correo y WhatsApp: próximamente.</li>}
-          </ul>
-        </div>
-
-        <form id="formulario" className="form" noValidate onSubmit={onSubmit} data-reveal>
+      <div className="container final__body">
+        <form id="formulario" className="form" noValidate onSubmit={onSubmit} data-reveal aria-label="Cuéntanos tu proyecto">
           <div className="form__row">
             <label className="field">
               <span>Nombre</span>
@@ -132,6 +113,25 @@ export function Contact() {
             </p>
           </div>
         </form>
+      </div>
+
+      <div className="container final__foot">
+        <ul className="final__channels">
+          {channels.map((c) =>
+            c.href ? (
+              <li key={c.label}>
+                <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+                  {c.label}
+                </a>
+              </li>
+            ) : (
+              <li key={c.label} className="is-pending">
+                {c.label} <small>próximamente</small>
+              </li>
+            ),
+          )}
+        </ul>
+        <p className="final__copy">© {new Date().getFullYear()} Fary Labs</p>
       </div>
     </section>
   );

@@ -1,4 +1,20 @@
-import type { IconName } from "@/data/content";
+export type IconName =
+  | "target"
+  | "pen"
+  | "code"
+  | "chart"
+  | "monitor"
+  | "cursor"
+  | "cart"
+  | "app"
+  | "layers"
+  | "cloud"
+  | "spark"
+  | "plug"
+  | "bolt"
+  | "gauge"
+  | "scale"
+  | "trend";
 
 const paths: Record<IconName, React.ReactNode> = {
   target: (
@@ -66,6 +82,14 @@ export function ArrowRight({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true" className={className}>
       <path d="M4 12h15M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function Plus({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true" className={className}>
+      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
     </svg>
   );
 }

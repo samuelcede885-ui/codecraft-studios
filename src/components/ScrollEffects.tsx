@@ -12,7 +12,7 @@ export function ScrollEffects() {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
-      gsap.set("[data-reveal]", { autoAlpha: 0, y: 40 });
+      gsap.set("[data-reveal]", { autoAlpha: 0, y: 28 });
       ScrollTrigger.batch("[data-reveal]", {
         start: "top 88%",
         once: true,
@@ -29,13 +29,6 @@ export function ScrollEffects() {
           scrollTrigger: { trigger: ".process__track", start: "top 75%", end: "bottom 55%", scrub: 0.6 },
         },
       );
-
-      gsap.to(".contact__mark", {
-        yPercent: -8,
-        rotate: -4,
-        ease: "none",
-        scrollTrigger: { trigger: ".contact", start: "top bottom", end: "bottom top", scrub: true },
-      });
 
       // Los recursos (fuentes) cambian alturas: recalcular pins y triggers.
       // Si se entró con un ancla (#contacto…), el salto inicial ocurrió antes

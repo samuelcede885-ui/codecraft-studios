@@ -6,7 +6,7 @@ Visión del proyecto: [`docs/fary-labs-brief.md`](docs/fary-labs-brief.md). Refe
 
 ## Stack
 
-Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · GSAP + ScrollTrigger · Lenis (scroll suave en escritorio, sincronizado con GSAP; desactivado en táctil y con `prefers-reduced-motion`).
+Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · GSAP + ScrollTrigger · Lenis (scroll suave sincronizado con GSAP; desactivado con `prefers-reduced-motion`).
 
 ## Comandos
 
@@ -19,24 +19,29 @@ npm run typecheck
 
 ## Estructura
 
-| Archivo | Qué contiene |
+| Ruta | Qué contiene |
 |---|---|
-| `src/data/content.ts` | Textos de la secuencia, servicios, portafolio y proceso |
-| `src/config/site.ts` | Navegación y datos de contacto (correo, WhatsApp) |
-| `src/components/ShowcaseStory.tsx` | Hero + secuencia fija con GSAP (laptop inmóvil, pantallas y textos sincronizados) |
-| `src/components/screens/Screens.tsx` | Las cinco pantallas de la laptop: tienda Gramercy reconstruida en HTML (zueco recortado en `public/projects/gramercy-shoe.webp`) + panel de métricas |
-| `src/components/Laptop.tsx` | Laptop en CSS |
-| `src/components/Sections.tsx` | Servicios, Portafolio y Proceso |
-| `src/components/Contact.tsx` | CTA final y formulario |
-| `src/app/globals.css` | Tokens, laptop, escena, pantallas y secciones |
+| `src/data/storySteps.ts` | Los cinco pasos de la secuencia (etapa, título, metadata, mensaje, etiquetas, pantalla) |
+| `src/data/services.ts` | Web, App y Agent Craft (qué incluye cada uno) y los pasos del proceso |
+| `src/data/projects.ts` | Proyecto principal (Gramercy) y "Más proyectos" (conceptos) |
+| `src/data/screens.ts` | Identificadores de las pantallas |
+| `src/config/site.ts` | Navegación y datos de contacto (Instagram, WhatsApp, correo) |
+| `src/components/Intro.tsx` | Intro de marca (≤ 2,7 s, una vez por sesión, botón "Saltar intro") |
+| `src/components/Header.tsx`, `MobileMenu.tsx` | Header fijo que se compacta con blur y menú móvil a pantalla completa |
+| `src/components/ScrollStory/` | Hero + secuencia fijada: una sola laptop, una línea de tiempo GSAP con scrub |
+| `src/components/screens/Screens.tsx` | Pantallas de la laptop: Gramercy en HTML, panel de métricas, asistente IA y estudio |
+| `src/components/Services.tsx` | Servicios en acordeón accesible con vista previa |
+| `src/components/Portfolio.tsx`, `Process.tsx`, `StoryCTA.tsx`, `FinalCTA.tsx` | Resto de secciones; el cierre negro sustituye al footer |
+| `src/styles/*.css` | Estilos por bloque (base, intro, header, laptop, story, screens, sections, form) |
 
 ## Comportamiento
 
-- **Escritorio:** texto a la izquierda, laptop centrada, mensaje a la derecha.
-- **Móvil y tablet (< 1024 px):** laptop centrada; información arriba y abajo en vertical.
-- **`prefers-reduced-motion`:** sin fijado ni animaciones; los cinco pasos se muestran uno tras otro.
+- **Intro:** fondo negro, el símbolo se dibuja, aparecen "Fary" y "labs" y la página entra. Solo una vez por sesión (`sessionStorage`); se omite con `prefers-reduced-motion`.
+- **Escritorio:** título a la izquierda, laptop centrada, metadata y mensaje a la derecha. Cada gesto de rueda avanza un paso.
+- **Móvil y tablet (< 1024 px):** título, laptop, metadata y mensaje en columna; la laptop no se mueve.
+- **`prefers-reduced-motion`:** la escena sigue fijada pero los pasos cambian sin animación.
 
 ## Pendiente
 
-- **Datos de contacto:** rellenar `email` y `whatsapp` en `src/config/site.ts`. Mientras estén vacíos, el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
-- **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.
+- **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. Mientras estén vacíos, los canales del cierre aparecen como "próximamente" y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
+- **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Los proyectos de "Más proyectos" también son conceptos de Fary Labs, no trabajos de clientes. Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.

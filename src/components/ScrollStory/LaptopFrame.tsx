@@ -1,8 +1,11 @@
 import { forwardRef } from "react";
 
-/** Laptop realista en CSS. El contenido de la pantalla se pasa como children. */
-export const Laptop = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
-  function Laptop({ children, className }, ref) {
+/**
+ * Carcasa de laptop en CSS. Es siempre la misma durante toda la historia:
+ * solo cambia lo que hay dentro de la pantalla (children), que recorta su contenido.
+ */
+export const LaptopFrame = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
+  function LaptopFrame({ children, className }, ref) {
     return (
       <div ref={ref} className={`laptop ${className ?? ""}`}>
         <div className="laptop__lid">

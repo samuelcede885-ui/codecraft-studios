@@ -1,0 +1,74 @@
+/* ───────────────────────── Formulario (sobre fondo negro) ───────────────────────── */
+.form {
+  display: grid;
+  gap: 26px;
+}
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+}
+.field > span {
+  font-size: 0.8rem;
+  color: var(--dark-muted);
+}
+.field em {
+  font-style: normal;
+  opacity: 0.7;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px 0;
+  border: 0;
+  border-bottom: 1px solid #3a3a40;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  transition: border-color 0.25s;
+}
+.field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #9a9aa2 50%), linear-gradient(135deg, #9a9aa2 50%, transparent 50%);
+  background-position:
+    calc(100% - 10px) 52%,
+    calc(100% - 5px) 52%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.field select option {
+  color: #111;
+}
+.field textarea {
+  resize: vertical;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-bottom-color: #fff;
+}
+.field input:user-invalid,
+.field select:user-invalid,
+.field textarea:user-invalid {
+  border-bottom-color: #ff6b6b;
+}
+.form__footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.form__status {
+  margin: 0;
+  flex: 1 1 240px;
+  font-size: 0.88rem;
+  color: var(--dark-muted);
+}

@@ -1,5 +1,5 @@
 /** Símbolo oficial de Fary Labs (flecha diagonal), trazado a partir del logo original. */
-const MARK_POINTS =
+export const MARK_POINTS =
   "191,188 484,188 803,516 803,188 1051,188 1051,744 863,921 1062,921 908,1065 370,1065 567,879 191,879 191,639 575,639 191,251";
 
 export function LogoMark({ className, title }: { className?: string; title?: string }) {

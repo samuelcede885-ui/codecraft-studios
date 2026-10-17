@@ -1,25 +1,27 @@
 import { Header } from "@/components/Header";
-import { ShowcaseStory } from "@/components/ShowcaseStory";
-import { Portfolio, Process, Services } from "@/components/Sections";
-import { Contact } from "@/components/Contact";
-import { Footer } from "@/components/Footer";
+import { Intro } from "@/components/Intro";
+import { ScrollStory } from "@/components/ScrollStory/ScrollStory";
+import { StoryCTA } from "@/components/StoryCTA";
+import { Services } from "@/components/Services";
+import { Portfolio } from "@/components/Portfolio";
+import { Process } from "@/components/Process";
+import { FinalCTA } from "@/components/FinalCTA";
 import { ScrollEffects } from "@/components/ScrollEffects";
 import { SmoothScroll } from "@/components/SmoothScroll";
-import { Preloader } from "@/components/Preloader";
 
 export default function Home() {
   return (
     <>
-      <Preloader />
+      <Intro />
       <Header />
       <main id="contenido">
-        <ShowcaseStory />
+        <ScrollStory />
+        <StoryCTA />
         <Services />
         <Portfolio />
         <Process />
-        <Contact />
+        <FinalCTA />
       </main>
-      <Footer />
       <SmoothScroll />
       <ScrollEffects />
     </>

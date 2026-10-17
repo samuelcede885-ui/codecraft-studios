@@ -8,7 +8,9 @@ const sora = Sora({ subsets: ["latin"], weight: ["700", "800"], variable: "--fon
 const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-display", display: "swap" });
 const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap" });
 
-const introScript = `try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
+// Antes del primer pintado: guarda el instante de inicio de la intro y la omite si ya se vio
+// en esta sesión o si se pide menos movimiento.
+const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
 
 export const metadata: Metadata = {
   title: "Fary Labs — Transformamos ideas en productos digitales",
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f4f5",
+  themeColor: "#f3f3f4",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -28,9 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        {/* Antes del primer pintado: sin intro si ya se vio en esta sesión o si se pide menos movimiento. */}
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
-        <link rel="preload" as="image" href="/projects/fary-intro.webp" fetchPriority="high" />
+        {/* Imágenes de la historia de la laptop: listas antes de que empiece la secuencia. */}
+        <link rel="preload" as="image" href="/projects/gramercy-shoe-clean.webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/projects/gramercy-shoe.webp" />
+        <link rel="preload" as="image" href="/projects/gramercy-logo.webp" />
       </head>
       <body>
         <a href="#contenido" className="skip-link">

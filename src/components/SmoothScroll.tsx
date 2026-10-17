@@ -24,6 +24,9 @@ export function SmoothScroll() {
     const resume = () => lenis.start();
     if (!window.__faryIntroDone && !document.documentElement.classList.contains("intro-seen")) lenis.stop();
     window.addEventListener("fary:intro-done", resume);
+    // Menú móvil abierto: el fondo no se desplaza.
+    const onLock = (e: Event) => ((e as CustomEvent<boolean>).detail ? lenis.stop() : lenis.start());
+    window.addEventListener("fary:scroll-lock", onLock);
 
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(raf);
@@ -31,6 +34,7 @@ export function SmoothScroll() {
 
     return () => {
       window.removeEventListener("fary:intro-done", resume);
+      window.removeEventListener("fary:scroll-lock", onLock);
       gsap.ticker.remove(raf);
       lenis.destroy();
     };

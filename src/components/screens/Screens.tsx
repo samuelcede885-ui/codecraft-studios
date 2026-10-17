@@ -1,4 +1,4 @@
-import type { ScreenId } from "@/data/content";
+import type { ScreenId } from "@/data/screens";
 
 /*
  * Pantallas que se muestran dentro de la laptop y en el portafolio.
@@ -315,8 +315,77 @@ function DashboardScreen() {
   );
 }
 
+function Check() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+      <path d="M5 12.5l4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Concepto: asistente que gestiona reservas por chat. */
+function AgentScreen() {
+  return (
+    <div className="sc sc-agent">
+      <div className="sc-agent__chat">
+        <div className="sc-agent__head">
+          <span className="sc-agent__avatar" />
+          <span>
+            <b>Asistente</b>
+            <small>En línea</small>
+          </span>
+        </div>
+        <div className="sc-agent__msgs">
+          <p className="is-user">Hola, ¿tienen disponibilidad el sábado?</p>
+          <p>Sí. Hay horarios a las 10:00 y a las 12:30. ¿Cuál prefieres?</p>
+          <p className="is-user">12:30, por favor.</p>
+          <p>
+            Listo. Tu reserva quedó confirmada para el sábado a las 12:30.
+          </p>
+        </div>
+        <div className="sc-agent__input">Escribe un mensaje…</div>
+      </div>
+      <aside className="sc-agent__flow">
+        <small>Automatización</small>
+        {["Consulta recibida", "Horario reservado", "Calendario actualizado", "Confirmación enviada"].map((t) => (
+          <span key={t}>
+            <Check />
+            {t}
+          </span>
+        ))}
+        <em>Datos de ejemplo</em>
+      </aside>
+    </div>
+  );
+}
+
+/** Concepto: portada editorial de un estudio de arquitectura. */
+function StudioScreen() {
+  return (
+    <div className="sc sc-studio">
+      <div className="sc-studio__nav">
+        <b>NORTE</b>
+        <span>Proyectos</span>
+        <span>Estudio</span>
+        <span>Contacto</span>
+      </div>
+      <div className="sc-studio__shapes" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
+      <p className="sc-studio__claim">
+        Arquitectura
+        <br />
+        que se habita.
+      </p>
+      <span className="sc-studio__title">NORTE</span>
+    </div>
+  );
+}
+
 /** `lazy`: carga diferida del zueco en pantallas fuera de la vista inicial. */
-export function Screen({ id, lazy }: { id: ScreenId; priority?: boolean; lazy?: boolean }) {
+export function Screen({ id, lazy }: { id: ScreenId; lazy?: boolean }) {
   switch (id) {
     case "home":
       return <HomeScreen lazy={lazy} />;
@@ -328,5 +397,9 @@ export function Screen({ id, lazy }: { id: ScreenId; priority?: boolean; lazy?: 
       return <PaymentScreen lazy={lazy} />;
     case "dashboard":
       return <DashboardScreen />;
+    case "agent":
+      return <AgentScreen />;
+    case "studio":
+      return <StudioScreen />;
   }
 }

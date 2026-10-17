@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 // Ritmo de la línea de tiempo (en unidades de timeline, no en segundos).
 const HERO_HOLD = 0.4;
 const STEP = 1; // duración de cada transición
-const HOLD = 1; // pausa en cada escena
+const HOLD = 0.6; // pausa en cada escena (con deriva continua de la pantalla)
 const TAIL = 1; // pausa final antes de liberar el pin
 
 function FeatureList({ items }: { items: Feature[] }) {
@@ -59,7 +59,9 @@ export default function Showcase() {
           const laptop = q<HTMLElement>("[data-laptop]")[0];
           const cue = q<HTMLElement>("[data-cue]");
           const lines = (layer: HTMLElement) => layer.querySelectorAll<HTMLElement>("[data-line]");
-          const shift = reduce ? 0 : desktop ? 36 : 22;
+          const shift = reduce ? 0 : desktop ? 80 : 44;
+          const skew = reduce ? 0 : 5;
+          const mark = q<HTMLElement>(".stage-mark")[0];
 
           // Estado inicial explícito: solo el hero y la primera pantalla visibles.
           gsap.set(screens, { autoAlpha: (i: number) => (i === 0 ? 1 : 0) });
@@ -74,9 +76,9 @@ export default function Showcase() {
             scrollTrigger: {
               trigger: root.current,
               start: "top top",
-              end: () => `+=${window.innerHeight * (desktop ? 5.4 : 4.4)}`,
+              end: () => `+=${window.innerHeight * (desktop ? 4 : 3.4)}`,
               pin: true,
-              scrub: reduce ? true : 0.9,
+              scrub: reduce ? true : 0.7,
               anticipatePin: 1,
               invalidateOnRefresh: true,
               onUpdate: (self) => {
@@ -92,14 +94,14 @@ export default function Showcase() {
 
           const copyOut = (step: number, at: number) => {
             const els = [lefts[step], rights[step]].flatMap((l) => [...lines(l)]);
-            tl.to(els, { autoAlpha: 0, y: -shift, duration: 0.45, stagger: 0.03, ease: "power2.in" }, at);
+            tl.to(els, { autoAlpha: 0, y: -shift, skewY: -skew, duration: 0.45, stagger: 0.04, ease: "power3.in" }, at);
           };
           const copyIn = (step: number, at: number) => {
             const els = [lefts[step], rights[step]].flatMap((l) => [...lines(l)]);
             tl.fromTo(
               els,
-              { autoAlpha: 0, y: shift },
-              { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.06, ease: "power3.out", immediateRender: false },
+              { autoAlpha: 0, y: shift, skewY: skew },
+              { autoAlpha: 1, y: 0, skewY: 0, duration: 0.5, stagger: 0.04, ease: "expo.out", immediateRender: false },
               at,
             );
           };
@@ -121,9 +123,9 @@ export default function Showcase() {
 
             switch (kind) {
               case "rise":
-                tl.to(prev, { autoAlpha: 0, yPercent: -5, scale: 0.97 }, at).fromTo(
+                tl.to(prev, { autoAlpha: 0, yPercent: -16, scale: 0.9 }, at).fromTo(
                   next,
-                  { autoAlpha: 0, yPercent: 7, scale: 1.05 },
+                  { autoAlpha: 0, yPercent: 18, scale: 1.12 },
                   { autoAlpha: 1, yPercent: 0, scale: 1, ...ir },
                   at,
                 );
@@ -134,13 +136,13 @@ export default function Showcase() {
                   { autoAlpha: 1, clipPath: "inset(0% 0% 0% 100%)" },
                   { clipPath: "inset(0% 0% 0% 0%)", ease: "power3.inOut", ...ir },
                   at,
-                ).to(prev, { xPercent: -10, ease: "power3.inOut" }, at);
+                ).to(prev, { xPercent: -30, scale: 0.94, ease: "power3.inOut" }, at);
                 hidePrev();
                 break;
               case "fade":
                 tl.to(prev, { autoAlpha: 0, duration: STEP * 0.9 }, at).fromTo(
                   next,
-                  { autoAlpha: 0, scale: 1.07 },
+                  { autoAlpha: 0, scale: 1.18 },
                   { autoAlpha: 1, scale: 1, duration: STEP * 1.1, ease: "power1.out", ...ir },
                   at + STEP * 0.1,
                 );
@@ -151,26 +153,34 @@ export default function Showcase() {
                   { autoAlpha: 1, clipPath: "inset(100% 0% 0% 0%)" },
                   { clipPath: "inset(0% 0% 0% 0%)", ease: "power3.inOut", ...ir },
                   at,
-                ).to(prev, { yPercent: -8, ease: "power3.inOut" }, at);
+                ).to(prev, { yPercent: -25, scale: 0.94, ease: "power3.inOut" }, at);
                 hidePrev();
                 break;
               default:
                 tl.to(prev, { autoAlpha: 0 }, at).fromTo(next, { autoAlpha: 0 }, { autoAlpha: 1, ...ir }, at);
             }
 
-            // Movimiento interno de los elementos de la nueva pantalla (solo escritorio).
-            if (desktop && !reduce) {
+            // Movimiento interno de los elementos de la nueva pantalla.
+            if (!reduce) {
               const floaters = next.querySelectorAll("[data-float]");
               if (floaters.length) {
                 tl.fromTo(
                   floaters,
-                  { y: 26, autoAlpha: 0 },
-                  { y: 0, autoAlpha: 1, duration: 0.7, stagger: 0.08, ease: "power3.out" },
+                  { y: desktop ? 70 : 40, autoAlpha: 0 },
+                  { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.06, ease: "back.out(1.6)" },
                   at + STEP * 0.15,
                 );
               }
             }
           };
+
+          // Deriva lenta de la pantalla mientras se hace scroll dentro de una escena (no al reposar).
+          const drift = (i: number, at: number, duration: number) => {
+            if (!reduce) tl.fromTo(screens[i], { scale: 1 }, { scale: 1.06, ease: "none", duration, immediateRender: false }, at);
+          };
+
+          // La marca del fondo gira y crece suavemente durante toda la secuencia.
+          if (!reduce && mark) gsap.set(mark, { xPercent: -46, yPercent: -50, x: 0, y: 0 });
 
           // Hero → escena 01: el texto inicial se va, la laptop se asienta y aparece la escena 01.
           tl.addLabel("hero", 0);
@@ -178,21 +188,24 @@ export default function Showcase() {
           copyOut(0, t);
           tl.to(cue, { autoAlpha: 0, duration: 0.4 }, t);
           if (!reduce) tl.fromTo(laptop, { y: 18, scale: 0.97 }, { y: 0, scale: 1 }, t);
-          copyIn(1, t + 0.45);
+          copyIn(1, t + 0.3);
           t += STEP;
           tl.addLabel(scenes[0].id, t);
 
           // Escenas 02–05: la laptop no se mueve, solo cambian pantalla, textos e iluminación.
           for (let i = 1; i < scenes.length; i++) {
+            drift(i - 1, t, HOLD);
             t += HOLD;
             copyOut(i, t);
             screenIn(i - 1, i, t);
             lighting(i - 1, i, t);
-            copyIn(i + 1, t + 0.45);
+            copyIn(i + 1, t + 0.3);
             t += STEP;
             tl.addLabel(scenes[i].id, t);
           }
+          drift(scenes.length - 1, t, TAIL);
           tl.to({}, { duration: TAIL }, t);
+          if (!reduce && mark) tl.to(mark, { rotation: -10, scale: 1.15, ease: "none", duration: t + TAIL }, 0);
 
           const st = tl.scrollTrigger!;
           setTargetResolver((target) => {

@@ -117,16 +117,16 @@ a {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(100vw, 177.78vh);
+  /* El logo ocupa lo mismo que en el vídeo original (700 px de 1920). */
+  width: min(36.5vw, 700px);
   max-width: none;
   height: auto;
   transform: translate(-50%, -50%);
+  will-change: transform;
 }
-@media (max-aspect-ratio: 1/1) {
-  /* En vertical se amplía para que el logo (centro del vídeo) se vea grande. */
+@media (max-width: 767px) {
   .preloader__video {
-    width: 250vw;
-    max-width: none;
+    width: 64vw;
   }
 }
 .preloader__skip {

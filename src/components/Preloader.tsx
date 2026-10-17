@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const SEEN_KEY = "fary-intro-seen";
-const INTRO_MS = 3050;
+const INTRO_MS = 2980;
 const MAX_MS = 6000;
 
 declare global {
@@ -20,8 +20,8 @@ function announceDone() {
 }
 
 /**
- * Intro animada del logo de Fary Labs antes de mostrar la web (WebP animado de 3 s,
- * generado desde el vídeo original: funciona también donde no se permite <video>).
+ * Intro animada del logo de Fary Labs antes de mostrar la web (WebP animado de 3 s con fondo
+ * transparente, recortado del vídeo original: funciona también donde no se permite <video>).
  * Se ve una vez por sesión; se omite con prefers-reduced-motion (ver script en layout.tsx).
  */
 export function Preloader() {
@@ -79,8 +79,8 @@ export function Preloader() {
         className="preloader__video"
         src="/projects/fary-intro.webp"
         alt=""
-        width={1280}
-        height={720}
+        width={700}
+        height={240}
         fetchPriority="high"
         decoding="sync"
         ref={img}

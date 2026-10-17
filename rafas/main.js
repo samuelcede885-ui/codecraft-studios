@@ -4,6 +4,10 @@
     orderUrl: '',        // e.g. your delivery / ordering page
     newsletterUrl: '',   // e.g. a form endpoint that accepts POST { email }
     price: 10.99,
+    // Real 360°: photos of the burger on a turntable, in order, same framing, e.g.
+    // Array.from({ length: 36 }, (_, i) => `assets/360/mentirosa-${String(i).padStart(2, '0')}.webp`)
+    // While empty, the single photo is turned in 3D instead.
+    spinFrames: [],
   };
 
   const $ = (s, root = document) => root.querySelector(s);
@@ -11,6 +15,7 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
   const ease = t => 1 - Math.pow(1 - t, 3);
+  const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   const money = n => n.toFixed(2);
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -111,20 +116,103 @@
     }
   });
 
-  /* ---------- scroll + pointer scenes ---------- */
-  const nav = $('#nav');
+  /* ---------- 360° spinner ---------- */
+  // With spinFrames it flips through real turntable photos; otherwise it stacks copies of the
+  // single photo in depth and turns the stack in 3D, so the burger keeps some volume edge-on.
+  function createSpinner(root) {
+    const face = $('img', root);
+    const frames = CONFIG.spinFrames;
+    if (frames.length) {
+      frames.forEach(src => { new Image().src = src; });
+      let shown = -1;
+      return {
+        set(angle) {
+          const n = frames.length;
+          const i = ((Math.round(angle / 360 * n) % n) + n) % n;
+          if (i !== shown) { face.src = frames[i]; shown = i; }
+        },
+      };
+    }
+    const SLICES = 26;
+    const slices = [face];
+    for (let i = 1; i < SLICES; i++) {
+      const s = face.cloneNode();
+      s.removeAttribute('fetchpriority');
+      s.alt = '';
+      s.className = 'spin__slice';
+      s.setAttribute('aria-hidden', 'true');
+      root.appendChild(s);
+      slices.push(s);
+    }
+    function layout() {
+      const half = root.offsetWidth * .09;
+      slices.forEach((s, i) => {
+        const t = i / (SLICES - 1);              // 0 = front face, 1 = back face
+        s.style.transform = `translateZ(${(half - 2 * half * t).toFixed(1)}px)`;
+        if (i) s.style.filter = `brightness(${(1 - .4 * Math.sin(Math.PI * t)).toFixed(2)})`;
+      });
+    }
+    layout();
+    addEventListener('resize', layout);
+    return {
+      set(angle, tilt = 0) { root.style.transform = `rotateX(${tilt}deg) rotateY(${angle}deg)`; },
+    };
+  }
+
+  const heroSpin = createSpinner($('[data-spin="hero"]'));
+  const layersSpin = createSpinner($('[data-spin="layers"]'));
+
+  /* ---------- hero: turntable that the visitor can grab ---------- */
   const heroSubject = $('[data-parallax]');
   const heroEl = $('.hero');
+  const AUTO_SPEED = 28;                         // degrees per second while idle
+  let angle = 0, velocity = motionOK() ? 520 : 0, dragging = false, lastX = 0, lastMove = 0;
+
+  heroSubject.addEventListener('pointerdown', e => {
+    dragging = true; lastX = e.clientX; lastMove = performance.now();
+    heroSubject.setPointerCapture(e.pointerId);
+    heroSubject.classList.add('is-dragging');
+  });
+  heroSubject.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const now = performance.now();
+    const delta = (e.clientX - lastX) * .55;
+    angle += delta;
+    velocity = delta / Math.max(1, now - lastMove) * 1000;
+    lastX = e.clientX; lastMove = now;
+    heroSpin.set(angle, -4);
+  });
+  const release = () => { dragging = false; heroSubject.classList.remove('is-dragging'); };
+  heroSubject.addEventListener('pointerup', release);
+  heroSubject.addEventListener('pointercancel', release);
+
+  let heroVisible = true, spinning = false, lastT = 0;
+  function spinLoop(t) {
+    const dt = Math.min(.05, (t - lastT) / 1000 || 0);
+    lastT = t;
+    if (!dragging) {
+      const target = motionOK() ? AUTO_SPEED : 0;
+      velocity += (target - velocity) * Math.min(1, dt * 1.6);
+      angle += velocity * dt;
+    }
+    heroSpin.set(angle, -4);
+    if (heroVisible) requestAnimationFrame(spinLoop); else spinning = false;
+  }
+  const startSpin = () => { if (!spinning) { spinning = true; lastT = performance.now(); requestAnimationFrame(spinLoop); } };
+  new IntersectionObserver(([entry]) => {
+    heroVisible = entry.isIntersecting;
+    if (heroVisible) startSpin();
+  }).observe(heroEl);
+  startSpin();
+
+  /* ---------- scroll scenes (only the burger moves; type stays put) ---------- */
+  const nav = $('#nav');
   const layers = $('[data-scene="layers"]');
   const stage = $('[data-stage]');
-  const phrases = $$('[data-phrase]');
   const callouts = $$('.callout');
-  const dots = $$('.layers__progress li');
   const caption = $('[data-caption]');
-  const statement = $('[data-scene="statement"]');
   const reveal = $('[data-scene="reveal"]');
   const zoomImg = $('[data-zoom]');
-  const marquees = $$('[data-marquee]');
   const drift = $('[data-drift]');
 
   // progress of an element moving through the viewport: 0 entering at bottom → 1 leaving at top
@@ -133,78 +221,56 @@
     return clamp((innerHeight - r.top) / (innerHeight + r.height));
   };
 
-  let pointer = { x: 0, y: 0 }, smooth = { x: 0, y: 0 };
-  const finePointer = matchMedia('(pointer: fine)');
-  heroEl.addEventListener('pointermove', e => {
-    if (!finePointer.matches || !motionOK()) return;
-    pointer.x = e.clientX / innerWidth - .5;
-    pointer.y = e.clientY / innerHeight - .5;
-  }, { passive: true });
-  heroEl.addEventListener('pointerleave', () => { pointer = { x: 0, y: 0 }; });
-
   let lastCaption = '';
   function frame() {
     nav.classList.toggle('is-scrolled', scrollY > 40);
 
     if (!motionOK()) {
       callouts.forEach(c => c.classList.add('is-on'));
+      layersSpin.set(0);
       return;
     }
 
-    // hero: burger lifts away faster than the title, plus a little pointer depth
+    // hero: burger lifts away as the banner scrolls out
     const hr = heroEl.getBoundingClientRect();
-    const hp = clamp(-hr.top / hr.height);
-    smooth.x = lerp(smooth.x, pointer.x, .08);
-    smooth.y = lerp(smooth.y, pointer.y, .08);
-    heroSubject.style.transform =
-      `translate3d(${smooth.x * 18}px, ${smooth.y * 12 - hp * 140}px, 0) rotate(${hp * 6}deg)`;
+    heroSubject.style.transform = `translate3d(0, ${(-clamp(-hr.top / hr.height) * 140).toFixed(1)}px, 0)`;
 
-    // layers: burger tumbles upright, then the six layers are called out one by one
+    // layers: scroll turns the burger a full 360°, then the six layers are called out
     const lr = layers.getBoundingClientRect();
     const lp = clamp(-lr.top / (lr.height - innerHeight));
-    const intro = ease(clamp(lp / .22));
-    const outro = ease(clamp((lp - .9) / .1));
-    stage.style.transform =
-      `translate3d(0, ${lerp(90, 0, intro)}px, 0) rotate(${lerp(-16, 0, intro)}deg) scale(${lerp(.62, 1, intro) + outro * .06})`;
-    const phase = lp < .3 ? 0 : lp < .6 ? 1 : 2;
-    phrases.forEach((p, i) => p.classList.toggle('is-on', i === phase));
-    dots.forEach((d, i) => d.classList.toggle('is-on', i === phase));
+    const intro = ease(clamp(lp / .15));
+    const turn = easeInOut(clamp((lp - .04) / .52));
+    stage.style.transform = `translate3d(0, ${lerp(70, 0, intro).toFixed(1)}px, 0) scale(${lerp(.75, 1, intro).toFixed(3)})`;
+    layersSpin.set(turn * 360, lerp(-10, 0, turn));
     let latest = null;
     callouts.forEach((c, i) => {
-      const on = lp > .26 + i * .1;
+      const on = lp > .58 + i * .06;
       c.classList.toggle('is-on', on);
       if (on) latest = c;
     });
     const text = latest ? $('.callout__label', latest).innerHTML : '';
     if (text !== lastCaption) { caption.innerHTML = text; lastCaption = text; }
 
-    // statement: letters fill as the section crosses the middle of the screen
-    statement.style.setProperty('--fill', (clamp((through(statement) - .2) / .45) * 100).toFixed(1) + '%');
-
     // split: burger drifts and turns
     const sp = through(drift.parentElement);
     drift.style.transform = `translate3d(0, ${lerp(60, -60, sp)}px, 0) rotate(${lerp(-6, 8, sp)}deg)`;
 
-    // reveal: slow zoom into the layers, two marquee rows in opposite directions
-    const rp = through(reveal);
-    zoomImg.style.transform = `scale(${lerp(.82, 1.12, rp)})`;
-    marquees.forEach(m => { m.style.transform = `translate3d(${Number(m.dataset.marquee) * lerp(-8, 22, rp)}%, 0, 0)`; });
+    // reveal: slow zoom into the layers
+    zoomImg.style.transform = `scale(${lerp(.82, 1.12, through(reveal))})`;
   }
 
   let ticking = false;
-  function loop() {
-    frame();
-    // keep easing the pointer parallax while it settles
-    if (Math.abs(smooth.x - pointer.x) + Math.abs(smooth.y - pointer.y) > .001) requestAnimationFrame(loop);
-    else ticking = false;
-  }
-  const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(loop); } };
+  const request = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { frame(); ticking = false; });
+  };
   addEventListener('scroll', request, { passive: true });
   addEventListener('resize', () => { fitTitle(); request(); });
-  heroEl.addEventListener('pointermove', request, { passive: true });
   reduced.addEventListener?.('change', () => {
     document.documentElement.classList.toggle('has-motion', motionOK());
-    if (!motionOK()) $$('[style*="transform"]').forEach(el => { el.style.transform = ''; });
+    if (!motionOK()) $$('[data-parallax], [data-stage], [data-drift], [data-zoom]').forEach(el => { el.style.transform = ''; });
+    startSpin();
     request();
   });
 

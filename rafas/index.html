@@ -62,8 +62,13 @@
     <p class="hero__tag">La hamburguesa que parece una cosa y resulta ser otra.</p>
     <figure class="hero__subject" data-parallax>
       <div class="hero__enter">
-        <img class="hero__img" src="assets/la-mentirosa.webp" width="715" height="523" fetchpriority="high"
-             alt="Hamburguesa La Mentirosa: pan brioche, lechuga, crujiente dorado, salsa blanca y carne a la plancha">
+        <span class="hero__shadow" aria-hidden="true"></span>
+        <div class="hero__float">
+          <div class="spin" data-spin="hero">
+            <img class="spin__face" src="assets/la-mentirosa.webp" width="715" height="523" fetchpriority="high" draggable="false"
+                 alt="Hamburguesa La Mentirosa: pan brioche, lechuga, crujiente dorado, salsa blanca y carne a la plancha">
+          </div>
+        </div>
       </div>
       <svg class="hero__sparks" viewBox="0 0 90 130" aria-hidden="true">
         <path d="M32 6 L18 34"/><path d="M78 50 L46 70"/><path d="M84 112 L50 110"/>
@@ -76,6 +81,7 @@
     <div class="hero__offer">
       <p class="hero__price"><span class="hero__ref">Ref</span><span class="hero__num">10.99</span></p>
       <a class="btn" href="#ordenar">Ordena ahora <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <p class="hero__hint">← Arrastra la hamburguesa para girarla →</p>
     </div>
     <a class="hero__cue" href="#capas">Desliza para ver qué esconde</a>
   </section>
@@ -83,14 +89,11 @@
   <!-- 2 · CAPAS (pinned) -->
   <section class="layers" id="capas" aria-labelledby="layers-title" data-scene="layers">
     <div class="layers__sticky">
-      <h2 class="sr-only" id="layers-title">La Mentirosa, capa por capa</h2>
-      <div class="layers__phrases">
-        <p class="layers__phrase" data-phrase>Parece clásica.</p>
-        <p class="layers__phrase" data-phrase>Pero miente.</p>
-        <p class="layers__phrase" data-phrase>Seis capas de verdad.</p>
-      </div>
+      <h2 class="layers__title" id="layers-title">Mírala por <span>todos lados.</span></h2>
       <div class="layers__stage" data-stage>
-        <img src="assets/la-mentirosa.webp" width="715" height="523" alt="" loading="lazy" decoding="async">
+        <div class="spin" data-spin="layers">
+          <img class="spin__face" src="assets/la-mentirosa.webp" width="715" height="523" alt="" loading="lazy" decoding="async" draggable="false">
+        </div>
         <ul class="layers__callouts">
           <li class="callout" style="--x:47%;--y:13%" data-side="right"><span class="callout__dot"></span><span class="callout__label"><b>Pan brioche</b> dorado en plancha</span></li>
           <li class="callout" style="--x:14%;--y:39%" data-side="left"><span class="callout__dot"></span><span class="callout__label"><b>Lechuga</b> fresca y crujiente</span></li>
@@ -101,7 +104,6 @@
         </ul>
       </div>
       <p class="layers__caption" data-caption aria-hidden="true"></p>
-      <ol class="layers__progress" aria-hidden="true"><li></li><li></li><li></li></ol>
     </div>
   </section>
 
@@ -123,7 +125,7 @@
   </section>
 
   <!-- 4 · STATEMENT -->
-  <section class="statement" aria-label="Puro sabor en cada mordida" data-scene="statement">
+  <section class="statement" aria-label="Puro sabor en cada mordida">
     <p class="statement__text" aria-hidden="true"><span>Puro sabor</span><span>en cada</span><span>mordida</span></p>
     <p class="statement__sub">Lo que ves es solo la mitad de la historia.</p>
   </section>
@@ -156,8 +158,8 @@
       <img src="assets/la-mentirosa.webp" width="715" height="523" alt="Primer plano de las capas de La Mentirosa" loading="lazy" decoding="async" data-zoom>
     </div>
     <div class="reveal__marquee" aria-hidden="true">
-      <p data-marquee="-1">Descubre lo que esconde · Descubre lo que esconde · Descubre lo que esconde ·</p>
-      <p data-marquee="1">Una mordida y la verdad sale · Una mordida y la verdad sale ·</p>
+      <p>Descubre lo</p>
+      <p>que esconde.</p>
     </div>
   </section>
 

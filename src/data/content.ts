@@ -8,6 +8,8 @@ export type StoryStep = {
   points: { icon: IconName; label: string }[];
   /** Pie bajo la laptop: nombre del concepto que se ve en pantalla. */
   caption: string;
+  /** Aclaración junto al pie: referencia visual o datos de ejemplo. */
+  note: string;
   /** Mensaje lateral derecho (sólo en los pasos de la secuencia). */
   message?: string;
 };
@@ -44,6 +46,7 @@ export const storySteps: StoryStep[] = [
       { icon: "chart", label: "Resultados" },
     ],
     caption: "Greenade",
+    note: "referencia visual",
   },
   {
     screen: "milk",
@@ -56,6 +59,7 @@ export const storySteps: StoryStep[] = [
       { icon: "cart", label: "E-commerce a tu medida" },
     ],
     caption: "Simply Milk",
+    note: "referencia visual",
     message: "Experiencias que cuentan historias.",
   },
   {
@@ -69,6 +73,7 @@ export const storySteps: StoryStep[] = [
       { icon: "cloud", label: "Productos SaaS" },
     ],
     caption: "Syntha-6",
+    note: "referencia visual",
     message: "Interfaces diseñadas para destacar.",
   },
   {
@@ -83,6 +88,7 @@ export const storySteps: StoryStep[] = [
       { icon: "bolt", label: "Procesos más eficientes" },
     ],
     caption: "Depthfield",
+    note: "referencia visual",
     message: "Creatividad sin límites.",
   },
   {
@@ -96,6 +102,7 @@ export const storySteps: StoryStep[] = [
       { icon: "trend", label: "ROI medible" },
     ],
     caption: "Panel de métricas",
+    note: "datos de ejemplo",
     message: "Datos que guían cada decisión.",
   },
 ];
@@ -127,7 +134,7 @@ export const services = [
   },
 ] as const;
 
-/** Conceptos visuales de referencia: no son trabajos de clientes. */
+/** Referencias visuales: no son trabajos realizados por Fary Labs. */
 export const portfolio: {
   screen: ScreenId;
   name: string;

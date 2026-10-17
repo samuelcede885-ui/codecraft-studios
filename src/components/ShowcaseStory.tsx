@@ -45,7 +45,7 @@ function StepMessage({ step }: { step: StoryStep }) {
   return (
     <div className="step-msg">
       <span className="step-msg__label" data-item>
-        Concepto {step.number} · {step.caption}
+        {step.number} · {step.caption}
       </span>
       <p className="step-msg__text" data-item>
         {step.message}
@@ -110,7 +110,7 @@ export function ShowcaseStory() {
           scrollTrigger: {
             trigger: q(".stage")[0],
             start: "top top",
-            end: () => `+=${window.innerHeight * (total - 1) * 0.9}`,
+            end: () => `+=${window.innerHeight * (total - 1)}`,
             pin: true,
             scrub: 0.7,
             anticipatePin: 1,
@@ -124,13 +124,14 @@ export function ShowcaseStory() {
           const at = `step${i}`;
           tl.addLabel(at, i === 1 ? 0.2 : "+=0.7");
           tl.to([left[i - 1], right[i - 1], captions[i - 1]], { autoAlpha: 0, y: -28, duration: 0.45, ease: "power2.in" }, at)
+            // Barrido de pantalla sólo con transform (GPU): capa sube, contenido compensa.
+            .fromTo(screens[i], { yPercent: 100, y: 0 }, { yPercent: 0, duration: 1 }, at)
             .fromTo(
-              screens[i],
-              { clipPath: "inset(100% 0% 0% 0%)" },
-              { clipPath: "inset(0% 0% 0% 0%)", duration: 1 },
+              screens[i].firstElementChild,
+              { yPercent: -100, y: 0, scale: 1.12 },
+              { yPercent: 0, scale: 1, duration: 1 },
               at,
             )
-            .fromTo(screens[i].firstElementChild, { scale: 1.14 }, { scale: 1, duration: 1.1, ease: "power2.out" }, at)
             .to(screens[i - 1].firstElementChild, { scale: 0.92, duration: 1 }, at)
             .set([left[i], right[i], captions[i]], { autoAlpha: 1, y: 0 }, `${at}+=0.42`)
             .fromTo(
@@ -192,7 +193,7 @@ export function ShowcaseStory() {
                 {storySteps.map((s, i) => (
                   <div className="screen-layer" data-screen data-step={i} key={s.screen}>
                     <div className="screen-layer__inner">
-                      <Screen id={s.screen} uid={`story-${i}`} />
+                      <Screen id={s.screen} priority={i === 0} />
                     </div>
                   </div>
                 ))}
@@ -204,7 +205,7 @@ export function ShowcaseStory() {
                 <span className="stage__captions">
                   {storySteps.map((s, i) => (
                     <span className="stage__caption-item" data-caption data-step={i} key={s.number}>
-                      {s.caption} · concepto visual
+                      {s.caption} · {s.note}
                     </span>
                   ))}
                 </span>
@@ -243,7 +244,7 @@ export function ShowcaseStory() {
             <Laptop className="static-frame__laptop">
               <div className="screen-layer" data-step="0">
                 <div className="screen-layer__inner">
-                  <Screen id={s.screen} uid={`static-${i}`} />
+                  <Screen id={s.screen} priority={i === 0} lazy={i > 0} />
                 </div>
               </div>
             </Laptop>

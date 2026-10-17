@@ -4,6 +4,7 @@ import { Portfolio, Process, Services } from "@/components/Sections";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { ScrollEffects } from "@/components/ScrollEffects";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <SmoothScroll />
       <ScrollEffects />
     </>
   );

@@ -83,7 +83,7 @@ export function Portfolio() {
             </h2>
           </div>
           <p className="section-note">
-            Selección de conceptos visuales que muestran nuestra dirección de diseño. No son proyectos de clientes.
+            Referencias visuales que inspiran nuestra dirección de diseño. No son trabajos realizados por Fary Labs.
           </p>
         </header>
 
@@ -98,14 +98,14 @@ export function Portfolio() {
                     <i />
                   </div>
                   <div className="work__screen">
-                    <Screen id={p.screen} uid={`work-${i}`} />
+                    <Screen id={p.screen} lazy />
                   </div>
                 </div>
                 <div className="work__meta">
                   <div>
                     <h3>{p.name}</h3>
                     <span>
-                      {p.type} · Concepto
+                      {p.type} · Referencia
                     </span>
                   </div>
                   <p>{p.description}</p>

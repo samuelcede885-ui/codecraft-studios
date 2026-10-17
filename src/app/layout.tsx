@@ -30,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Antes del primer pintado: sin intro si ya se vio en esta sesión o si se pide menos movimiento. */}
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
+        <link rel="preload" as="image" href="/projects/fary-intro.webp" fetchPriority="high" />
       </head>
       <body>
         <a href="#contenido" className="skip-link">

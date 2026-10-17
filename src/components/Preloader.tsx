@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const SEEN_KEY = "fary-intro-seen";
-const INTRO_MS = 8000;
-const MAX_MS = 11000;
+const INTRO_MS = 3050;
+const MAX_MS = 6000;
 
 declare global {
   interface Window {
@@ -20,7 +20,7 @@ function announceDone() {
 }
 
 /**
- * Intro animada del logo de Fary Labs antes de mostrar la web (WebP animado de 8 s,
+ * Intro animada del logo de Fary Labs antes de mostrar la web (WebP animado de 3 s,
  * generado desde el vídeo original: funciona también donde no se permite <video>).
  * Se ve una vez por sesión; se omite con prefers-reduced-motion (ver script en layout.tsx).
  */
@@ -41,11 +41,11 @@ export function Preloader() {
       setPhase("done");
     } else {
       setPhase("leaving");
-      window.setTimeout(() => setPhase("done"), 700);
+      window.setTimeout(() => setPhase("done"), 500);
     }
   }
 
-  /** La animación dura 8 s desde que la imagen se muestra (o se vuelve a montar). */
+  /** La animación dura 3 s desde que la imagen se muestra (o se vuelve a montar). */
   function startClock() {
     window.clearTimeout(endTimer.current);
     endTimer.current = window.setTimeout(() => finish(), INTRO_MS);
@@ -81,6 +81,8 @@ export function Preloader() {
         alt=""
         width={1280}
         height={720}
+        fetchPriority="high"
+        decoding="sync"
         ref={img}
         onLoad={startClock}
         onError={() => finish()}

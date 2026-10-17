@@ -100,8 +100,8 @@ a {
   overflow: hidden;
   background: #101114;
   transition:
-    opacity 0.7s var(--ease),
-    visibility 0.7s;
+    opacity 0.5s var(--ease),
+    visibility 0.5s;
 }
 .preloader.is-leaving {
   opacity: 0;

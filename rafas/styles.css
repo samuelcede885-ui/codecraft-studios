@@ -122,8 +122,8 @@ button { font: inherit; color: inherit; }
 }
 .hero__subject {
   position: absolute; z-index: 2; margin: 0;
-  left: 50%; width: min(45vw, 760px);
-  bottom: calc(clamp(18px, 3.5vh, 44px) + var(--ts) * .55);
+  left: 50%; width: min(39vw, 660px);
+  bottom: calc(clamp(18px, 3.5vh, 44px) + var(--ts) * .5);
   translate: -50% 0;
 }
 .hero__subject { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
@@ -202,7 +202,7 @@ button { font: inherit; color: inherit; }
   text-align: center; font: 900 clamp(40px, 7vw, 120px)/.9 var(--f-display); font-stretch: 116%; letter-spacing: -.03em; text-transform: uppercase;
 }
 .layers__title span { color: var(--bun); }
-.layers__stage { position: relative; width: min(60vw, 720px); aspect-ratio: 715 / 523; max-width: 100%; perspective: 1800px; }
+.layers__stage { position: relative; width: min(52vw, 640px); aspect-ratio: 720 / 600; max-width: 100%; perspective: 1800px; }
 .layers__stage::before { content: ""; position: absolute; left: 12%; right: 12%; bottom: -6%; height: 14%; background: radial-gradient(closest-side, rgb(0 0 0 / .55), transparent); }
 .layers__callouts { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
 .callout { position: absolute; left: var(--x); top: var(--y); }

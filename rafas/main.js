@@ -4,10 +4,9 @@
     orderUrl: '',        // e.g. your delivery / ordering page
     newsletterUrl: '',   // e.g. a form endpoint that accepts POST { email }
     price: 10.99,
-    // Real 360°: photos of the burger on a turntable, in order, same framing, e.g.
-    // Array.from({ length: 36 }, (_, i) => `assets/360/mentirosa-${String(i).padStart(2, '0')}.webp`)
-    // While empty, the single photo is turned in 3D instead.
-    spinFrames: [],
+    // Turntable frames cut from the product video, in order. The last frame is the banner's angle.
+    // Leave empty to fall back to turning the single photo in 3D.
+    spinFrames: Array.from({ length: 96 }, (_, i) => `assets/360/mentirosa-${String(i).padStart(2, '0')}.webp`),
   };
 
   const $ = (s, root = document) => root.querySelector(s);
@@ -123,13 +122,28 @@
     const face = $('img', root);
     const frames = CONFIG.spinFrames;
     if (frames.length) {
-      frames.forEach(src => { new Image().src = src; });
-      let shown = -1;
+      // The video covers half a turn, so one 360° of "angle" plays it forward and back:
+      // 0° is the banner's angle (last frame), 180° the opposite end of the clip.
+      const n = frames.length;
+      const ready = new Array(n).fill(false);
+      ready[n - 1] = true;
+      frames.forEach((src, i) => {
+        const img = new Image();
+        img.onload = () => { ready[i] = true; };
+        img.src = src;
+      });
+      let shown = n - 1;
       return {
         set(angle) {
-          const n = frames.length;
-          const i = ((Math.round(angle / 360 * n) % n) + n) % n;
-          if (i !== shown) { face.src = frames[i]; shown = i; }
+          const turn = ((angle / 360) % 1 + 1) % 1;
+          const there = turn < .5 ? turn * 2 : 2 - turn * 2;
+          let i = Math.round((1 - there) * (n - 1));
+          // while frames are still loading, hold the closest one that is ready
+          for (let d = 0; !ready[i] && d < n; d++) {
+            if (ready[i + d]) { i += d; break; }
+            if (ready[i - d]) { i -= d; break; }
+          }
+          if (i !== shown && ready[i]) { face.src = frames[i]; shown = i; }
         },
       };
     }
@@ -165,8 +179,8 @@
   /* ---------- hero: turntable that the visitor can grab ---------- */
   const heroSubject = $('[data-parallax]');
   const heroEl = $('.hero');
-  const AUTO_SPEED = 28;                         // degrees per second while idle
-  let angle = 0, velocity = motionOK() ? 520 : 0, dragging = false, lastX = 0, lastMove = 0;
+  const AUTO_SPEED = 30;                         // degrees per second while idle
+  let angle = 0, velocity = motionOK() ? 160 : 0, dragging = false, lastX = 0, lastMove = 0;
 
   heroSubject.addEventListener('pointerdown', e => {
     dragging = true; lastX = e.clientX; lastMove = performance.now();

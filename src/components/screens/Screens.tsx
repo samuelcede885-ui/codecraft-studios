@@ -8,16 +8,19 @@ import type { ScreenId } from "@/data/content";
  */
 
 const SHOE = "/projects/gramercy-shoe.webp";
+const LOGO = "/projects/gramercy-logo.webp";
+const SHOE_CLEAN = "/projects/gramercy-shoe-clean.webp";
 
-function Shoe({ className, lazy }: { className: string; lazy?: boolean }) {
+/** `clean`: versión sin sombra, para la portada donde el zueco va sobre las letras. */
+function Shoe({ className, lazy, clean }: { className: string; lazy?: boolean; clean?: boolean }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes
     <img
       className={`sc-img ${className}`}
-      src={SHOE}
+      src={clean ? SHOE_CLEAN : SHOE}
       alt="Zueco Birkenstock Boston de ante color taupe"
-      width={809}
-      height={754}
+      width={clean ? 804 : 809}
+      height={clean ? 710 : 754}
       decoding="async"
       loading={lazy ? "lazy" : "eager"}
       draggable={false}
@@ -34,7 +37,8 @@ function GmHeader() {
         <i />
         <i />
       </span>
-      <span className="gm-header__logo">Gramercy.</span>
+      {/* eslint-disable-next-line @next/next/no-img-element -- logo recortado del diseño original */}
+      <img className="sc-img gm-header__logo" src={LOGO} alt="Gramercy" width={265} height={88} draggable={false} />
       <svg className="gm-header__search" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6">
         <circle cx="10" cy="10" r="6.5" />
         <path d="M15 15l6 6" strokeLinecap="round" />
@@ -80,7 +84,7 @@ function HomeScreen({ lazy }: { lazy?: boolean }) {
       <span className="gm-home__birken" data-gm="birken">
         BIRKEN
       </span>
-      <Shoe className="gm-home__shoe" lazy={lazy} />
+      <Shoe className="gm-home__shoe" lazy={lazy} clean />
       <span className="gm-home__boston" data-gm="boston">
         BOSTON
       </span>
@@ -123,7 +127,9 @@ function ProductScreen({ lazy }: { lazy?: boolean }) {
         <span className="gm-stock" data-gm="item">
           <span className="gm-qty">
             <b>−</b>
-            <span data-gm="qty">1</span>
+            <span className="gm-qty__n" data-gm="qty">
+              1
+            </span>
             <b>+</b>
           </span>
           <span className="gm-stock__head">
@@ -138,8 +144,10 @@ function ProductScreen({ lazy }: { lazy?: boolean }) {
           DESCRIPCIÓN
         </span>
         <span className="gm-desc" data-gm="item">
-          Diseñadas en Alemania desde 1774, las Birkenstock combinan artesanía y comodidad atemporal. Su plantilla
-          anatómica de corcho y látex natural se adapta a tu pie con cada paso.
+          Diseñadas en Alemania desde 1774, las Birkenstock combinan artesanía y comodidad atemporal en una pieza que
+          no necesita presentación. Su icónica plantilla anatómica de corcho y látex natural se adapta a la forma de tu
+          pie con cada paso, mientras que la suela ligera y las correas de cuero de primera calidad garantizan
+          durabilidad y un ajuste impecable.
         </span>
         <span className="gm-btn gm-btn--tan gm-product__cta" data-gm="item">
           ADD TO CART
@@ -160,7 +168,7 @@ function CartScreen({ lazy }: { lazy?: boolean }) {
           CARRITO
         </span>
         <span className="gm-cart__qty" data-gm="left">
-          − 1 BIRKENSTOCK +
+          <b>−</b> 1 BIRKENSTOCK <b>+</b>
         </span>
         <span className="gm-pill gm-pill--dark gm-cart__tag" data-gm="left">
           TALLAS
@@ -185,7 +193,7 @@ function CartScreen({ lazy }: { lazy?: boolean }) {
       <div className="gm-panel gm-cart__panel" data-gm="panel">
         <span className="gm-cart__item" data-gm="item">
           <span className="gm-thumb">
-            <Shoe className="gm-thumb__shoe" lazy={lazy} />
+            <Shoe className="gm-thumb__shoe" lazy={lazy} clean />
           </span>
           <span className="gm-cart__name">
             <b>1 BIRKENSTOCK</b>

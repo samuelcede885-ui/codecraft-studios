@@ -20,7 +20,7 @@
   height: min(74vmin, 780px);
   margin: calc(min(74vmin, 780px) / -2) 0 0 calc(min(74vmin, 780px) / -2);
   color: #fff;
-  opacity: 0.8;
+  opacity: 0.55;
   pointer-events: none;
   will-change: transform;
 }
@@ -32,7 +32,8 @@
   grid-template-columns: minmax(0, 1.2fr) var(--lw) minmax(0, 0.75fr);
   align-items: center;
   gap: clamp(24px, 2.4vw, 48px);
-  padding: calc(var(--header-h) + 20px) max(var(--gutter), env(safe-area-inset-right, 0px)) 72px
+  /* A la derecha, sitio para el indicador de progreso. */
+  padding: calc(var(--header-h) + 20px) calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 40px) 72px
     max(var(--gutter), env(safe-area-inset-left, 0px));
 }
 .zone {
@@ -115,13 +116,13 @@
   white-space: nowrap;
 }
 .hero-copy__sub {
-  margin: 24px 0 0;
+  margin: 28px 0 0;
   max-width: 30ch;
   color: var(--muted);
   font-size: clamp(0.95rem, 1vw, 1.05rem);
 }
 .hero-copy__cta {
-  margin-top: 40px;
+  margin-top: 48px;
 }
 
 /* Número grande con máscara: la columna 01…05 se desplaza dentro de una línea. */
@@ -185,25 +186,6 @@
   line-height: 1.5;
   color: var(--ink-2);
 }
-.step-aside__tags {
-  list-style: none;
-  margin: 26px 0 0;
-  padding: 0;
-  display: grid;
-  gap: 12px;
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-.step-aside__tags li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.step-aside__icon {
-  width: 17px;
-  height: 17px;
-  flex: none;
-}
 
 /* Progreso lateral y aviso de scroll (escritorio) */
 .stage__hint {
@@ -249,27 +231,110 @@
     opacity: 0;
   }
 }
-.stage__progress {
+/* Progreso 01–05 (escritorio): línea vertical discreta con los números. */
+.story-progress {
   position: absolute;
-  right: calc(var(--gutter) / 2);
+  right: max(calc(var(--gutter) / 2), env(safe-area-inset-right, 0px));
   top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.story-progress ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+.story-progress li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  opacity: 0.45;
+  transition: opacity 0.4s var(--ease), color 0.4s var(--ease);
+}
+.story-progress li i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  transition: transform 0.4s var(--ease);
+}
+.story-progress li.is-on {
+  opacity: 1;
+  color: var(--ink);
+}
+.story-progress li.is-on i {
+  transform: scale(1.5);
+}
+.story-progress__track {
+  position: absolute;
+  right: 2px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: rgba(9, 10, 11, 0.12);
+}
+.story-progress__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s var(--ease);
+}
+/* Progreso móvil: cinco segmentos finos. */
+.story-bar {
+  display: none;
+}
+
+/* Fondo: un velo casi imperceptible que cambia con cada paso. */
+.stage__tint {
+  position: absolute;
+  inset: 0;
+  background: var(--negro);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Cierre dentro de la escena: "Ideas claras. / Productos que funcionan." */
+.stage__outro {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(32px, 5vh, 52px);
+  padding: var(--header-h) var(--gutter) 0;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
 }
-.stage__progress span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #c4c4c9;
-  transition:
-    transform 0.4s var(--ease),
-    background-color 0.4s;
+.outro__title {
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 6rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
-.stage__progress span.is-on {
-  background: var(--ink);
-  transform: scale(1.5);
+.outro__line {
+  display: block;
+}
+/* Bloque negro del manual ("IDEAS QUE FUNCIONAN."). */
+.outro__mark {
+  padding: 0.02em 0.22em 0.08em;
+  border-radius: 0.16em;
+  background: var(--negro);
+  color: var(--blanco);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* ── Tablet y móvil: título, laptop, metadata y mensaje en columna ── */
@@ -281,7 +346,8 @@
     align-content: center;
     justify-items: center;
     gap: clamp(22px, 3.6svh, 44px);
-    padding-top: calc(var(--header-h-sm) + 12px);
+    padding-top: calc(var(--header-h) + 4px);
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
     padding-bottom: 24px;
   }
   .zone--device {
@@ -297,22 +363,40 @@
     max-width: none;
   }
   .stage__hint,
-  .stage__progress {
+  .story-progress {
     display: none;
+  }
+  .story-bar {
+    position: absolute;
+    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    gap: 4px;
+    transform: translateX(-50%);
+  }
+  .story-bar span {
+    width: 14px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(9, 10, 11, 0.14);
+    transition: background-color 0.4s var(--ease);
+  }
+  .story-bar span.is-on {
+    background: var(--ink);
   }
   .hero-copy__rule,
   .hero-copy__sub {
     display: none;
   }
   .hero-copy__title {
-    font-size: clamp(2.1rem, 8.4vw, 3.4rem);
+    font-size: clamp(1.9rem, min(8.4vw, 6.4svh), 3.4rem);
   }
   .hero-copy__cta {
-    margin-top: 28px;
+    margin-top: 32px;
   }
   /* Aire entre el botón del hero y la laptop. */
   .zone--lead > .panel--hero {
-    padding-bottom: 14px;
+    padding-bottom: clamp(12px, 3svh, 32px);
   }
   .story-num {
     margin-bottom: 10px;
@@ -330,33 +414,10 @@
     max-width: 44ch;
     font-size: 0.95rem;
   }
-  .step-aside__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-    font-size: 0.76rem;
-  }
-  .step-aside__tags li {
-    gap: 6px;
-    padding: 6px 10px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.6);
-  }
-  .step-aside__icon {
-    width: 13px;
-    height: 13px;
-  }
 }
-@media (max-width: 1023px) and (max-height: 800px) {
-  .step-aside__tags {
-    display: none;
-  }
-}
-@media (max-width: 1023px) and (max-height: 640px) {
+@media (max-width: 1023px) and (max-height: 700px) {
   .stage__grid {
-    --lw: min(80vw, 520px);
+    --lw: min(80vw, 520px, max(34vw, calc((100svh - 430px) * 1.75)));
   }
   .story-num {
     display: none;
@@ -366,33 +427,47 @@
   }
 }
 
-/* ───────────────────────── CTA tras la historia ───────────────────────── */
-.story-cta {
-  padding: clamp(96px, 12vw, 170px) 0;
-  background: var(--bg);
-}
-.story-cta__inner {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-.story-cta__title {
-  margin: 0;
-  font-size: clamp(2rem, 4.4vw, 4.4rem);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  text-wrap: balance;
-}
-/* Bloque negro del manual ("IDEAS QUE FUNCIONAN."): resalta la segunda línea. */
-.story-cta__mark {
-  padding: 0.02em 0.2em 0.06em;
-  border-radius: 0.18em;
-  line-height: 1.22;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  background: var(--negro);
-  color: var(--blanco);
+
+/* ── Móvil en horizontal (muy poca altura): texto a la izquierda y laptop a la derecha ── */
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  .stage__grid {
+    --lw: min(48vw, calc((100svh - 100px) * 1.75));
+    grid-template-columns: minmax(0, 1fr) var(--lw);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "lead device"
+      "aside device";
+    justify-items: stretch;
+    align-content: center;
+    gap: 10px 28px;
+    padding-top: calc(var(--header-h) + 8px);
+    padding-bottom: 20px;
+  }
+  .zone--lead {
+    grid-area: lead;
+    align-self: end;
+  }
+  .zone--device {
+    grid-area: device;
+    align-self: center;
+  }
+  .zone--aside {
+    grid-area: aside;
+    align-self: start;
+  }
+  .hero-copy__title {
+    font-size: clamp(1.4rem, 7.5svh, 2.1rem);
+  }
+  .hero-copy__cta {
+    margin-top: 16px;
+  }
+  .zone--lead > .panel--hero {
+    padding-bottom: 0;
+  }
+  .step-lead__title {
+    font-size: clamp(1.3rem, 6.5svh, 1.9rem);
+  }
+  .step-aside__desc {
+    font-size: 0.85rem;
+  }
 }

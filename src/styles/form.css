@@ -1,74 +1,95 @@
-/* ───────────────────────── Formulario (sobre fondo negro) ───────────────────────── */
-.form {
+/* ───────────────────────── Formulario de contacto (fondo claro) ───────────────────────── */
+.cform {
   display: grid;
-  gap: 26px;
+  gap: 28px;
 }
-.form__row {
+.cform__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 26px;
+  gap: 28px;
 }
-.field {
+.cfield {
   display: grid;
   gap: 8px;
 }
-.field > span {
+.cfield > span {
   font-size: 0.8rem;
-  color: var(--dark-muted);
+  font-weight: 500;
+  color: var(--muted);
 }
-.field em {
+.cfield em {
   font-style: normal;
-  opacity: 0.7;
+  opacity: 0.75;
 }
-.field input,
-.field select,
-.field textarea {
+.cfield input,
+.cfield select,
+.cfield textarea {
   width: 100%;
   padding: 12px 0;
   border: 0;
-  border-bottom: 1px solid #3a3a40;
+  border-bottom: 1px solid #c9c9c4;
   border-radius: 0;
   background: transparent;
-  color: #fff;
+  color: var(--ink);
   font: inherit;
   font-size: 1rem;
   transition: border-color 0.25s;
 }
-.field select {
+.cfield select {
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #9a9aa2 50%), linear-gradient(135deg, #9a9aa2 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, #66676a 50%), linear-gradient(135deg, #66676a 50%, transparent 50%);
   background-position:
     calc(100% - 10px) 52%,
     calc(100% - 5px) 52%;
   background-size: 5px 5px;
   background-repeat: no-repeat;
 }
-.field select option {
-  color: var(--negro);
-}
-.field textarea {
+.cfield textarea {
   resize: vertical;
 }
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
+.cfield input:focus,
+.cfield select:focus,
+.cfield textarea:focus {
   outline: none;
-  border-bottom-color: #fff;
+  border-bottom-color: var(--ink);
+  box-shadow: 0 1px 0 0 var(--ink);
 }
-.field input:user-invalid,
-.field select:user-invalid,
-.field textarea:user-invalid {
-  border-bottom-color: #ff6b6b;
+.cfield [aria-invalid="true"] {
+  border-bottom-color: #b42318;
 }
-.form__footer {
+.field__error {
+  font-size: 0.8rem;
+  color: #b42318;
+}
+.cform__foot {
   display: flex;
   align-items: center;
-  gap: 20px;
   flex-wrap: wrap;
+  gap: 16px 28px;
+  margin-top: 8px;
 }
-.form__status {
+.cform__wa {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: 600 0.95rem/1 var(--font-sans), sans-serif;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cform__status {
   margin: 0;
-  flex: 1 1 240px;
-  font-size: 0.88rem;
-  color: var(--dark-muted);
+  min-height: 1.4em;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+.cform__status.is-error {
+  color: #b42318;
+}
+.cform__status.is-sent {
+  color: #1d6b3a;
+}
+@media (max-width: 600px) {
+  .cform__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Inter, Lato, Oswald } from "next/font/google";
+import { site } from "@/config/site";
 import "./globals.css";
 
 // Tipografías de marca: Lato en pesos altos para titulares e Inter para texto e interfaces.
@@ -13,10 +14,28 @@ const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "-
 // en esta sesión o si se pide menos movimiento.
 const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
 
+const title = "Fary Labs — Transformamos ideas en productos digitales";
+
+// Canonical, imagen social absoluta y sitemap dependen del dominio (NEXT_PUBLIC_SITE_URL).
 export const metadata: Metadata = {
-  title: "Fary Labs — Transformamos ideas en productos digitales",
-  description:
-    "Estudio de desarrollo digital y consultoría tecnológica. Sitios web, software a medida y automatización para negocios que quieren avanzar.",
+  title,
+  description: site.description,
+  applicationName: "Fary Labs",
+  ...(site.url && { metadataBase: new URL(site.url), alternates: { canonical: "/" } }),
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    siteName: "Fary Labs",
+    title,
+    description: site.description,
+    ...(site.url && { url: "/", images: [{ url: "/og.png", width: 1200, height: 630, alt: "Fary Labs" }] }),
+  },
+  twitter: {
+    card: site.url ? "summary_large_image" : "summary",
+    title,
+    description: site.description,
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {

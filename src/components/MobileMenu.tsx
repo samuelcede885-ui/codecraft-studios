@@ -63,7 +63,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: (restore
             <li key={n.href} style={{ "--i": i } as React.CSSProperties}>
               <a href={n.href} onClick={(e) => go(e, n.href)}>
                 <small>{String(i + 1).padStart(2, "0")}</small>
-                {n.mobileLabel}
+                {n.label}
               </a>
             </li>
           ))}

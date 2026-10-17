@@ -10,22 +10,27 @@ import { HeroCopy } from "./Hero";
 import { LaptopFrame } from "./LaptopFrame";
 import { LaptopScreen } from "./LaptopScreen";
 import { StepAside, StepLead, StoryNumber } from "./StoryCopy";
+import { StoryOutro } from "./StoryOutro";
 import { StoryProgress } from "./StoryProgress";
 import { enterScreen, gm } from "./screenMotion";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const N = storySteps.length;
-/** Estados de la escena: 0 = hero, 1…N = pasos de la historia. */
-const STATES = N + 1;
-/** Distancia de la línea de tiempo entre un paso y el siguiente. */
+/** Estados de la escena: 0 = hero, 1…N = pasos, N + 1 = cierre ("Ideas claras."). */
+const STATES = N + 2;
+/** Distancia de la línea de tiempo entre un estado y el siguiente. */
 const GAP = 1.9;
-/** Inicio de cada transición hacia el estado k (k = 1…N). */
-const starts = Array.from({ length: N }, (_, i) => 0.25 + i * GAP);
+/** Inicio de cada transición hacia el estado k (k = 1…N + 1). La última es el cierre. */
+const starts = Array.from({ length: N + 1 }, (_, i) => 0.25 + i * GAP);
+const OUTRO = starts[N];
+/** Fondo de la escena: se oscurece de forma casi imperceptible en cada paso. */
+const TINT = [0, 0.012, 0.022, 0.032, 0.024, 0.04, 0];
 
 /**
  * Hero + historia en una sola escena fijada: la laptop es siempre la misma y está siempre
- * en el mismo sitio; el scroll solo cambia la pantalla y los textos que la rodean.
+ * en el mismo sitio; el scroll solo cambia la pantalla, los textos, el número y el progreso.
+ * Al terminar, la laptop se retira y entra el mensaje de cierre con el CTA.
  */
 export function ScrollStory() {
   const root = useRef<HTMLDivElement>(null);
@@ -37,9 +42,15 @@ export function ScrollStory() {
       const leads = q<HTMLElement>("[data-lead]");
       const asides = q<HTMLElement>("[data-aside]");
       const screens = q<HTMLElement>("[data-screen]");
+      const laptop = q<HTMLElement>(".zone--device .laptop")[0];
+      const outro = q<HTMLElement>("[data-outro]")[0];
+      const tint = q<HTMLElement>(".stage__tint")[0];
       const num = q<HTMLElement>(".story-num")[0];
       const numCol = q<HTMLElement>(".story-num__col")[0];
       const dots = q<HTMLElement>("[data-dot]");
+      const segs = q<HTMLElement>("[data-seg]");
+      const fill = q<HTMLElement>(".story-progress__fill")[0];
+      const progress = q<HTMLElement>(".story-progress, .story-bar");
 
       // Estado visible para lectores de pantalla y para el indicador de progreso.
       let current = -1;
@@ -48,10 +59,16 @@ export function ScrollStory() {
         current = state;
         leads.forEach((el, i) => el.toggleAttribute("aria-hidden", i !== state));
         asides.forEach((el, i) => el.toggleAttribute("aria-hidden", i !== state));
-        dots.forEach((d, i) => d.classList.toggle("is-on", i === Math.max(0, state - 1)));
+        outro.toggleAttribute("aria-hidden", state !== N + 1);
+        outro.toggleAttribute("inert", state !== N + 1);
+        const step = Math.min(N, Math.max(0, state)) - 1; // −1 en el hero
+        dots.forEach((d, i) => d.classList.toggle("is-on", i === step));
+        segs.forEach((d, i) => d.classList.toggle("is-on", i <= step));
+        fill.style.transform = `scaleY(${Math.max(0, step) / (N - 1)})`;
       };
       setActive(0);
 
+      // La escena queda fijada 5 pantallas (≈500vh de recorrido).
       const pinLength = () => window.innerHeight * N;
       const mm = gsap.matchMedia();
 
@@ -60,15 +77,19 @@ export function ScrollStory() {
         (ctx) => {
           const { motion, small, fine } = ctx.conditions as Record<string, boolean>;
 
-          // Sin movimiento: misma escena fijada, pero cada paso aparece sin animación.
+          // Movimiento reducido: sin scrub ni desplazamientos; cada estado aparece con un fundido simple.
           if (!motion) {
+            const fade = { duration: 0.2, overwrite: true };
             const show = (state: number) => {
-              gsap.set(leads, { autoAlpha: (i: number) => (i === state ? 1 : 0) });
-              gsap.set(asides, { autoAlpha: (i: number) => (i === state ? 1 : 0) });
-              const screen = Math.max(0, state - 1);
-              gsap.set(screens, { autoAlpha: (i: number) => (i === screen ? 1 : 0) });
-              gsap.set(num, { autoAlpha: state > 0 ? 1 : 0 });
+              if (state === current) return;
+              const screen = Math.min(N - 1, Math.max(0, state - 1));
+              gsap.to(leads, { autoAlpha: (i: number) => (i === state ? 1 : 0), ...fade });
+              gsap.to(asides, { autoAlpha: (i: number) => (i === state ? 1 : 0), ...fade });
+              gsap.to(screens, { autoAlpha: (i: number) => (i === screen ? 1 : 0), ...fade });
+              gsap.to(num, { autoAlpha: state > 0 && state <= N ? 1 : 0, ...fade });
               gsap.set(numCol, { yPercent: (-100 / N) * screen });
+              gsap.to(laptop, { autoAlpha: state === N + 1 ? 0 : 1, ...fade });
+              gsap.to(outro, { autoAlpha: state === N + 1 ? 1 : 0, ...fade });
               setActive(state);
             };
             ScrollTrigger.create({
@@ -82,56 +103,75 @@ export function ScrollStory() {
             return;
           }
 
-          const lift = small ? 16 : 26;
+          const lift = small ? 18 : 28;
+          const drop = small ? 14 : 20;
 
           // Entrada del hero: espera a que termine la intro de marca (Intro.tsx).
           const intro = gsap.timeline({ defaults: { ease: "expo.out" }, paused: !window.__faryIntroDone });
           window.addEventListener("fary:intro-done", () => intro.play(), { once: true });
           intro
             .from(q(".hero-line > span"), { yPercent: 110, duration: 1.05, stagger: 0.08 }, 0.05)
-            .from(q(".laptop"), { autoAlpha: 0, y: 18, scale: 0.985, duration: 1.2 }, 0.15)
+            .from(laptop, { autoAlpha: 0, y: 18, scale: 0.985, duration: 1.2 }, 0.15)
             .from(gm(screens[0], "birken"), { yPercent: 18, autoAlpha: 0, duration: 0.9 }, 0.45)
             .from(gm(screens[0], "shoe"), { yPercent: -6, autoAlpha: 0, duration: 1, ease: "power3.out" }, 0.55)
             .from(gm(screens[0], "boston"), { yPercent: 18, autoAlpha: 0, duration: 0.9 }, 0.6)
             .from(gm(screens[0], "order"), { y: 8, autoAlpha: 0, duration: 0.6, ease: "power3.out" }, 0.9)
             .from(q("[data-hero-fade]"), { autoAlpha: 0, y: 14, duration: 0.8, stagger: 0.07 }, 0.45)
-            .from(q(".stage__hint, .stage__progress"), { autoAlpha: 0, duration: 0.8 }, 0.9);
+            .from(q(".stage__hint, .story-progress, .story-bar"), { autoAlpha: 0, duration: 0.8 }, 0.9);
 
           // Línea de tiempo única de la historia, ligada al scroll.
           const tl = gsap.timeline({ defaults: { ease: "power2.inOut" } });
           const items = (el: Element) => el.querySelectorAll("[data-item]");
+          const textIn = (targets: Element[], at: number) =>
+            tl.fromTo(
+              targets,
+              { autoAlpha: 0, y: lift },
+              { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.05, ease: "power3.out" },
+              at,
+            );
 
           starts.forEach((at, k) => {
-            const from = k; // estado que sale
-            const to = k + 1; // estado que entra
-            tl.to([leads[from], asides[from]], { autoAlpha: 0, y: -lift, duration: 0.35, ease: "power2.in" }, at)
-              .set([leads[to], asides[to]], { autoAlpha: 1, y: 0 }, at + 0.32)
-              .fromTo(
-                [...items(leads[to]), ...items(asides[to])],
-                { autoAlpha: 0, y: lift },
-                { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.045, ease: "power3.out" },
-                at + 0.32,
-              );
+            const isOutro = k === N;
+            // Sale el estado k: textos hacia arriba.
+            tl.to([leads[k], asides[k]], { autoAlpha: 0, y: -drop, duration: 0.35, ease: "power2.in" }, at);
+            tl.to(tint, { opacity: TINT[k + 1], duration: 0.8, ease: "none" }, at);
 
-            if (k === 0) {
-              // Del hero al paso 01: la pantalla no cambia; aparece el número.
-              tl.fromTo(num, { autoAlpha: 0, y: lift }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, at + 0.3).to(
-                q(".stage__hint"),
-                { autoAlpha: 0, duration: 0.3 },
-                at,
-              );
+            if (isOutro) {
+              // Cierre: la laptop se retira (escala y fundido) y entra el mensaje.
+              tl.to(num, { autoAlpha: 0, y: -drop, duration: 0.35, ease: "power2.in" }, at)
+                .to(progress, { autoAlpha: 0, duration: 0.35 }, at)
+                .to(laptop, { scale: 0.94, autoAlpha: 0, duration: 0.7, ease: "power2.inOut" }, at + 0.05)
+                .set(outro, { autoAlpha: 1 }, at + 0.35);
+              textIn([...items(outro)], at + 0.4);
               return;
             }
 
-            // Cambio de pantalla dentro de la máscara: fundido cruzado con una escala mínima.
+            // Entra el estado k + 1.
+            tl.set([leads[k + 1], asides[k + 1]], { autoAlpha: 1, y: 0 }, at + 0.32);
+            textIn([...items(leads[k + 1]), ...items(asides[k + 1])], at + 0.32);
+
+            if (k === 0) {
+              // Del hero al paso 01: la pantalla no cambia; aparece el número y el zueco respira.
+              tl.fromTo(num, { autoAlpha: 0, y: lift }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out" }, at + 0.3)
+                .to(q(".stage__hint"), { autoAlpha: 0, duration: 0.3 }, at)
+                .to(gm(screens[0], "shoe"), { yPercent: -2.5, scale: 1.02, duration: 1.3, ease: "sine.inOut" }, at + 0.2);
+              return;
+            }
+
+            // Número tipo contador y cambio de pantalla dentro de la máscara.
             const out = screens[k - 1];
             const inn = screens[k];
             tl.to(numCol, { yPercent: (-100 / N) * k, duration: 0.6, ease: "power3.inOut" }, at + 0.05)
-              .to(out, { autoAlpha: 0, scale: 0.985, duration: 0.45 }, at + 0.05)
-              .fromTo(inn, { autoAlpha: 0, scale: 1.015, y: 6 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, ease: "power2.out" }, at + 0.12);
+              .to(out, { autoAlpha: 0, scale: 0.985, y: -10, duration: 0.45 }, at + 0.05)
+              .fromTo(
+                inn,
+                { autoAlpha: 0, scale: 1.015, y: 12 },
+                { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, ease: "power2.out" },
+                at + 0.12,
+              );
             enterScreen(tl, inn, at + 0.4);
           });
-          tl.to({}, { duration: 0.45 }, starts[N - 1] + GAP - 0.45);
+          tl.to({}, { duration: 0.5 }, OUTRO + GAP - 0.5);
 
           // Capa trasera: la marca deriva muy despacio (nunca la laptop).
           tl.fromTo(q(".stage__ghost"), { yPercent: 0 }, { yPercent: -8, ease: "none", duration: tl.duration() }, 0);
@@ -178,6 +218,7 @@ export function ScrollStory() {
   return (
     <section id="inicio" className="story" aria-label="Fary Labs: de la idea al producto" ref={root}>
       <div className="stage">
+        <span className="stage__tint" aria-hidden="true" />
         <LogoMark className="stage__ghost" />
         <div className="stage__grid">
           <div className="zone zone--lead">
@@ -190,6 +231,8 @@ export function ScrollStory() {
                 <StepLead step={s} />
               </div>
             ))}
+            {/* Hueco del cierre: mantiene la correspondencia índice ↔ estado. */}
+            <div className="panel panel--step" data-lead />
           </div>
 
           <div className="zone zone--device">
@@ -205,9 +248,11 @@ export function ScrollStory() {
                 <StepAside step={s} total={N} />
               </div>
             ))}
+            <div className="panel panel--step" data-aside />
           </div>
         </div>
-        <StoryProgress total={N} />
+        <StoryOutro />
+        <StoryProgress steps={storySteps} />
       </div>
     </section>
   );

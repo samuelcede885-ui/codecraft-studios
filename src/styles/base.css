@@ -8,6 +8,10 @@
   --blanco: #ffffff;
 
   --bg: var(--marfil);
+  /* Tonos de sección (casi blancos). */
+  --bg-1: #ffffff;
+  --bg-2: #f7f7f5;
+  --bg-3: #f2f2ef;
   --surface: var(--blanco);
   --ink: var(--negro);
   --ink-2: var(--grafito);
@@ -28,7 +32,14 @@
 
 @media (max-width: 1023px) {
   :root {
-    --header-h: 72px;
+    --header-h: 84px;
+    --header-h-sm: 60px;
+  }
+}
+
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  :root {
+    --header-h: 60px;
   }
 }
 
@@ -129,7 +140,7 @@ a {
     box-shadow 0.28s var(--ease);
 }
 .btn:hover {
-  transform: translateY(-2px);
+  transform: scale(1.015);
 }
 .btn:active {
   transform: translateY(0) scale(0.98);
@@ -141,8 +152,43 @@ a {
   transition: transform 0.28s var(--ease);
 }
 .btn:hover .btn__arrow,
-.work__link:hover .btn__arrow {
-  transform: translateX(4px);
+.link-arrow:hover .btn__arrow,
+.project__link:hover .btn__arrow,
+.project__link:focus-visible .btn__arrow {
+  transform: translateX(5px);
+}
+
+/* Enlace con flecha y subrayado que se dibuja al pasar el ratón. */
+.link-arrow,
+.link-line {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  font-weight: 600;
+}
+.link-arrow::after,
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease);
+}
+.link-line::after {
+  transform: scaleX(0);
+}
+.link-arrow:hover::after,
+.link-line:hover::after,
+.project__link:hover .link-arrow::after,
+.project__link:focus-visible .link-arrow::after {
+  transform: scaleX(1);
 }
 .btn--dark {
   background: var(--ink);

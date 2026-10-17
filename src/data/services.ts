@@ -5,9 +5,8 @@ export type Service = {
   name: string;
   kind: string;
   description: string;
-  /** Texto extra al expandir el servicio. */
-  detail: string;
   includes: string[];
+  /** Pantalla que se muestra en grande al abrir el servicio. */
   preview: ScreenId;
 };
 
@@ -17,8 +16,7 @@ export const services: Service[] = [
     name: "Web Craft",
     kind: "Desarrollo web",
     description:
-      "Diseño y desarrollo de páginas web profesionales, landing pages, sitios corporativos y tiendas online.",
-    detail: "Creamos una web clara para presentar tu negocio y facilitar el contacto.",
+      "Creamos webs profesionales, rápidas y claras para presentar tu negocio, vender y facilitar el contacto.",
     includes: ["Landing pages", "Sitios corporativos", "E-commerce", "Desarrollo web"],
     preview: "home",
   },
@@ -27,9 +25,8 @@ export const services: Service[] = [
     name: "App Craft",
     kind: "Aplicaciones",
     description:
-      "Desarrollo de aplicaciones web, plataformas digitales y sistemas personalizados para empresas.",
-    detail: "Diseñamos una herramienta para organizar la información y simplificar tareas.",
-    includes: ["Apps web", "Plataformas", "Sistemas a medida"],
+      "Diseñamos aplicaciones, plataformas y sistemas personalizados para resolver necesidades reales de negocio.",
+    includes: ["Apps web", "Plataformas", "Sistemas a medida", "Dashboards"],
     preview: "dashboard",
   },
   {
@@ -37,15 +34,8 @@ export const services: Service[] = [
     name: "Agent Craft",
     kind: "Inteligencia artificial",
     description:
-      "Creación de agentes inteligentes, asistentes virtuales, integraciones y automatizaciones empresariales.",
-    detail: "Automatizamos procesos definidos para que tu equipo dedique tiempo a tareas de valor.",
+      "Creamos agentes inteligentes y automatizaciones que conectan procesos, información y personas.",
     includes: ["Agentes IA", "Asistentes", "Automatización", "Integraciones"],
     preview: "agent",
   },
 ];
-
-export const processSteps = [
-  { number: "01", name: "Discovery", description: "Conocemos el negocio, necesidades y objetivos." },
-  { number: "02", name: "Crafting", description: "Diseñamos y desarrollamos la solución." },
-  { number: "03", name: "Handoff", description: "Entregamos, probamos y acompañamos el lanzamiento." },
-] as const;

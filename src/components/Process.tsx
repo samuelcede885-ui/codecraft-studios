@@ -1,15 +1,16 @@
-import { processSteps } from "@/data/services";
+import { processSteps } from "@/data/process";
 
+/** Cuatro pasos: en horizontal en escritorio y en vertical en móvil, con una línea que avanza con el scroll. */
 export function Process() {
   return (
     <section id="proceso" className="section process" aria-labelledby="proceso-title">
       <div className="container">
         <header className="section-head" data-reveal>
-          <span className="eyebrow">Proceso</span>
+          <span className="eyebrow">Cómo trabajamos</span>
           <h2 id="proceso-title" className="section-title">
-            Así trabajamos
+            De la idea
             <br />
-            contigo.
+            al lanzamiento.
           </h2>
         </header>
 

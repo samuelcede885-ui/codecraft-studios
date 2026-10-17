@@ -16,7 +16,7 @@
 }
 .header.is-scrolled {
   height: var(--header-h-sm);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.85);
   -webkit-backdrop-filter: saturate(1.6) blur(16px);
   backdrop-filter: saturate(1.6) blur(16px);
   border-bottom-color: rgba(11, 11, 12, 0.07);
@@ -27,7 +27,7 @@
   }
 }
 .header.is-dark.is-scrolled {
-  background: rgba(10, 10, 11, 0.72);
+  background: rgba(9, 10, 11, 0.85);
   border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 .header.is-open,
@@ -129,9 +129,13 @@
 }
 
 /* Botón circular negro del menú móvil */
+.header__close {
+  display: none;
+}
 .header__toggle {
   display: none;
   position: relative;
+  flex: none;
   width: 46px;
   height: 46px;
   border: 0;
@@ -164,25 +168,50 @@
   .header__nav {
     display: none;
   }
-  /* En móvil no cabe la firma a su tamaño mínimo: se usa el isotipo. */
-  .header__logo {
-    width: 34px;
-    height: 36px;
+  /* Botón de menú más compacto al hacer scroll (escala: no mueve nada alrededor). */
+  .header__toggle {
+    transition:
+      transform 0.45s var(--ease),
+      background-color 0.3s;
   }
-  .header__firma {
-    display: none;
+  .header.is-scrolled:not(.is-open) .header__toggle {
+    transform: scale(0.87);
   }
-  .header__mark,
-  .header.is-scrolled .header__mark {
-    position: static;
-    margin: 0;
+  /* Etiqueta visible del botón de cierre con el menú abierto. */
+  /* Fuera del flujo: no roba espacio al logo ni al botón en pantallas estrechas. */
+  .header__close {
+    position: absolute;
+    right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 60px);
+    top: 50%;
+    margin-top: -0.6em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateX(6px);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.3s var(--ease);
+  }
+  .header.is-open .header__cta {
+    visibility: hidden;
+  }
+  .header.is-open .header__close {
     opacity: 1;
+    transform: none;
   }
   .header__toggle {
     display: block;
   }
+  .header__close {
+    display: inline;
+  }
   .header__cta {
     margin-left: auto;
+  }
+}
+@media (max-width: 360px) {
+  .header__close {
+    display: none;
   }
 }
 @media (max-width: 560px) {
@@ -263,5 +292,18 @@
 @media (min-width: 1024px) {
   .mobile-menu {
     display: none;
+  }
+}
+
+/* Móvil en horizontal: siempre el header compacto, con el isotipo. */
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  .header {
+    height: var(--header-h-sm);
+  }
+  .header__firma {
+    opacity: 0;
+  }
+  .header__mark {
+    opacity: 1;
   }
 }

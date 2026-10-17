@@ -5,7 +5,7 @@ import type { ScreenId } from "@/data/screens";
  * Pantallas que se muestran dentro de la laptop y en el portafolio.
  * Las cuatro primeras reconstruyen en HTML la tienda Gramercy (diseño 16:9) para poder
  * animar cada pieza; el zueco es un recorte con transparencia en public/projects.
- * Los atributos data-gm son los puntos de anclaje de las animaciones de ShowcaseStory.
+ * Los atributos data-gm son los puntos de anclaje de las animaciones de ScrollStory (screenMotion.ts).
  */
 
 const SHOE = "/projects/gramercy-shoe.webp";
@@ -150,8 +150,10 @@ function ProductScreen({ lazy }: { lazy?: boolean }) {
           pie con cada paso, mientras que la suela ligera y las correas de cuero de primera calidad garantizan
           durabilidad y un ajuste impecable.
         </span>
-        <span className="gm-btn gm-btn--tan gm-product__cta" data-gm="item">
-          ADD TO CART
+        <span className="gm-product__cta-wrap" data-gm="item">
+          <span className="gm-btn gm-btn--tan gm-product__cta" data-gm="cta">
+            ADD TO CART
+          </span>
         </span>
       </div>
     </div>
@@ -247,6 +249,7 @@ function PaymentScreen({ lazy }: { lazy?: boolean }) {
             ] as const
           ).map(([k, label]) => (
             <span key={k} className="gm-method" data-gm="row">
+              <i className="gm-method__hl" data-gm="hl" aria-hidden="true" />
               <PayBadge kind={k} />
               {label}
             </span>
@@ -260,7 +263,15 @@ function PaymentScreen({ lazy }: { lazy?: boolean }) {
 function Spark({ points, color = "#2f6bff" }: { points: string; color?: string }) {
   return (
     <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="sc-dash__spark" aria-hidden="true">
-      <polyline points={points} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        vectorEffect="non-scaling-stroke"
+        pathLength={1}
+        data-gm="line"
+      />
     </svg>
   );
 }
@@ -295,7 +306,7 @@ function DashboardScreen() {
             <b>1,240</b>
             <div className="sc-dash__bars" aria-hidden="true">
               {[30, 45, 38, 52, 48, 60, 56, 72, 66, 84, 78, 95].map((h, i) => (
-                <i key={i} style={{ height: `${h}%` }} />
+                <i key={i} style={{ height: `${h}%` }} data-gm="bar" />
               ))}
             </div>
           </div>

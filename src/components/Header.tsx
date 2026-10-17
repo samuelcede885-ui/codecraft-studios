@@ -10,6 +10,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("#inicio");
   const [scrolled, setScrolled] = useState(false);
+  const [dark, setDark] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -30,9 +31,17 @@ export function Header() {
     );
     sections.forEach((s) => io.observe(s));
 
+    // Sobre el cierre negro el header pasa a su versión oscura.
+    const closing = document.querySelector("#cierre");
+    const darkIo = new IntersectionObserver(([e]) => setDark(e.isIntersecting), {
+      rootMargin: "0px 0px -94% 0px",
+    });
+    if (closing) darkIo.observe(closing);
+
     return () => {
       window.removeEventListener("scroll", onScroll);
       io.disconnect();
+      darkIo.disconnect();
     };
   }, []);
 
@@ -45,7 +54,7 @@ export function Header() {
     <>
       <header
         className={`header ${scrolled ? "is-scrolled" : ""} ${open ? "is-open" : ""} ${
-          active === "#contacto" && !open ? "is-dark" : ""
+          dark && !open ? "is-dark" : ""
         }`}
       >
         <div className="header__inner">
@@ -66,6 +75,9 @@ export function Header() {
             Comenzar proyecto <ArrowRight className="btn__arrow" />
           </a>
 
+          <span className="header__close" aria-hidden="true">
+            Cerrar
+          </span>
           <button
             ref={toggle}
             type="button"

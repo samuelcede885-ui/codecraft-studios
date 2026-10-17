@@ -1,5 +1,4 @@
 import type { StoryStep } from "@/data/storySteps";
-import { Icon } from "../Icon";
 
 /** Columna izquierda (arriba en móvil): etapa y título. El número vive aparte, en StoryNumber. */
 export function StepLead({ step }: { step: StoryStep }) {
@@ -15,7 +14,7 @@ export function StepLead({ step }: { step: StoryStep }) {
   );
 }
 
-/** Columna derecha (debajo de la laptop en móvil): metadata, mensaje y etiquetas. */
+/** Columna derecha (debajo de la laptop en móvil): metadata y mensaje. */
 export function StepAside({ step, total }: { step: StoryStep; total: number }) {
   return (
     <div className="step-aside">
@@ -25,19 +24,11 @@ export function StepAside({ step, total }: { step: StoryStep; total: number }) {
       <p className="step-aside__desc" data-item>
         {step.description}
       </p>
-      <ul className="step-aside__tags" aria-label="Incluye">
-        {step.tags.map((t) => (
-          <li key={t.label} data-item>
-            <Icon name={t.icon} className="step-aside__icon" />
-            {t.label}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
 
-/** Número grande con máscara vertical: la columna 01…05 se desliza dentro de una ventana de una línea. */
+/** Número grande con máscara vertical: la columna 01…05 se desliza como un contador. */
 export function StoryNumber({ steps }: { steps: StoryStep[] }) {
   return (
     <div className="story-num" aria-hidden="true">

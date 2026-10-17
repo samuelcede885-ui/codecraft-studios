@@ -71,8 +71,34 @@ export function enterScreen(tl: TL, screen: HTMLElement, at: number) {
     }
   }
 
-  // Pago: los métodos entran uno tras otro.
+  // Producto: "ADD TO CART" se destaca una vez, con un pulso mínimo.
+  const cta = gm(screen, "cta");
+  if (cta.length)
+    tl.fromTo(cta, { scale: 1 }, { scale: 1.05, duration: 0.18, yoyo: true, repeat: 1, ease: "sine.inOut" }, at + 1.05);
+
+  // Pago: los métodos entran uno tras otro y después se resaltan en secuencia.
   const rows = gm(screen, "row");
-  if (rows.length)
+  if (rows.length) {
     tl.fromTo(rows, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.08, ease: "power3.out" }, at + 0.45);
+    gm(screen, "hl").forEach((hl, i) => {
+      const t = at + 0.85 + i * 0.2;
+      tl.fromTo(hl, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "none" }, t).to(
+        hl,
+        { opacity: 0, duration: 0.12, ease: "none" },
+        t + 0.2,
+      );
+    });
+  }
+
+  // Panel: las líneas se dibujan y las barras crecen.
+  const lines = gm(screen, "line");
+  if (lines.length) {
+    tl.fromTo(lines, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" }, at + 0.2);
+    tl.fromTo(
+      gm(screen, "bar"),
+      { scaleY: 0 },
+      { scaleY: 1, duration: 0.5, stagger: 0.03, ease: "power2.out", transformOrigin: "50% 100%" },
+      at + 0.25,
+    );
+  }
 }

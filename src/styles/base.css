@@ -21,7 +21,8 @@
   --gutter: clamp(20px, 4.5vw, 72px);
   --header-h: 96px;
   --header-h-sm: 64px;
-  --radius: 4px;
+  --radius: 12px;
+  --radius-btn: 10px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -117,7 +118,7 @@ a {
   align-items: center;
   gap: 0.7em;
   padding: 1.05em 1.6em;
-  border-radius: 2px;
+  border-radius: var(--radius-btn);
   border: 0;
   font: 600 0.95rem/1 var(--font-sans), sans-serif;
   cursor: pointer;

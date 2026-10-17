@@ -341,7 +341,7 @@
     gap: 6px;
     padding: 6px 10px;
     border: 1px solid var(--line);
-    border-radius: 2px;
+    border-radius: 8px;
     background: rgba(255, 255, 255, 0.6);
   }
   .step-aside__icon {
@@ -389,6 +389,7 @@
 /* Bloque negro del manual ("IDEAS QUE FUNCIONAN."): resalta la segunda línea. */
 .story-cta__mark {
   padding: 0.02em 0.2em 0.06em;
+  border-radius: 0.18em;
   line-height: 1.22;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;

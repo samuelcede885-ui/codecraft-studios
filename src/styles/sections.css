@@ -127,7 +127,7 @@
   width: 48px;
   height: 48px;
   border: 1px solid var(--line);
-  border-radius: 2px;
+  border-radius: var(--radius-btn);
   transition:
     background-color 0.35s var(--ease),
     color 0.35s var(--ease),

@@ -135,7 +135,7 @@
   width: 46px;
   height: 46px;
   border: 0;
-  border-radius: 2px;
+  border-radius: var(--radius-btn);
   background: var(--ink);
   cursor: pointer;
 }

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const SEEN_KEY = "fary-intro-seen";
-const MAX_MS = 9500;
+const INTRO_MS = 8000;
+const MAX_MS = 11000;
 
 declare global {
   interface Window {
@@ -19,12 +20,14 @@ function announceDone() {
 }
 
 /**
- * Intro en vídeo del logo de Fary Labs antes de mostrar la web.
+ * Intro animada del logo de Fary Labs antes de mostrar la web (WebP animado de 8 s,
+ * generado desde el vídeo original: funciona también donde no se permite <video>).
  * Se ve una vez por sesión; se omite con prefers-reduced-motion (ver script en layout.tsx).
  */
 export function Preloader() {
   const [phase, setPhase] = useState<"play" | "leaving" | "done">("play");
-  const video = useRef<HTMLVideoElement>(null);
+  const img = useRef<HTMLImageElement>(null);
+  const endTimer = useRef<number | undefined>(undefined);
   const finished = useRef(false);
 
   function finish(immediate = false) {
@@ -42,19 +45,26 @@ export function Preloader() {
     }
   }
 
+  /** La animación dura 8 s desde que la imagen se muestra (o se vuelve a montar). */
+  function startClock() {
+    window.clearTimeout(endTimer.current);
+    endTimer.current = window.setTimeout(() => finish(), INTRO_MS);
+  }
+
   useEffect(() => {
     if (document.documentElement.classList.contains("intro-seen")) {
       finish(true);
       return;
     }
     document.documentElement.classList.add("intro-playing");
-    // Si el navegador no permite reproducir el vídeo, no se bloquea la web.
-    video.current?.play().catch(() => finish());
+    // La imagen puede haber cargado antes de que React tome el control.
+    if (img.current?.complete && img.current.naturalWidth > 0) startClock();
     const timer = window.setTimeout(() => finish(), MAX_MS);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && finish();
     document.addEventListener("keydown", onKey);
     return () => {
       window.clearTimeout(timer);
+      window.clearTimeout(endTimer.current);
       document.removeEventListener("keydown", onKey);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,15 +74,16 @@ export function Preloader() {
 
   return (
     <div className={`preloader ${phase === "leaving" ? "is-leaving" : ""}`} aria-hidden="true">
-      <video
-        ref={video}
+      {/* eslint-disable-next-line @next/next/no-img-element -- animación, no foto */}
+      <img
         className="preloader__video"
-        src="/projects/fary-intro.mp4"
-        muted
-        playsInline
-        autoPlay
-        preload="auto"
-        onEnded={() => finish()}
+        src="/projects/fary-intro.webp"
+        alt=""
+        width={1280}
+        height={720}
+        ref={img}
+        onLoad={startClock}
+        onError={() => finish()}
       />
       <button type="button" className="preloader__skip" tabIndex={0} onClick={() => finish()}>
         Saltar intro

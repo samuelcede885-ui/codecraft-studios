@@ -98,7 +98,7 @@ a {
   inset: 0;
   z-index: 200;
   overflow: hidden;
-  background: #0f1013;
+  background: #101114;
   transition:
     opacity 0.7s var(--ease),
     visibility 0.7s;
@@ -126,6 +126,7 @@ a {
   /* En vertical se amplía para que el logo (centro del vídeo) se vea grande. */
   .preloader__video {
     width: 250vw;
+    max-width: none;
   }
 }
 .preloader__skip {

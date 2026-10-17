@@ -1,23 +1,18 @@
-/**
- * Recreación vectorial del símbolo de Fary Labs (flecha → con barra).
- * Es una aproximación a partir del brand board; sustituir por el SVG
- * original del logotipo cuando esté disponible.
- */
+/** Símbolo oficial de Fary Labs (flecha diagonal), trazado a partir del logo original. */
+const MARK_POINTS =
+  "191,188 484,188 803,516 803,188 1051,188 1051,744 863,921 1062,921 908,1065 370,1065 567,879 191,879 191,639 575,639 191,251";
+
 export function LogoMark({ className, title }: { className?: string; title?: string }) {
   return (
     <svg
-      viewBox="0 0 100 100"
+      viewBox="191 188 871 877"
       className={className}
       role={title ? "img" : undefined}
       aria-hidden={title ? undefined : true}
       aria-label={title}
       fill="currentColor"
     >
-      <polygon points="6,0 33,0 71,50 44,50" />
-      <polygon points="44,50 71,50 33,100 6,100" />
-      <rect x="0" y="38" width="48" height="24" />
-      <polygon points="76,0 100,0 100,46 76,46 76,40" />
-      <polygon points="80,56 100,56 100,100 76,100 76,62" />
+      <polygon points={MARK_POINTS} />
     </svg>
   );
 }

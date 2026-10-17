@@ -39,5 +39,4 @@ npm run typecheck
 ## Pendiente
 
 - **Datos de contacto:** rellenar `email` y `whatsapp` en `src/config/site.ts`. Mientras estén vacíos, el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
-- **Logotipo:** `LogoMark` en `src/components/Logo.tsx` es una recreación del brand board. Sustituir por el SVG original.
 - **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.

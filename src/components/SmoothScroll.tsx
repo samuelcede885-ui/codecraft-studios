@@ -16,11 +16,8 @@ export function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      anchors: { offset: 0 },
-    });
+    // Inercia corta: suaviza la rueda sin dejar la página "atrasada" respecto al gesto.
+    const lenis = new Lenis({ lerp: 0.14, wheelMultiplier: 0.9, anchors: { offset: 0 } });
     const raf = (time: number) => lenis.raf(time * 1000);
 
     // Durante la intro el scroll queda quieto; se libera al terminar.

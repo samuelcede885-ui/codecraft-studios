@@ -240,13 +240,12 @@ a {
     box-shadow 0.35s var(--ease);
 }
 .header.is-scrolled {
-  background: rgba(243, 243, 244, 0.82);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  /* Sin desenfoque de fondo: se recalculaba en cada fotograma durante la secuencia fija. */
+  background: rgba(243, 243, 244, 0.95);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 .header.is-dark.is-scrolled {
-  background: rgba(10, 10, 11, 0.78);
+  background: rgba(10, 10, 11, 0.95);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .header.is-dark .logo,
@@ -499,7 +498,7 @@ a {
   height: min(78vmin, 820px);
   margin: calc(min(78vmin, 820px) / -2) 0 0 calc(min(78vmin, 820px) / -2);
   color: #fff;
-  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.06));
+  will-change: transform;
   opacity: 0.85;
   pointer-events: none;
 }
@@ -547,10 +546,8 @@ a {
   opacity: 0;
   visibility: hidden;
 }
-.story-motion .screen-layer,
-.story-motion .screen-layer__inner,
-.story-motion .panel {
-  will-change: transform, opacity;
+.story-motion .screen-layer {
+  will-change: opacity;
 }
 
 .stage__caption {
@@ -1855,6 +1852,7 @@ a {
   transform: rotateY(-22deg) rotateX(8deg);
   filter: drop-shadow(3px 3px 0 #8d8d94) drop-shadow(3px 3px 0 #5d5d63) drop-shadow(4px 4px 0 #36363b)
     drop-shadow(30px 40px 50px rgba(0, 0, 0, 0.7));
+  will-change: transform;
 }
 .contact__body {
   display: grid;

@@ -181,7 +181,21 @@ export function ShowcaseStory() {
             start: "top top",
             end: () => `+=${window.innerHeight * (total - 1)}`,
             pin: true,
-            scrub: 0.7,
+            // Lenis ya suaviza el scroll: sin retraso extra para que la animación siga al gesto.
+            scrub: true,
+            // Con ratón o trackpad cada gesto termina en un paso completo; en táctil, scroll libre.
+            snap: !window.matchMedia("(pointer: fine)").matches ? undefined : {
+              // Avanza (o retrocede) al siguiente paso en la dirección del gesto, nunca vuelve atrás.
+              snapTo: (v: number, self?: ScrollTrigger) => {
+                const pts = rests.map((r) => r / tl.duration());
+                return (self?.direction ?? 1) > 0
+                  ? (pts.find((p) => p >= v - 0.004) ?? 1)
+                  : ([...pts].reverse().find((p) => p <= v + 0.004) ?? 0);
+              },
+              duration: { min: 0.25, max: 0.7 },
+              delay: 0.08,
+              ease: "power2.inOut",
+            },
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
@@ -214,8 +228,12 @@ export function ShowcaseStory() {
         }
         tl.to({}, { duration: 0.6 });
 
+        // Puntos de reposo: el inicio y el final de cada paso, cuando su animación ya terminó.
+        const starts = Object.keys(tl.labels).filter((k) => k.startsWith("step")).map((k) => tl.labels[k]);
+        const rests = [0, ...starts.slice(1).map((t) => t - 0.05), tl.duration()];
+
         // Marca de fondo con deriva lenta (capa trasera, no la laptop).
-        tl.fromTo(q(".stage__ghost"), { yPercent: 0, rotate: 0 }, { yPercent: -12, rotate: -6, ease: "none", duration: tl.duration() }, 0);
+        tl.fromTo(q(".stage__ghost"), { yPercent: 0, rotate: 0 }, { yPercent: -10, rotate: -5, ease: "none", duration: tl.duration() }, 0);
 
         const marks = Object.values(tl.labels);
         tl.eventCallback("onUpdate", () => {

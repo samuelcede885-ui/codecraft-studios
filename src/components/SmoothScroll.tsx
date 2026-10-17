@@ -23,11 +23,17 @@ export function SmoothScroll() {
     });
     const raf = (time: number) => lenis.raf(time * 1000);
 
+    // Durante la intro el scroll queda quieto; se libera al terminar.
+    const resume = () => lenis.start();
+    if (!window.__faryIntroDone && !document.documentElement.classList.contains("intro-seen")) lenis.stop();
+    window.addEventListener("fary:intro-done", resume);
+
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      window.removeEventListener("fary:intro-done", resume);
       gsap.ticker.remove(raf);
       lenis.destroy();
     };

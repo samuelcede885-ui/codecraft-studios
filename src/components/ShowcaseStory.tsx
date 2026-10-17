@@ -157,8 +157,11 @@ export function ShowcaseStory() {
         const counter = q<HTMLElement>("[data-counter]")[0];
 
         // Entrada: fondo inmediato → título por líneas → laptop → resto.
-        gsap
-          .timeline({ defaults: { ease: "expo.out" } })
+        // La entrada del hero espera a que termine la intro en vídeo (Preloader).
+        const intro = gsap.timeline({ defaults: { ease: "expo.out" }, paused: !window.__faryIntroDone });
+        const playIntro = () => intro.play();
+        window.addEventListener("fary:intro-done", playIntro, { once: true });
+        intro
           .from(q(".hero-line > span"), { yPercent: 110, duration: 1.1, stagger: 0.09 }, 0.1)
           .from(q(".laptop"), { autoAlpha: 0, scale: 0.96, duration: 1.3 }, 0.25)
           // Portada de Gramercy: BIRKEN entra por la izquierda, el zueco cae, BOSTON sube y aparece el botón.

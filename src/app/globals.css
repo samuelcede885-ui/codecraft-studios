@@ -92,6 +92,63 @@ a {
   padding-inline: var(--gutter);
 }
 
+/* ───────────────────────── Intro en vídeo ───────────────────────── */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: #0f1013;
+  transition:
+    opacity 0.7s var(--ease),
+    visibility 0.7s;
+}
+.preloader.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+}
+.intro-seen .preloader {
+  display: none;
+}
+.intro-playing body {
+  overflow: hidden;
+}
+.preloader__video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(100vw, 177.78vh);
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+@media (max-aspect-ratio: 1/1) {
+  /* En vertical se amplía para que el logo (centro del vídeo) se vea grande. */
+  .preloader__video {
+    width: 250vw;
+  }
+}
+.preloader__skip {
+  position: absolute;
+  right: calc(var(--gutter) + env(safe-area-inset-right, 0px));
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font: 500 0.8rem/1 var(--font-sans), sans-serif;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.preloader__skip:hover,
+.preloader__skip:focus-visible {
+  color: #fff;
+  border-color: #fff;
+}
+
 /* ───────────────────────── Botones ───────────────────────── */
 .btn {
   display: inline-flex;

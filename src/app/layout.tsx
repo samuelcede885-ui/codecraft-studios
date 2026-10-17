@@ -8,6 +8,8 @@ const sora = Sora({ subsets: ["latin"], weight: ["700", "800"], variable: "--fon
 const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-display", display: "swap" });
 const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap" });
 
+const introScript = `try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
+
 export const metadata: Metadata = {
   title: "Fary Labs — Transformamos ideas en productos digitales",
   description:
@@ -20,7 +22,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${inter.variable} ${sora.variable} ${anton.variable} ${oswald.variable}`}>
+    <html
+      lang="es"
+      className={`${inter.variable} ${sora.variable} ${anton.variable} ${oswald.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Antes del primer pintado: sin intro si ya se vio en esta sesión o si se pide menos movimiento. */}
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
+      </head>
       <body>
         <a href="#contenido" className="skip-link">
           Saltar al contenido

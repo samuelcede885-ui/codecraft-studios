@@ -40,7 +40,7 @@ export const moreProjects: Project[] = [
     name: "Asistente de reservas",
     category: "Agente IA",
     status: "Concepto",
-    line: "Responde, agenda y confirma cada reserva por sí solo.",
+    line: "Responde consultas, propone horarios y confirma reservas.",
     screen: "agent",
     href: "#contacto",
     cta: "Quiero algo así",

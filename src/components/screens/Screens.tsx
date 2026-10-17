@@ -1,3 +1,4 @@
+import { LogoMark } from "../Logo";
 import type { ScreenId } from "@/data/screens";
 
 /*
@@ -269,8 +270,7 @@ function DashboardScreen() {
     <div className="sc sc-dash">
       <aside className="sc-dash__side">
         <span className="sc-dash__brand">
-          Fary
-          <br />
+          <LogoMark className="sc-dash__mark" />
           Dashboard
         </span>
         {["Resumen", "Analítica", "Productos", "Clientes", "Ajustes"].map((l, i) => (

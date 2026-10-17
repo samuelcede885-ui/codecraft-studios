@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/config/site";
-import { Logo } from "./Logo";
+import { Logo, LogoMark } from "./Logo";
 import { ArrowRight } from "./Icon";
 import { MobileMenu } from "./MobileMenu";
 
@@ -50,7 +50,8 @@ export function Header() {
       >
         <div className="header__inner">
           <a href="#inicio" className="header__logo" aria-label="Fary Labs, ir al inicio">
-            <Logo />
+            <Logo className="header__firma" />
+            <LogoMark className="header__mark" />
           </a>
 
           <nav className="header__nav" aria-label="Principal">

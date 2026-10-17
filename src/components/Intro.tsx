@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MARK_POINTS } from "./Logo";
+import { FARY_PATHS, FIRMA_VIEWBOX, LABS_PATHS, MARK_PATHS } from "./brandPaths";
 
 const SEEN_KEY = "fary-intro-seen";
 /** Momento en que empieza la transición hacia la página y fin total de la intro (ms). */
@@ -25,7 +25,8 @@ function announceDone() {
 }
 
 /**
- * Intro de marca (≈2,7 s): fondo negro → se construye el símbolo → "Fary" → "labs" → la página.
+ * Intro de marca (≈2,7 s): fondo negro → las piezas del símbolo avanzan en la dirección de la flecha
+ * → "Fary" → "labs" → la página. Usa la firma oficial del manual, sin contornos ni efectos.
  * La coreografía vive en CSS (intro.css) para empezar en el primer pintado, sin esperar a JS.
  * Se ve una vez por sesión y se omite con prefers-reduced-motion (script del <head> en layout.tsx).
  */
@@ -78,27 +79,17 @@ export function Intro() {
       style={{ "--intro-offset": `${Math.min(0, offset)}ms` } as React.CSSProperties}
       suppressHydrationWarning
     >
-      <div className="intro__logo" role="img" aria-label="Fary Labs">
-        <svg className="intro__mark" viewBox="191 188 871 877" aria-hidden="true">
-          <polygon points={MARK_POINTS} pathLength={1} />
-        </svg>
-        <span className="intro__word" aria-hidden="true">
-          <span className="intro__fary">
-            {"Fary".split("").map((c, i) => (
-              <span key={i} style={{ "--i": i } as React.CSSProperties}>
-                {c}
-              </span>
-            ))}
-          </span>
-          <span className="intro__labs">
-            {"labs".split("").map((c, i) => (
-              <span key={i} style={{ "--i": i } as React.CSSProperties}>
-                {c}
-              </span>
-            ))}
-          </span>
-        </span>
-      </div>
+      <svg className="intro__logo" viewBox={FIRMA_VIEWBOX} role="img" aria-label="Fary Labs" fill="#fff" fillRule="evenodd">
+        {MARK_PATHS.map((d, i) => (
+          <path key={`m${i}`} className="intro__piece" d={d} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+        {FARY_PATHS.map((d, i) => (
+          <path key={`f${i}`} className="intro__letter" d={d} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+        {LABS_PATHS.map((d, i) => (
+          <path key={`l${i}`} className="intro__labs" d={d} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+      </svg>
       <button type="button" className="intro__skip" onClick={() => finish(true)}>
         Saltar intro
       </button>

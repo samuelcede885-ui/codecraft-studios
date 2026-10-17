@@ -1,14 +1,14 @@
 import { ArrowRight } from "./Icon";
 
-/** Cierre de la historia de la laptop: la idea que acabas de ver puede ser la tuya. */
+/** Cierre de la historia con el mensaje propuesto por el manual de marca, en su composición editorial. */
 export function StoryCTA() {
   return (
     <section className="story-cta" aria-labelledby="story-cta-title">
       <div className="container story-cta__inner" data-reveal>
         <h2 id="story-cta-title" className="story-cta__title">
-          De la idea al producto.
+          Ideas claras.
           <br />
-          <span>Tu proyecto puede ser el siguiente.</span>
+          <span className="story-cta__mark">Productos que funcionan.</span>
         </h2>
         <a href="#contacto" className="btn btn--dark">
           Comenzar proyecto <ArrowRight className="btn__arrow" />

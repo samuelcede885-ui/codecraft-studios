@@ -501,12 +501,20 @@
   color: #6b7280;
 }
 .sc-dash__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7cqw;
   margin-bottom: 1.4cqw;
-  font-family: var(--font-brand), sans-serif;
-  font-size: 1.9cqw;
-  font-weight: 800;
-  color: #111;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.5cqw;
+  font-weight: 900;
+  color: #090a0b;
   line-height: 1;
+}
+.sc-dash__mark {
+  width: 2.2cqw;
+  height: 2.2cqw;
+  flex: none;
 }
 .sc-dash__side .is-on {
   color: #111;

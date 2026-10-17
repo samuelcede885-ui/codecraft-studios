@@ -18,7 +18,7 @@ export const services: Service[] = [
     kind: "Desarrollo web",
     description:
       "Diseño y desarrollo de páginas web profesionales, landing pages, sitios corporativos y tiendas online.",
-    detail: "Sitios rápidos, claros y pensados para convertir visitas en clientes.",
+    detail: "Creamos una web clara para presentar tu negocio y facilitar el contacto.",
     includes: ["Landing pages", "Sitios corporativos", "E-commerce", "Desarrollo web"],
     preview: "home",
   },
@@ -28,7 +28,7 @@ export const services: Service[] = [
     kind: "Aplicaciones",
     description:
       "Desarrollo de aplicaciones web, plataformas digitales y sistemas personalizados para empresas.",
-    detail: "Herramientas a medida que ordenan procesos y crecen con tu negocio.",
+    detail: "Diseñamos una herramienta para organizar la información y simplificar tareas.",
     includes: ["Apps web", "Plataformas", "Sistemas a medida"],
     preview: "dashboard",
   },
@@ -38,7 +38,7 @@ export const services: Service[] = [
     kind: "Inteligencia artificial",
     description:
       "Creación de agentes inteligentes, asistentes virtuales, integraciones y automatizaciones empresariales.",
-    detail: "Agentes que responden, organizan y automatizan las tareas repetitivas.",
+    detail: "Automatizamos procesos definidos para que tu equipo dedique tiempo a tareas de valor.",
     includes: ["Agentes IA", "Asistentes", "Automatización", "Integraciones"],
     preview: "agent",
   },

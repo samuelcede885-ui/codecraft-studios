@@ -17,7 +17,7 @@ export function HeroCopy() {
         </span>
       </h1>
       <p className="hero-copy__sub" data-hero-fade>
-        Diseño, desarrollo y automatización para llevar tu negocio al siguiente nivel.
+        Diseño, desarrollo y automatización para que la tecnología impulse tu negocio.
       </p>
       <a href="#contacto" className="btn btn--dark hero-copy__cta" data-hero-fade>
         Comenzar proyecto <ArrowRight className="btn__arrow" />

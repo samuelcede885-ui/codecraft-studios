@@ -44,7 +44,7 @@
   background-repeat: no-repeat;
 }
 .field select option {
-  color: #111;
+  color: var(--negro);
 }
 .field textarea {
   resize: vertical;

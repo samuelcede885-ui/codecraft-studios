@@ -1,5 +1,5 @@
 /* ───────────────────────── Intro de marca ─────────────────────────
-   0.0–0.4 s fondo negro · 0.4–1.2 s se construye el símbolo · 1.2–1.8 s "Fary"
+   0.0–0.4 s fondo negro · 0.4–1.2 s entra el símbolo · 1.2–1.8 s "Fary"
    · 1.8–2.2 s "labs" · 2.2–2.7 s fundido hacia la página.
    --intro-offset (negativo) adelanta todo si el nodo se vuelve a montar a mitad. */
 .intro {
@@ -9,7 +9,7 @@
   z-index: 200;
   display: grid;
   place-items: center;
-  background: #0a0a0b;
+  background: var(--negro);
   color: #fff;
   animation: intro-out 0.5s var(--ease) calc(2.2s + var(--t)) forwards;
 }
@@ -30,72 +30,34 @@
   }
 }
 
+/* Firma oficial; sus piezas solo se desplazan y aparecen, nunca se deforman. */
 .intro__logo {
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
-  font-size: clamp(38px, 6vw, 76px);
-}
-.intro__mark {
-  width: 1.12em;
-  height: 1.12em;
+  width: clamp(240px, 52vw, 560px);
+  height: auto;
+  aspect-ratio: 790 / 248;
   overflow: visible;
 }
-.intro__mark polygon {
-  fill: #fff;
-  fill-opacity: 0;
-  stroke: #fff;
-  stroke-width: 12;
-  stroke-linejoin: miter;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation:
-    intro-draw 0.6s cubic-bezier(0.65, 0, 0.35, 1) calc(0.4s + var(--t)) forwards,
-    intro-fill 0.3s ease calc(0.9s + var(--t)) forwards;
-}
-@keyframes intro-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@keyframes intro-fill {
-  to {
-    fill-opacity: 1;
-  }
-}
-
-.intro__word {
-  position: relative;
-  padding-bottom: 0.42em;
-  font: 800 1em/1 var(--font-brand), sans-serif;
-  letter-spacing: -0.03em;
-}
-.intro__fary span {
-  display: inline-block;
+/* 0.4–1.2 s: las tres piezas del símbolo avanzan hacia la derecha, una tras otra. */
+.intro__piece {
   opacity: 0;
-  transform: translateY(0.16em);
-  animation: intro-letter 0.42s var(--ease) calc(1.2s + var(--i) * 0.1s + var(--t)) forwards;
+  transform: translateX(-56px);
+  animation: intro-in 0.5s var(--ease) calc(0.4s + var(--i) * 0.15s + var(--t)) forwards;
 }
+/* 1.2–1.8 s: "Fary", letra a letra. */
+.intro__letter {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: intro-in 0.42s var(--ease) calc(1.2s + var(--i) * 0.1s + var(--t)) forwards;
+}
+/* 1.8–2.2 s: "labs". */
 .intro__labs {
-  position: absolute;
-  left: 0.15em;
-  bottom: -0.04em;
-  font: 600 0.36em/1 var(--font-sans), sans-serif;
-  letter-spacing: 0.62em;
-}
-.intro__labs span {
   opacity: 0;
-  animation: intro-fade 0.3s ease calc(1.8s + var(--i) * 0.07s + var(--t)) forwards;
+  animation: intro-in 0.3s ease calc(1.8s + var(--i) * 0.07s + var(--t)) forwards;
 }
-@keyframes intro-letter {
+@keyframes intro-in {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-@keyframes intro-fade {
-  to {
-    opacity: 1;
   }
 }
 
@@ -105,7 +67,7 @@
   bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   padding: 10px 16px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
+  border-radius: 2px;
   background: transparent;
   color: rgba(255, 255, 255, 0.75);
   font: 500 0.8rem/1 var(--font-sans), sans-serif;

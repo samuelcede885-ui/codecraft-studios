@@ -54,8 +54,8 @@ export const storySteps: StoryStep[] = [
     label: "Gramercy / Carrito",
     tags: [
       { icon: "app", label: "Apps a medida" },
-      { icon: "layers", label: "Checkout" },
-      { icon: "bolt", label: "Sin fricción" },
+      { icon: "layers", label: "Proceso de compra" },
+      { icon: "bolt", label: "Pasos simples" },
     ],
   },
   {
@@ -82,7 +82,7 @@ export const storySteps: StoryStep[] = [
     label: "Panel de métricas",
     tags: [
       { icon: "gauge", label: "Rendimiento" },
-      { icon: "scale", label: "Escalabilidad" },
+      { icon: "scale", label: "Crecimiento" },
       { icon: "trend", label: "Métricas" },
     ],
   },

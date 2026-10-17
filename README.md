@@ -2,7 +2,7 @@
 
 Escaparate digital de Fary Labs: hero con laptop protagonista, secuencia de scroll con la laptop fija y proyectos que cambian en su pantalla, servicios, portafolio, proceso y contacto.
 
-Visión del proyecto: [`docs/fary-labs-brief.md`](docs/fary-labs-brief.md). Referencias visuales en `docs/references/`.
+Visión del proyecto: [`docs/fary-labs-brief.md`](docs/fary-labs-brief.md). Identidad: [`docs/brand/fary-labs-manual-de-marca-v1.1.pdf`](docs/brand/fary-labs-manual-de-marca-v1.1.pdf). Referencias visuales en `docs/references/`.
 
 ## Stack
 
@@ -25,6 +25,7 @@ npm run typecheck
 | `src/data/services.ts` | Web, App y Agent Craft (qué incluye cada uno) y los pasos del proceso |
 | `src/data/projects.ts` | Proyecto principal (Gramercy) y "Más proyectos" (conceptos) |
 | `src/data/screens.ts` | Identificadores de las pantallas |
+| `src/components/brandPaths.ts`, `Logo.tsx` | Firma e isotipo oficiales vectorizados del manual (no redibujar) |
 | `src/config/site.ts` | Navegación y datos de contacto (Instagram, WhatsApp, correo) |
 | `src/components/Intro.tsx` | Intro de marca (≤ 2,7 s, una vez por sesión, botón "Saltar intro") |
 | `src/components/Header.tsx`, `MobileMenu.tsx` | Header fijo que se compacta con blur y menú móvil a pantalla completa |
@@ -36,7 +37,8 @@ npm run typecheck
 
 ## Comportamiento
 
-- **Intro:** fondo negro, el símbolo se dibuja, aparecen "Fary" y "labs" y la página entra. Solo una vez por sesión (`sessionStorage`); se omite con `prefers-reduced-motion`.
+- **Logo:** firma completa a 180 px en el header de escritorio; al compactarse y en móvil, solo el isotipo.
+- **Intro:** fondo negro, las piezas del símbolo avanzan en la dirección de la flecha, aparecen "Fary" y "labs" y la página entra. Solo una vez por sesión (`sessionStorage`); se omite con `prefers-reduced-motion`.
 - **Escritorio:** título a la izquierda, laptop centrada, metadata y mensaje a la derecha. Cada gesto de rueda avanza un paso.
 - **Móvil y tablet (< 1024 px):** título, laptop, metadata y mensaje en columna; la laptop no se mueve.
 - **`prefers-reduced-motion`:** la escena sigue fijada pero los pasos cambian sin animación.

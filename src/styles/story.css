@@ -10,7 +10,7 @@
   background:
     radial-gradient(55% 45% at 72% 18%, #ffffff 0%, rgba(255, 255, 255, 0) 70%),
     radial-gradient(40% 60% at 10% 85%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%),
-    linear-gradient(112deg, #e9e9eb 0%, #f8f8f9 32%, #e4e4e7 52%, #f6f6f7 72%, #e8e8ea 100%);
+    linear-gradient(112deg, #ebebe8 0%, #f8f8f6 32%, #e6e6e3 52%, #f6f6f4 72%, #eaeae7 100%);
 }
 .stage__ghost {
   position: absolute;
@@ -99,9 +99,9 @@
 }
 .hero-copy__title {
   margin: 0;
-  font-size: clamp(1.9rem, 2.8vw, 3.8rem);
+  font-size: clamp(1.9rem, 3.1vw, 4.1rem);
   line-height: 1.02;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 .hero-line {
@@ -130,7 +130,7 @@
   margin-bottom: 22px;
   overflow: hidden;
   font: 300 clamp(3rem, 5vw, 5.4rem) / 1 var(--font-sans), sans-serif;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
@@ -159,7 +159,7 @@
   max-width: 13ch;
   font-size: clamp(2rem, 2.9vw, 3.5rem);
   line-height: 1.03;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.02em;
   font-weight: 700;
   text-wrap: balance;
 }
@@ -341,7 +341,7 @@
     gap: 6px;
     padding: 6px 10px;
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: 2px;
     background: rgba(255, 255, 255, 0.6);
   }
   .step-aside__icon {
@@ -382,10 +382,16 @@
   margin: 0;
   font-size: clamp(2rem, 4.4vw, 4.4rem);
   line-height: 1.02;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.02em;
   font-weight: 700;
   text-wrap: balance;
 }
-.story-cta__title span {
-  color: var(--muted);
+/* Bloque negro del manual ("IDEAS QUE FUNCIONAN."): resalta la segunda línea. */
+.story-cta__mark {
+  padding: 0.02em 0.2em 0.06em;
+  line-height: 1.22;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: var(--negro);
+  color: var(--blanco);
 }

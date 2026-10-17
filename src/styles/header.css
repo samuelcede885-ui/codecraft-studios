@@ -38,6 +38,7 @@
   border-bottom-color: transparent;
 }
 .header.is-dark .logo,
+.header.is-dark .header__mark,
 .header.is-dark .header__nav a,
 .header.is-dark .header__nav a[aria-current="true"] {
   color: #fff;
@@ -61,14 +62,38 @@
   gap: 24px;
   padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)) max(var(--gutter), env(safe-area-inset-right, 0px));
 }
+/* Arriba: firma completa a 180 px (mínimo del manual; el alto del header deja su margen libre).
+   Compacto: el espacio ya no alcanza, así que queda solo el isotipo. La caja mide siempre
+   180 px, por lo que el resto del header no se mueve. */
 .header__logo {
-  display: inline-flex;
-  font-size: 16px;
-  transform-origin: left center;
-  transition: transform 0.45s var(--ease);
+  position: relative;
+  display: block;
+  flex: none;
+  width: 180px;
 }
-.header.is-scrolled .header__logo {
-  transform: scale(0.9);
+.header__firma {
+  width: 180px;
+  transition: opacity 0.3s var(--ease);
+}
+.header__mark {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 34px;
+  height: 36px;
+  margin-top: -18px;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+.header.is-scrolled .header__firma {
+  opacity: 0;
+}
+.header.is-scrolled .header__mark {
+  opacity: 1;
+}
+.header.is-dark .header__mark {
+  color: #fff;
 }
 .header__nav {
   display: flex;
@@ -110,7 +135,7 @@
   width: 46px;
   height: 46px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--ink);
   cursor: pointer;
 }
@@ -138,6 +163,20 @@
 @media (max-width: 1023px) {
   .header__nav {
     display: none;
+  }
+  /* En móvil no cabe la firma a su tamaño mínimo: se usa el isotipo. */
+  .header__logo {
+    width: 34px;
+    height: 36px;
+  }
+  .header__firma {
+    display: none;
+  }
+  .header__mark,
+  .header.is-scrolled .header__mark {
+    position: static;
+    margin: 0;
+    opacity: 1;
   }
   .header__toggle {
     display: block;
@@ -206,7 +245,7 @@
   border-bottom: 1px solid var(--line);
   font-size: clamp(2rem, 9vw, 2.8rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
   line-height: 1.05;
 }
 .mobile-menu__list small {

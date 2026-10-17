@@ -15,7 +15,7 @@
   background: linear-gradient(180deg, #1d1d20 0%, #0d0d0f 100%);
   box-shadow:
     inset 0 0 0 0.12cqw #34343a,
-    inset 0 0 0 0.4cqw #0a0a0b,
+    inset 0 0 0 0.4cqw var(--negro),
     0 3cqw 5cqw -2.5cqw rgba(0, 0, 0, 0.45);
 }
 .laptop__camera {

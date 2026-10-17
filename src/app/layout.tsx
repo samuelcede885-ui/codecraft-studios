@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Inter_Tight, Oswald, Sora } from "next/font/google";
+import { Anton, Inter, Lato, Oswald } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter_Tight({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const sora = Sora({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-brand", display: "swap" });
+// Tipografías de marca: Lato en pesos altos para titulares e Inter para texto e interfaces.
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const lato = Lato({ subsets: ["latin"], weight: ["700", "900"], variable: "--font-display", display: "swap" });
 // Tipografías de la tienda Gramercy que se ve dentro de la laptop.
 const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-display", display: "swap" });
 const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap" });
@@ -15,18 +16,18 @@ const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorag
 export const metadata: Metadata = {
   title: "Fary Labs — Transformamos ideas en productos digitales",
   description:
-    "Estudio digital: desarrollo web, aplicaciones a medida y agentes de inteligencia artificial para empresas y emprendedores.",
+    "Estudio de desarrollo digital y consultoría tecnológica. Sitios web, software a medida y automatización para negocios que quieren avanzar.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f3f3f4",
+  themeColor: "#f5f5f3",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${sora.variable} ${anton.variable} ${oswald.variable}`}
+      className={`${inter.variable} ${lato.variable} ${anton.variable} ${oswald.variable}`}
       suppressHydrationWarning
     >
       <head>

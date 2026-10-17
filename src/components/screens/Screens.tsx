@@ -2,34 +2,34 @@ import type { ScreenId } from "@/data/content";
 
 /*
  * Pantallas que se muestran dentro de la laptop y en el portafolio.
- * Las cuatro primeras son imágenes de referencia (public/projects, 16:10);
+ * Las cuatro primeras son pantallas del concepto Gramercy (public/projects, 16:10);
  * el panel de métricas es una interfaz propia en HTML.
  */
 
 const images: Record<Exclude<ScreenId, "dashboard">, { src: string; alt: string; width: number; height: number }> = {
-  greenade: {
-    src: "/projects/greenade.webp",
-    alt: "Referencia Greenade: landing verde con un producto central y el titular GREENADE! en gran tamaño",
-    width: 1036,
-    height: 648,
+  home: {
+    src: "/projects/gramercy-home.webp",
+    alt: "Gramercy, portada: zueco Birkenstock Boston con el titular BIRKEN BOSTON y el botón Order now",
+    width: 1440,
+    height: 900,
   },
-  milk: {
-    src: "/projects/simply-milk.webp",
-    alt: "Referencia Simply Milk: botellas de leche orgánica y cocos sobre fondo claro con tipografía gigante",
-    width: 1199,
-    height: 749,
+  product: {
+    src: "/projects/gramercy-product.webp",
+    alt: "Gramercy, ficha de producto: Birkenstock Boston a 50 dólares con delivery gratis, stock y botón para añadir al carrito",
+    width: 1440,
+    height: 900,
   },
-  syntha: {
-    src: "/projects/syntha-6.webp",
-    alt: "Referencia Syntha-6: app móvil de tienda de proteínas en rojo y blanco",
-    width: 1376,
-    height: 860,
+  cart: {
+    src: "/projects/gramercy-cart.webp",
+    alt: "Gramercy, carrito: selector de tallas, ubicación de entrega y resumen con total de 50 dólares",
+    width: 1440,
+    height: 900,
   },
-  depthfield: {
-    src: "/projects/depthfield.webp",
-    alt: "Referencia Depthfield: escena oscura con un círculo rojo, una figura y la palabra FORM en gran tamaño",
-    width: 1099,
-    height: 687,
+  payment: {
+    src: "/projects/gramercy-payment.webp",
+    alt: "Gramercy, métodos de pago: Pago Móvil, Binance y efectivo",
+    width: 1440,
+    height: 900,
   },
 };
 

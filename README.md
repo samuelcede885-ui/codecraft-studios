@@ -40,4 +40,4 @@ npm run typecheck
 
 - **Datos de contacto:** rellenar `email` y `whatsapp` en `src/config/site.ts`. Mientras estén vacíos, el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
 - **Logotipo:** `LogoMark` en `src/components/Logo.tsx` es una recreación del brand board. Sustituir por el SVG original.
-- **Proyectos:** las imágenes de Greenade, Simply Milk, Syntha-6 y Depthfield son referencias de terceros (incluyen marcas como ARTichoke o BSN) y se muestran como "referencia visual". Antes de publicar la web, sustituirlas por trabajos propios o confirmar los derechos. La de Greenade tiene poca resolución de origen (≈520 px) y se reescaló.
+- **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.

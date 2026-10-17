@@ -83,7 +83,7 @@ export function Portfolio() {
             </h2>
           </div>
           <p className="section-note">
-            Referencias visuales que inspiran nuestra dirección de diseño. No son trabajos realizados por Fary Labs.
+            Gramercy, un concepto de e-commerce completo: del escaparate al pago.
           </p>
         </header>
 
@@ -105,7 +105,7 @@ export function Portfolio() {
                   <div>
                     <h3>{p.name}</h3>
                     <span>
-                      {p.type} · Referencia
+                      {p.type} · Concepto
                     </span>
                   </div>
                   <p>{p.description}</p>

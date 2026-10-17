@@ -1,4 +1,4 @@
-export type ScreenId = "greenade" | "milk" | "syntha" | "depthfield" | "dashboard";
+export type ScreenId = "home" | "product" | "cart" | "payment" | "dashboard";
 
 export type StoryStep = {
   screen: ScreenId;
@@ -8,7 +8,7 @@ export type StoryStep = {
   points: { icon: IconName; label: string }[];
   /** Pie bajo la laptop: nombre del concepto que se ve en pantalla. */
   caption: string;
-  /** Aclaración junto al pie: referencia visual o datos de ejemplo. */
+  /** Aclaración junto al pie: tipo de pantalla o datos de ejemplo. */
   note: string;
   /** Mensaje lateral derecho (sólo en los pasos de la secuencia). */
   message?: string;
@@ -35,7 +35,7 @@ export type IconName =
 /** Paso 0 = hero. Pasos 1–4 = secuencia de la laptop fija. */
 export const storySteps: StoryStep[] = [
   {
-    screen: "greenade",
+    screen: "home",
     number: "01",
     title: ["Ideas", "que cobran", "vida."],
     description: "Convertimos conceptos en experiencias digitales reales y funcionales.",
@@ -45,11 +45,11 @@ export const storySteps: StoryStep[] = [
       { icon: "code", label: "Desarrollo" },
       { icon: "chart", label: "Resultados" },
     ],
-    caption: "Greenade",
-    note: "referencia visual",
+    caption: "Gramercy · Inicio",
+    note: "concepto e-commerce",
   },
   {
-    screen: "milk",
+    screen: "product",
     number: "02",
     title: ["Diseño web", "que impacta."],
     description: "Creamos experiencias digitales modernas, rápidas y enfocadas en resultados.",
@@ -58,12 +58,12 @@ export const storySteps: StoryStep[] = [
       { icon: "cursor", label: "Landing pages que convierten" },
       { icon: "cart", label: "E-commerce a tu medida" },
     ],
-    caption: "Simply Milk",
-    note: "referencia visual",
+    caption: "Gramercy · Producto",
+    note: "concepto e-commerce",
     message: "Experiencias que cuentan historias.",
   },
   {
-    screen: "syntha",
+    screen: "cart",
     number: "03",
     title: ["Aplicaciones", "a medida."],
     description: "Convertimos tus ideas en aplicaciones funcionales, escalables y fáciles de usar.",
@@ -72,12 +72,12 @@ export const storySteps: StoryStep[] = [
       { icon: "layers", label: "Plataformas internas" },
       { icon: "cloud", label: "Productos SaaS" },
     ],
-    caption: "Syntha-6",
-    note: "referencia visual",
+    caption: "Gramercy · Carrito",
+    note: "concepto e-commerce",
     message: "Interfaces diseñadas para destacar.",
   },
   {
-    screen: "depthfield",
+    screen: "payment",
     number: "04",
     title: ["Tecnología", "que impulsa."],
     description:
@@ -87,8 +87,8 @@ export const storySteps: StoryStep[] = [
       { icon: "plug", label: "Integraciones" },
       { icon: "bolt", label: "Procesos más eficientes" },
     ],
-    caption: "Depthfield",
-    note: "referencia visual",
+    caption: "Gramercy · Pago",
+    note: "concepto e-commerce",
     message: "Creatividad sin límites.",
   },
   {
@@ -134,7 +134,7 @@ export const services = [
   },
 ] as const;
 
-/** Referencias visuales: no son trabajos realizados por Fary Labs. */
+/** Pantallas del concepto de e-commerce Gramercy, del escaparate al pago. */
 export const portfolio: {
   screen: ScreenId;
   name: string;
@@ -142,28 +142,28 @@ export const portfolio: {
   description: string;
 }[] = [
   {
-    screen: "greenade",
-    name: "Greenade",
-    type: "Landing de producto",
-    description: "Verde intenso, producto central y tipografía de gran escala.",
+    screen: "home",
+    name: "Gramercy · Inicio",
+    type: "Portada de tienda",
+    description: "Producto protagonista con tipografía monumental y llamada a comprar.",
   },
   {
-    screen: "milk",
-    name: "Simply Milk",
-    type: "Sitio editorial",
-    description: "Composición minimalista con producto protagonista y colores claros.",
+    screen: "product",
+    name: "Gramercy · Producto",
+    type: "Ficha de producto",
+    description: "Precio, envío gratis, stock y métodos de pago en una sola vista.",
   },
   {
-    screen: "syntha",
-    name: "Syntha-6",
-    type: "E-commerce",
-    description: "Catálogo de producto con interfaz moderna y presencia en rojo.",
+    screen: "cart",
+    name: "Gramercy · Carrito",
+    type: "Carrito",
+    description: "Selección de talla, ubicación de entrega y resumen del pedido.",
   },
   {
-    screen: "depthfield",
-    name: "Depthfield",
-    type: "Estudio creativo",
-    description: "Escena cinematográfica oscura con un círculo rojo y tipografía monumental.",
+    screen: "payment",
+    name: "Gramercy · Pago",
+    type: "Checkout",
+    description: "Pago Móvil, Binance o efectivo, adaptados al cliente local.",
   },
 ];
 

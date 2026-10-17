@@ -2,7 +2,7 @@ import type { ScreenId } from "@/data/content";
 
 /*
  * Pantallas que se muestran dentro de la laptop y en el portafolio.
- * Las cuatro primeras son pantallas del concepto Gramercy (public/projects, 16:10);
+ * Las cuatro primeras son pantallas del concepto Gramercy (public/projects, 16:9);
  * el panel de métricas es una interfaz propia en HTML.
  */
 
@@ -10,25 +10,25 @@ const images: Record<Exclude<ScreenId, "dashboard">, { src: string; alt: string;
   home: {
     src: "/projects/gramercy-home.webp",
     alt: "Gramercy, portada: zueco Birkenstock Boston con el titular BIRKEN BOSTON y el botón Order now",
-    width: 1440,
+    width: 1600,
     height: 900,
   },
   product: {
     src: "/projects/gramercy-product.webp",
     alt: "Gramercy, ficha de producto: Birkenstock Boston a 50 dólares con delivery gratis, stock y botón para añadir al carrito",
-    width: 1440,
+    width: 1600,
     height: 900,
   },
   cart: {
     src: "/projects/gramercy-cart.webp",
     alt: "Gramercy, carrito: selector de tallas, ubicación de entrega y resumen con total de 50 dólares",
-    width: 1440,
+    width: 1600,
     height: 900,
   },
   payment: {
     src: "/projects/gramercy-payment.webp",
     alt: "Gramercy, métodos de pago: Pago Móvil, Binance y efectivo",
-    width: 1440,
+    width: 1600,
     height: 900,
   },
 };

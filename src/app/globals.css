@@ -365,7 +365,7 @@ a {
 }
 .laptop__screen {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 0.35cqw;
   background: #000;
@@ -1148,7 +1148,7 @@ a {
 }
 .work__screen {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   container-type: inline-size;
   overflow: hidden;
 }

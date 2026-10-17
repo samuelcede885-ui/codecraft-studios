@@ -4,7 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { storySteps, type StoryStep } from "@/data/content";
+import { storySteps, storyTrack, type StoryStep } from "@/data/content";
 import { Laptop } from "./Laptop";
 import { Screen } from "./screens/Screens";
 import { ArrowRight, Icon } from "./Icon";
@@ -54,6 +54,32 @@ function StepMessage({ step }: { step: StoryStep }) {
   );
 }
 
+/** Etiquetas de un paso, situadas donde queda cada punto tras el zoom de cámara. */
+function Callouts({ step, index }: { step: StoryStep; index: number }) {
+  if (!step.callouts) return null;
+  const f = step.focus ?? { x: 50, y: 50, scale: 1 };
+  return (
+    <div className="callouts" data-callouts data-step={index} aria-hidden="true">
+      {step.callouts.map((c) => (
+        <span
+          key={c.label}
+          className={`callout callout--${c.side ?? "right"}`}
+          style={{ left: `${f.x + f.scale * (c.x - f.x)}%`, top: `${f.y + f.scale * (c.y - f.y)}%` }}
+        >
+          <span className="callout__dot" />
+          <span className="callout__label">{c.label}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function formatCount(el: HTMLElement, value: number) {
+  const decimals = Number(el.dataset.decimals ?? 0);
+  const n = value.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  el.textContent = `${el.dataset.prefix ?? ""}${n}${el.dataset.suffix ?? ""}`;
+}
+
 function HeroCopy() {
   return (
     <div className="hero-copy">
@@ -94,6 +120,9 @@ export function ShowcaseStory() {
         const captions = q<HTMLElement>("[data-caption]");
         const dots = q<HTMLElement>("[data-dot]");
         const counter = q<HTMLElement>("[data-counter]")[0];
+        const callouts = q<HTMLElement>("[data-callouts]");
+        const calloutsFor = (i: number) => callouts.find((c) => c.dataset.step === String(i));
+        const track = q<HTMLElement>(".stage__track")[0];
 
         // Entrada: fondo inmediato → título por líneas → laptop → resto.
         gsap
@@ -147,11 +176,70 @@ export function ShowcaseStory() {
               `${at}+=0.5`,
             )
             .fromTo(captions[i], { y: 12 }, { y: 0, duration: 0.4, ease: "power3.out" }, `${at}+=0.42`);
+
+          const prevCallouts = calloutsFor(i - 1);
+          if (prevCallouts) tl.to(prevCallouts, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, at);
+
+          // Zoom de cámara hacia lo importante de la pantalla y etiquetas que lo señalan.
+          const focus = storySteps[i].focus;
+          if (focus) {
+            tl.set(screens[i].firstElementChild, { transformOrigin: `${focus.x}% ${focus.y}%` }, at).to(
+              screens[i].firstElementChild,
+              { scale: focus.scale, duration: 0.7, ease: "power2.inOut" },
+              `${at}+=1`,
+            );
+          }
+          const ownCallouts = calloutsFor(i);
+          if (ownCallouts) {
+            tl.set(ownCallouts, { autoAlpha: 1 }, `${at}+=1.2`).fromTo(
+              ownCallouts.querySelectorAll(".callout"),
+              { autoAlpha: 0, scale: 0.6 },
+              { autoAlpha: 1, scale: 1, duration: 0.35, stagger: 0.12, ease: "back.out(2)" },
+              `${at}+=1.2`,
+            );
+          }
+
+          // El panel de métricas cobra vida: cifras desde cero, barras y líneas.
+          if (storySteps[i].screen === "dashboard") {
+            const nums = [...screens[i].querySelectorAll<HTMLElement>("[data-count]")];
+            const proxy = { v: 0 };
+            tl.fromTo(
+              proxy,
+              { v: 0 },
+              {
+                v: 1,
+                duration: 0.9,
+                ease: "power2.out",
+                onUpdate: () => nums.forEach((el) => formatCount(el, Number(el.dataset.count) * proxy.v)),
+              },
+              `${at}+=0.5`,
+            )
+              .fromTo(
+                screens[i].querySelectorAll(".sc-dash__bars i"),
+                { scaleY: 0 },
+                { scaleY: 1, transformOrigin: "50% 100%", duration: 0.6, stagger: 0.03, ease: "power3.out" },
+                `${at}+=0.6`,
+              )
+              .fromTo(
+                screens[i].querySelectorAll(".sc-dash__spark polyline"),
+                { strokeDasharray: 1, strokeDashoffset: 1 },
+                { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" },
+                `${at}+=0.6`,
+              );
+          }
         }
         tl.to({}, { duration: 0.6 });
 
-        // Marca de fondo con deriva lenta (capa trasera, no la laptop).
-        tl.fromTo(q(".stage__ghost"), { yPercent: 0, rotate: 0 }, { yPercent: -12, rotate: -6, ease: "none", duration: tl.duration() }, 0);
+        // Capas traseras (nunca la laptop): la marca se despide y entra la franja de palabras.
+        tl.fromTo(q(".stage__ghost"), { yPercent: 0, rotate: 0 }, { yPercent: -12, rotate: -6, ease: "none", duration: tl.duration() }, 0)
+          .to(q(".stage__ghost"), { autoAlpha: 0, duration: 0.6 }, "step1")
+          .fromTo(track, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, "step1")
+          .fromTo(
+            track,
+            { x: () => window.innerWidth * 0.35 },
+            { x: () => -(track.scrollWidth - window.innerWidth * 0.65), ease: "none", duration: tl.duration() - tl.labels.step1 },
+            "step1",
+          );
 
         const marks = Object.values(tl.labels);
         tl.eventCallback("onUpdate", () => {
@@ -176,6 +264,11 @@ export function ShowcaseStory() {
       <div ref={root} className="story-motion">
         <div className="stage">
           <LogoMark className="stage__ghost" />
+          <div className="stage__track" aria-hidden="true">
+            {storyTrack.map((w) => (
+              <span key={w}>{w}</span>
+            ))}
+          </div>
           <div className="stage__grid">
             <div className="zone zone--left">
               <div className="panel" data-left data-step="0">
@@ -189,7 +282,11 @@ export function ShowcaseStory() {
             </div>
 
             <div className="zone zone--center">
-              <Laptop>
+              <Laptop
+                overlay={storySteps.map((s, i) => (
+                  <Callouts step={s} index={i} key={s.number} />
+                ))}
+              >
                 {storySteps.map((s, i) => (
                   <div className="screen-layer" data-screen data-step={i} key={s.screen}>
                     <div className="screen-layer__inner">

@@ -24,7 +24,7 @@ npm run typecheck
 | `src/data/content.ts` | Textos de la secuencia, servicios, portafolio y proceso |
 | `src/config/site.ts` | Navegación y datos de contacto (correo, WhatsApp) |
 | `src/components/ShowcaseStory.tsx` | Hero + secuencia fija con GSAP (laptop inmóvil, pantallas y textos sincronizados) |
-| `src/components/screens/Screens.tsx` | Las cinco pantallas de la laptop (imágenes en `public/projects/` + panel de métricas en HTML) |
+| `src/components/screens/Screens.tsx` | Las cinco pantallas de la laptop: tienda Gramercy reconstruida en HTML (zueco recortado en `public/projects/gramercy-shoe.webp`) + panel de métricas |
 | `src/components/Laptop.tsx` | Laptop en CSS |
 | `src/components/Sections.tsx` | Servicios, Portafolio y Proceso |
 | `src/components/Contact.tsx` | CTA final y formulario |

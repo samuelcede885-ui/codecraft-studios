@@ -12,10 +12,6 @@ export type StoryStep = {
   note: string;
   /** Mensaje lateral derecho (sólo en los pasos de la secuencia). */
   message?: string;
-  /** Zoom de cámara dentro de la pantalla: origen en % de la pantalla y escala. */
-  focus?: { x: number; y: number; scale: number };
-  /** Etiquetas sobre la pantalla: punto en % de la imagen original (antes del zoom). */
-  callouts?: { x: number; y: number; label: string; side?: "left" | "right" }[];
 };
 
 export type IconName =
@@ -35,9 +31,6 @@ export type IconName =
   | "gauge"
   | "scale"
   | "trend";
-
-/** Palabras de la franja cinética que cruza detrás de la laptop durante la secuencia. */
-export const storyTrack = ["Ideas", "Web", "Apps", "Pagos", "Datos"];
 
 /** Paso 0 = hero. Pasos 1–4 = secuencia de la laptop fija. */
 export const storySteps: StoryStep[] = [
@@ -68,12 +61,6 @@ export const storySteps: StoryStep[] = [
     caption: "Gramercy · Producto",
     note: "concepto e-commerce",
     message: "Experiencias que cuentan historias.",
-    focus: { x: 72, y: 50, scale: 1.22 },
-    callouts: [
-      { x: 53.5, y: 41, label: "Precio claro", side: "left" },
-      { x: 75.5, y: 49, label: "Envío gratis" },
-      { x: 86, y: 62.5, label: "Stock en vivo" },
-    ],
   },
   {
     screen: "cart",
@@ -88,12 +75,6 @@ export const storySteps: StoryStep[] = [
     caption: "Gramercy · Carrito",
     note: "concepto e-commerce",
     message: "Interfaces diseñadas para destacar.",
-    focus: { x: 38, y: 62, scale: 1.18 },
-    callouts: [
-      { x: 48, y: 52, label: "Selector de talla" },
-      { x: 25, y: 90, label: "Dirección de entrega" },
-      { x: 57, y: 81.5, label: "Total claro", side: "left" },
-    ],
   },
   {
     screen: "payment",
@@ -109,12 +90,6 @@ export const storySteps: StoryStep[] = [
     caption: "Gramercy · Pago",
     note: "concepto e-commerce",
     message: "Creatividad sin límites.",
-    focus: { x: 74, y: 68, scale: 1.18 },
-    callouts: [
-      { x: 53, y: 53, label: "Pago Móvil", side: "left" },
-      { x: 53, y: 71, label: "Binance (USDT)", side: "left" },
-      { x: 53, y: 89, label: "Efectivo", side: "left" },
-    ],
   },
   {
     screen: "dashboard",
@@ -129,10 +104,6 @@ export const storySteps: StoryStep[] = [
     caption: "Panel de métricas",
     note: "datos de ejemplo",
     message: "Datos que guían cada decisión.",
-    callouts: [
-      { x: 38, y: 37, label: "Ventas al día", side: "left" },
-      { x: 89, y: 73, label: "Conversión", side: "left" },
-    ],
   },
 ];
 

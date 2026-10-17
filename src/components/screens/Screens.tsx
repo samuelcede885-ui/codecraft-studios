@@ -36,7 +36,7 @@ const images: Record<Exclude<ScreenId, "dashboard">, { src: string; alt: string;
 function Spark({ points, color = "#2f6bff" }: { points: string; color?: string }) {
   return (
     <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="sc-dash__spark" aria-hidden="true">
-      <polyline points={points} pathLength={1} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      <polyline points={points} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
     </svg>
   );
 }
@@ -64,12 +64,12 @@ function DashboardScreen() {
         <div className="sc-dash__grid">
           <div className="sc-dash__card">
             <small>Ventas totales</small>
-            <b data-count="12430" data-prefix="$">$12,430</b>
+            <b>$12,430</b>
             <Spark points="0,24 12,20 24,22 36,14 48,17 60,10 72,13 84,6 100,8" />
           </div>
           <div className="sc-dash__card">
             <small>Usuarios</small>
-            <b data-count="1240">1,240</b>
+            <b>1,240</b>
             <div className="sc-dash__bars" aria-hidden="true">
               {[30, 45, 38, 52, 48, 60, 56, 72, 66, 84, 78, 95].map((h, i) => (
                 <i key={i} style={{ height: `${h}%` }} />
@@ -78,12 +78,12 @@ function DashboardScreen() {
           </div>
           <div className="sc-dash__card">
             <small>Productos</small>
-            <b data-count="24">24</b>
+            <b>24</b>
             <Spark points="0,22 14,18 28,20 42,12 56,15 70,9 84,12 100,5" />
           </div>
           <div className="sc-dash__card">
             <small>Conversión</small>
-            <b data-count="3.6" data-decimals="1" data-suffix="%">3.6%</b>
+            <b>3.6%</b>
             <Spark points="0,18 14,20 28,14 42,16 56,11 70,13 84,8 100,10" color="#9aa3b2" />
           </div>
         </div>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rafa's La Mentirosa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="La Mentirosa de Rafa's: parece una hamburguesa clásica hasta la primera mordida.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Instrument+Sans:wght@400;500;600;700&family=Yellowtail&display=swap">
+<link rel="preload" as="image" href="assets/la-mentirosa.webp" type="image/webp">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="nav" id="nav">
+  <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav__logo logo" href="#inicio">Rafa's</a>
+  <button class="nav__bag" type="button" aria-controls="bag" aria-label="Ver bolsa (0 productos)">
+    <svg viewBox="0 0 32 36" aria-hidden="true"><path d="M3 11h26l-1.6 22H4.6z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M10.5 14V8.5a5.5 5.5 0 0 1 11 0V14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <span class="nav__count" data-bag-count hidden>0</span>
+  </button>
+</header>
+
+<nav class="menu" id="menu" aria-label="Principal" hidden>
+  <ul>
+    <li><a href="#capas">La Mentirosa</a></li>
+    <li><a href="#sin-atajos">Sin atajos</a></li>
+    <li><a href="#por-que">¿Por qué miente?</a></li>
+    <li><a href="#ordenar">Ordenar</a></li>
+    <li><a href="#promos">Promos</a></li>
+  </ul>
+</nav>
+
+<div class="bag-scrim" data-bag-close hidden></div>
+<aside class="bag" id="bag" aria-label="Tu bolsa" hidden>
+  <div class="bag__head">
+    <h2>Tu bolsa</h2>
+    <button type="button" class="bag__close" data-bag-close aria-label="Cerrar bolsa">×</button>
+  </div>
+  <p class="bag__empty" data-bag-empty>Todavía no agregas nada. La Mentirosa te espera.</p>
+  <div class="bag__line" data-bag-line hidden>
+    <img src="assets/la-mentirosa.webp" alt="" width="715" height="523">
+    <div><b>La Mentirosa</b><span data-bag-qty>× 0</span></div>
+    <span class="bag__sub" data-bag-sub>0.00</span>
+  </div>
+  <div class="bag__total"><span>Total</span><b data-bag-total>0.00</b></div>
+  <button type="button" class="btn btn--block" data-checkout>Finalizar pedido</button>
+  <p class="bag__note" data-checkout-note role="status"></p>
+</aside>
+
+<main id="main">
+
+  <!-- 1 · HERO -->
+  <section class="hero" id="inicio" aria-labelledby="hero-title">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <p class="hero__tag">La hamburguesa que parece una cosa y resulta ser otra.</p>
+    <figure class="hero__subject" data-parallax>
+      <div class="hero__enter">
+        <img class="hero__img" src="assets/la-mentirosa.webp" width="715" height="523" fetchpriority="high"
+             alt="Hamburguesa La Mentirosa: pan brioche, lechuga, crujiente dorado, salsa blanca y carne a la plancha">
+      </div>
+      <svg class="hero__sparks" viewBox="0 0 90 130" aria-hidden="true">
+        <path d="M32 6 L18 34"/><path d="M78 50 L46 70"/><path d="M84 112 L50 110"/>
+      </svg>
+    </figure>
+    <h1 class="hero__title" id="hero-title">
+      <span class="hero__line"><span>La</span></span>
+      <span class="hero__line"><span data-fit>Mentirosa</span></span>
+    </h1>
+    <div class="hero__offer">
+      <p class="hero__price"><span class="hero__ref">Ref</span><span class="hero__num">10.99</span></p>
+      <a class="btn" href="#ordenar">Ordena ahora <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <a class="hero__cue" href="#capas">Desliza para ver qué esconde</a>
+  </section>
+
+  <!-- 2 · CAPAS (pinned) -->
+  <section class="layers" id="capas" aria-labelledby="layers-title" data-scene="layers">
+    <div class="layers__sticky">
+      <h2 class="sr-only" id="layers-title">La Mentirosa, capa por capa</h2>
+      <div class="layers__phrases">
+        <p class="layers__phrase" data-phrase>Parece clásica.</p>
+        <p class="layers__phrase" data-phrase>Pero miente.</p>
+        <p class="layers__phrase" data-phrase>Seis capas de verdad.</p>
+      </div>
+      <div class="layers__stage" data-stage>
+        <img src="assets/la-mentirosa.webp" width="715" height="523" alt="" loading="lazy" decoding="async">
+        <ul class="layers__callouts">
+          <li class="callout" style="--x:47%;--y:13%" data-side="right"><span class="callout__dot"></span><span class="callout__label"><b>Pan brioche</b> dorado en plancha</span></li>
+          <li class="callout" style="--x:14%;--y:39%" data-side="left"><span class="callout__dot"></span><span class="callout__label"><b>Lechuga</b> fresca y crujiente</span></li>
+          <li class="callout" style="--x:66%;--y:49%" data-side="right"><span class="callout__dot"></span><span class="callout__label"><b>El crujiente</b> que nadie espera</span></li>
+          <li class="callout" style="--x:57%;--y:61%" data-side="right"><span class="callout__dot"></span><span class="callout__label"><b>Pepinillos</b> y salsa roja</span></li>
+          <li class="callout" style="--x:78%;--y:72%" data-side="right"><span class="callout__dot"></span><span class="callout__label"><b>Salsa blanca</b> de la casa</span></li>
+          <li class="callout" style="--x:9%;--y:59%" data-side="left"><span class="callout__dot"></span><span class="callout__label"><b>Carne</b> a la plancha</span></li>
+        </ul>
+      </div>
+      <p class="layers__caption" data-caption aria-hidden="true"></p>
+      <ol class="layers__progress" aria-hidden="true"><li></li><li></li><li></li></ol>
+    </div>
+  </section>
+
+  <!-- 3 · SIN ATAJOS -->
+  <section class="split" id="sin-atajos" aria-labelledby="split-title">
+    <div class="split__text">
+      <h2 id="split-title">Sin relleno.<br>Sin atajos.</h2>
+      <p>Cada Mentirosa se arma cuando la pides. Pan a la plancha, capas en su orden y la salsa justo donde va.</p>
+      <ul class="split__list">
+        <li>Se arma al momento</li>
+        <li>Pan brioche tostado</li>
+        <li>Salsa de la casa</li>
+      </ul>
+    </div>
+    <div class="split__visual" aria-hidden="true">
+      <span class="split__script logo">Rafa's</span>
+      <img src="assets/la-mentirosa.webp" width="715" height="523" alt="" loading="lazy" decoding="async" data-drift>
+    </div>
+  </section>
+
+  <!-- 4 · STATEMENT -->
+  <section class="statement" aria-label="Puro sabor en cada mordida" data-scene="statement">
+    <p class="statement__text" aria-hidden="true"><span>Puro sabor</span><span>en cada</span><span>mordida</span></p>
+    <p class="statement__sub">Lo que ves es solo la mitad de la historia.</p>
+  </section>
+
+  <!-- 5 · POR QUÉ -->
+  <section class="why" id="por-que" aria-labelledby="why-title">
+    <div class="why__inner">
+      <h2 id="why-title">¿Por qué <em>“La Mentirosa”</em>?</h2>
+      <p class="why__lead">Porque te promete una hamburguesa más. Y luego llega la primera mordida.</p>
+      <div class="why__grid">
+        <article>
+          <h3>Se ve sencilla</h3>
+          <p>Pan, carne, lechuga. Nada que no hayas visto antes. Eso es lo que quiere que creas.</p>
+        </article>
+        <article>
+          <h3>Esconde un crujiente</h3>
+          <p>Entre la lechuga y la carne hay una capa dorada que cambia toda la mordida.</p>
+        </article>
+        <article>
+          <h3>Te hace volver</h3>
+          <p>La salsa blanca y la roja se juntan al final. Ahí entiendes el nombre.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · REVEAL -->
+  <section class="reveal" aria-label="Descubre lo que esconde" data-scene="reveal">
+    <div class="reveal__frame">
+      <img src="assets/la-mentirosa.webp" width="715" height="523" alt="Primer plano de las capas de La Mentirosa" loading="lazy" decoding="async" data-zoom>
+    </div>
+    <div class="reveal__marquee" aria-hidden="true">
+      <p data-marquee="-1">Descubre lo que esconde · Descubre lo que esconde · Descubre lo que esconde ·</p>
+      <p data-marquee="1">Una mordida y la verdad sale · Una mordida y la verdad sale ·</p>
+    </div>
+  </section>
+
+  <!-- 7 · ORDENAR -->
+  <section class="order" id="ordenar" aria-labelledby="order-title">
+    <div class="order__inner">
+      <div class="order__copy">
+        <h2 id="order-title">Vamos<br>a comer.</h2>
+        <p>Elige cuántas quieres y agrégalas a tu bolsa.</p>
+      </div>
+      <form class="order__card" data-order>
+        <img src="assets/la-mentirosa.webp" width="715" height="523" alt="" loading="lazy" decoding="async">
+        <div class="order__row">
+          <h3>La Mentirosa</h3>
+          <p class="order__price"><span>Ref</span> 10.99</p>
+        </div>
+        <div class="order__row">
+          <label for="qty">Cantidad</label>
+          <div class="stepper">
+            <button type="button" data-step="-1" aria-label="Quitar una">−</button>
+            <input id="qty" name="qty" type="number" inputmode="numeric" min="1" max="20" value="1">
+            <button type="button" data-step="1" aria-label="Agregar una">+</button>
+          </div>
+        </div>
+        <button class="btn btn--block" type="submit">Agregar a la bolsa</button>
+        <p class="order__status" data-order-status role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- 8 · PROMOS -->
+  <section class="promos" id="promos" aria-labelledby="promos-title">
+    <div class="promos__inner">
+      <h2 id="promos-title">Promos jugosas directo a tu correo.</h2>
+      <form class="promos__form" data-newsletter novalidate>
+        <label class="sr-only" for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required>
+        <button class="btn" type="submit">Suscribirme</button>
+        <p class="promos__status" data-newsletter-status role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="logo">Rafa's</span>
+  <p>© 2026 Rafa's. Hecho para morder.</p>
+  <a href="#inicio">Volver arriba ↑</a>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -12,7 +12,7 @@
   margin-inline: auto;
   padding: 1.25cqw 1.25cqw 2.1cqw;
   border-radius: 2.1cqw 2.1cqw 0.5cqw 0.5cqw;
-  background: linear-gradient(180deg, #1d1d20 0%, #0d0d0f 100%);
+  background: var(--carbon);
   box-shadow:
     inset 0 0 0 0.12cqw #34343a,
     inset 0 0 0 0.4cqw var(--negro),

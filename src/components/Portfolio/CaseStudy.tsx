@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { Project } from "@/data/projects";
 import { lockScroll } from "@/lib/scroll";
 import { Screen } from "../screens/Screens";
-import { ArrowRight } from "../Icon";
+import { ArrowRight, Close } from "../Icon";
 
 /**
  * Caso de estudio editorial a pantalla completa (diálogo nativo: foco atrapado y Escape).
@@ -60,20 +60,21 @@ export function CaseStudy({ project, onClose }: { project: Project | null; onClo
           <div className="case__bar">
             <span>Caso de estudio · Concepto</span>
             <button type="button" className="case__close" onClick={onClose} aria-label="Cerrar caso de estudio">
-              Cerrar <span aria-hidden="true">✕</span>
+              Cerrar <Close className="case__close-icon" />
             </button>
           </div>
 
           <header className="case__hero container">
-            <span className="eyebrow">{p.category}</span>
             <h2 id="case-title" className="case__title">
               {p.name}
             </h2>
-            <p className="case__lead">{p.line}</p>
+            <p className="case__lead">
+              {p.line} <span className="case__cat">{p.category}.</span>
+            </p>
           </header>
 
           <div className="case__visual container">
-            <div className="screen-frame case__frame" aria-hidden="true">
+            <div className="screen-frame case__frame" aria-hidden="true" data-ui>
               <Screen id={p.screen} />
             </div>
           </div>
@@ -88,15 +89,14 @@ export function CaseStudy({ project, onClose }: { project: Project | null; onClo
           </dl>
 
           <div className="case__sections container">
-            {p.sections.map((s, i) => (
+            {p.sections.map((s) => (
               <section key={s.title} className="case__section">
                 <div className="case__text">
-                  <span className="case__num">{String(i + 1).padStart(2, "0")}</span>
                   <h3>{s.title}</h3>
                   <p>{s.text}</p>
                 </div>
                 {s.screen && (
-                  <div className="screen-frame case__frame" aria-hidden="true">
+                  <div className="screen-frame case__frame" aria-hidden="true" data-ui>
                     <Screen id={s.screen} />
                   </div>
                 )}

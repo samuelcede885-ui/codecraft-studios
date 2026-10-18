@@ -11,14 +11,16 @@
 @import "../styles/sections.css";
 @import "../styles/form.css";
 
-/* Movimiento reducido: sin bucles ni transiciones largas; la historia se resuelve sin animación. */
+/* Movimiento reducido: menos movimiento, no cero. Se quitan desplazamientos y bucles,
+   pero los cambios de opacidad y color (que ayudan a entender un cambio de estado) se mantienen breves. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.15s !important;
+    transition-property: opacity, color, background-color, border-color !important;
     scroll-behavior: auto !important;
   }
 }

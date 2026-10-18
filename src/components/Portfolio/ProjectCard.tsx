@@ -24,16 +24,16 @@ export function ProjectCard({
         }}
       >
         <div className="project__media" data-clip>
-          <div className="project__frame screen-frame" aria-hidden="true">
+          <div className="project__frame screen-frame" aria-hidden="true" data-ui>
             <Screen id={project.screen} lazy />
           </div>
         </div>
         <div className="project__meta" data-reveal>
+          <h3 className="project__name">{project.name}</h3>
           <span className="project__cat">
             {project.category}
             {project.year && ` · ${project.year}`}
           </span>
-          <h3 className="project__name">{project.name}</h3>
           <p className="project__line">{project.line}</p>
           <span className="project__cta link-arrow">
             Ver proyecto <ArrowRight className="btn__arrow" />

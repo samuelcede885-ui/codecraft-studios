@@ -6,7 +6,6 @@ export function Services() {
     <section id="servicios" className="section services" aria-labelledby="servicios-title">
       <div className="container">
         <header className="section-head" data-reveal>
-          <span className="eyebrow">Servicios</span>
           <h2 id="servicios-title" className="section-title">
             Tres formas de
             <br />

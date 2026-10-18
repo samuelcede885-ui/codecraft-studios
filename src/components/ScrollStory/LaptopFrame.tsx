@@ -7,7 +7,7 @@ import { forwardRef } from "react";
 export const LaptopFrame = forwardRef<HTMLDivElement, { children: React.ReactNode; className?: string }>(
   function LaptopFrame({ children, className }, ref) {
     return (
-      <div ref={ref} className={`laptop ${className ?? ""}`}>
+      <div ref={ref} className={`laptop ${className ?? ""}`} data-ui>
         <div className="laptop__lid">
           <span className="laptop__camera" aria-hidden="true" />
           <div className="laptop__screen">{children}</div>

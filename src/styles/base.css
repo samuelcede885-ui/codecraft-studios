@@ -27,7 +27,10 @@
   --header-h-sm: 64px;
   --radius: 12px;
   --radius-btn: 10px;
+  /* Curvas fuertes (Emil Kowalski): ease-out para entradas y respuesta, ease-in-out para lo que se mueve en pantalla. */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @media (max-width: 1023px) {
@@ -123,7 +126,9 @@ a {
   padding-inline: var(--gutter);
 }
 
-/* ───────────────────────── Botones ───────────────────────── */
+/* ───────────────────────── Botones ─────────────────────────
+   Planos (sin sombra en reposo). Responden al toque con scale(0.97) en 160 ms; el hover solo
+   existe con ratón, para que en táctil no se quede "pegado" tras un toque. */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -134,28 +139,18 @@ a {
   font: 600 0.95rem/1 var(--font-sans), sans-serif;
   cursor: pointer;
   white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
   transition:
-    transform 0.28s var(--ease),
-    background-color 0.28s var(--ease),
-    box-shadow 0.28s var(--ease);
-}
-.btn:hover {
-  transform: scale(1.015);
+    transform 160ms var(--ease-out),
+    background-color 200ms ease;
 }
 .btn:active {
-  transform: translateY(0) scale(0.98);
-  transition-duration: 0.12s;
+  transform: scale(0.97);
 }
 .btn__arrow {
   width: 1.1em;
   height: 1.1em;
-  transition: transform 0.28s var(--ease);
-}
-.btn:hover .btn__arrow,
-.link-arrow:hover .btn__arrow,
-.project__link:hover .btn__arrow,
-.project__link:focus-visible .btn__arrow {
-  transform: translateX(5px);
+  transition: transform 220ms var(--ease-out);
 }
 
 /* Enlace con flecha y subrayado que se dibuja al pasar el ratón. */
@@ -179,35 +174,70 @@ a {
   background: currentColor;
   transform: scaleX(0.35);
   transform-origin: left;
-  transition: transform 0.45s var(--ease);
+  transition: transform 300ms var(--ease-out);
 }
 .link-line::after {
   transform: scaleX(0);
 }
-.link-arrow:hover::after,
-.link-line:hover::after,
-.project__link:hover .link-arrow::after,
+.link-arrow:focus-visible::after,
+.link-line:focus-visible::after,
 .project__link:focus-visible .link-arrow::after {
   transform: scaleX(1);
 }
 .btn--dark {
   background: var(--ink);
   color: #fff;
-  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.55);
-}
-.btn--dark:hover {
-  background: var(--grafito);
 }
 .btn--light {
   background: #fff;
   color: var(--ink);
 }
-.btn--light:hover {
-  background: var(--marfil);
-}
 .btn--sm {
   padding: 0.8em 1.25em;
   font-size: 0.85rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--dark:hover {
+    background: var(--grafito);
+  }
+  .btn--light:hover {
+    background: var(--marfil);
+  }
+  .btn:hover:not(:active) {
+    transform: scale(1.015);
+  }
+  .btn:hover .btn__arrow,
+  .link-arrow:hover .btn__arrow,
+  .project__link:hover .btn__arrow {
+    transform: translateX(5px);
+  }
+  .link-arrow:hover::after,
+  .link-line:hover::after,
+  .project__link:hover .link-arrow::after {
+    transform: scaleX(1);
+  }
+}
+.project__link:focus-visible .btn__arrow {
+  transform: translateX(5px);
+}
+
+/* ───────────────────────── Superficies del navegador ─────────────────────────
+   Selección, cursor de texto y controles nativos con la paleta de marca. */
+::selection {
+  background: var(--negro);
+  color: var(--blanco);
+}
+.final ::selection {
+  background: var(--blanco);
+  color: var(--negro);
+}
+input,
+textarea {
+  caret-color: var(--negro);
+}
+:root {
+  accent-color: var(--negro);
 }
 
 /* ───────────────────────── Logo ─────────────────────────

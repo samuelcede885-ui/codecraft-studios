@@ -84,7 +84,6 @@ export function Contact() {
     <section id="contacto" className="section contact" aria-labelledby="contacto-title">
       <div className="container contact__grid">
         <header className="contact__head" data-reveal>
-          <span className="eyebrow">Contacto</span>
           <h2 id="contacto-title" className="section-title section-title--md">
             Cuéntanos qué quieres construir.
           </h2>

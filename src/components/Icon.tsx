@@ -86,6 +86,15 @@ export function ArrowRight({ className }: { className?: string }) {
   );
 }
 
+/** Cierre: la misma cruz que el "+" de los acordeones, girada. */
+export function Close({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true" className={className}>
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function Plus({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true" className={className}>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ArrowRight } from "./Icon";
 
 /**
  * Cursor de acompañamiento, solo en escritorio con ratón y sin movimiento reducido.
@@ -48,7 +49,9 @@ export function Cursor() {
   return (
     <div className="cursor" ref={el} aria-hidden="true">
       <span className="cursor__label cursor__label--project">Ver proyecto</span>
-      <span className="cursor__label cursor__label--arrow">→</span>
+      <span className="cursor__label cursor__label--arrow">
+        <ArrowRight />
+      </span>
     </div>
   );
 }

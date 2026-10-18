@@ -6,34 +6,6 @@ import { services } from "@/data/services";
 import { Screen } from "../screens/Screens";
 import { ArrowRight, Plus } from "../Icon";
 
-function ServiceGlyph({ id }: { id: string }) {
-  return (
-    <svg viewBox="0 0 64 64" className="service__glyph" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
-      {id === "web" && (
-        <>
-          <rect x="6" y="12" width="52" height="36" rx="3" />
-          <path d="M6 20h52M22 56h20M32 48v8" />
-        </>
-      )}
-      {id === "app" && (
-        <>
-          <rect x="8" y="8" width="22" height="22" rx="4" />
-          <rect x="34" y="8" width="22" height="22" rx="4" />
-          <rect x="8" y="34" width="22" height="22" rx="4" />
-          <rect x="34" y="34" width="22" height="22" rx="11" />
-        </>
-      )}
-      {id === "agent" && (
-        <>
-          <circle cx="32" cy="32" r="10" />
-          <circle cx="32" cy="32" r="22" strokeDasharray="3 5" />
-          <path d="M32 4v8M32 52v8M4 32h8M52 32h8" />
-        </>
-      )}
-    </svg>
-  );
-}
-
 /**
  * Acordeón editorial: solo un servicio abierto a la vez. La descripción vive en la cabecera
  * (no se repite al abrir); el cuerpo muestra capacidades, CTA y una vista previa grande.
@@ -43,7 +15,7 @@ export function ServiceAccordion() {
 
   return (
     <ol className="services__list">
-      {services.map((s, i) => {
+      {services.map((s) => {
         const isOpen = open === s.id;
         return (
           <li key={s.id} className={`service ${isOpen ? "is-open" : ""}`} data-reveal>
@@ -56,8 +28,6 @@ export function ServiceAccordion() {
                 aria-controls={`service-${s.id}-body`}
                 onClick={() => setOpen(isOpen ? null : s.id)}
               >
-                <span className="service__num">{String(i + 1).padStart(2, "0")}</span>
-                <ServiceGlyph id={s.id} />
                 <span className="service__name">
                   <b>{s.name}</b>
                   <span>{s.kind}</span>
@@ -78,8 +48,7 @@ export function ServiceAccordion() {
             >
               <div className="service__inner">
                 <div className="service__detail">
-                  <span className="service__label">Capacidades</span>
-                  <ul className="service__includes">
+                  <ul className="service__includes" aria-label={`Qué incluye ${s.name}`}>
                     {s.includes.map((t) => (
                       <li key={t}>{t}</li>
                     ))}
@@ -89,7 +58,7 @@ export function ServiceAccordion() {
                   </a>
                 </div>
                 <div className="service__preview" aria-hidden="true">
-                  <div className="screen-frame">
+                  <div className="screen-frame" data-ui>
                     <Screen id={s.preview} lazy />
                   </div>
                 </div>

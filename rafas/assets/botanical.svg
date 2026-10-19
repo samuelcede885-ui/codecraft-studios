@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="560" viewBox="0 0 560 560">
+  <!-- Faint leaf and fern watermark, tiled behind every section (DESIGN.md: Botanical Watermark Layer) -->
+  <defs>
+    <g id="leaf">
+      <path d="M0 0C28-34 92-38 128 0C92 38 28 34 0 0Z"/>
+      <path d="M2 0H124M30 0l14-12M30 0l14 12M58 0l14-14M58 0l14 14M86 0l12-10M86 0l12 10" fill="none" stroke-width="2.2"/>
+    </g>
+    <g id="leaflet"><path d="M0 0C10-12 30-13 42 0C30 13 10 12 0 0Z"/></g>
+    <g id="fern">
+      <path d="M0 0C20-60 30-130 22-200" fill="none" stroke-width="2.4"/>
+      <use href="#leaflet" transform="translate(4 -20) rotate(-150)"/>
+      <use href="#leaflet" transform="translate(6 -22) rotate(-20)"/>
+      <use href="#leaflet" transform="translate(12 -55) rotate(-150) scale(.92)"/>
+      <use href="#leaflet" transform="translate(14 -57) rotate(-25) scale(.92)"/>
+      <use href="#leaflet" transform="translate(19 -90) rotate(-148) scale(.82)"/>
+      <use href="#leaflet" transform="translate(21 -92) rotate(-30) scale(.82)"/>
+      <use href="#leaflet" transform="translate(23 -125) rotate(-145) scale(.7)"/>
+      <use href="#leaflet" transform="translate(24 -127) rotate(-35) scale(.7)"/>
+      <use href="#leaflet" transform="translate(24 -158) rotate(-140) scale(.55)"/>
+      <use href="#leaflet" transform="translate(24 -160) rotate(-40) scale(.55)"/>
+    </g>
+    <g id="flower">
+      <path d="M0-26C10-26 12-10 0 0C-12-10-10-26 0-26Z"/>
+      <path d="M0-26C10-26 12-10 0 0C-12-10-10-26 0-26Z" transform="rotate(72)"/>
+      <path d="M0-26C10-26 12-10 0 0C-12-10-10-26 0-26Z" transform="rotate(144)"/>
+      <path d="M0-26C10-26 12-10 0 0C-12-10-10-26 0-26Z" transform="rotate(216)"/>
+      <path d="M0-26C10-26 12-10 0 0C-12-10-10-26 0-26Z" transform="rotate(288)"/>
+    </g>
+  </defs>
+  <g fill="#9f531b" stroke="#9f531b" opacity=".22">
+    <use href="#leaf" transform="translate(30 90) rotate(-28)"/>
+    <use href="#fern" transform="translate(250 300) rotate(12)"/>
+    <use href="#leaf" transform="translate(380 120) rotate(32) scale(.8)"/>
+    <use href="#flower" transform="translate(120 330)"/>
+    <use href="#leaf" transform="translate(410 470) rotate(-150) scale(.9)"/>
+    <use href="#fern" transform="translate(70 560) rotate(-35) scale(.8)"/>
+    <use href="#flower" transform="translate(470 290) scale(.7)"/>
+    <use href="#leaf" transform="translate(170 500) rotate(-10) scale(.6)"/>
+  </g>
+</svg>

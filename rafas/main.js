@@ -53,7 +53,7 @@
   let qtyInBag = 0;
   const bag = $('#bag');
   const scrim = $('.bag-scrim');
-  const bagBtn = $('.nav__bag');
+  const bagBtn = $('.dock');
   const countEl = $('[data-bag-count]');
   function renderBag() {
     countEl.hidden = qtyInBag === 0;
@@ -267,10 +267,10 @@
 
     // split: burger drifts and turns
     const sp = through(drift.parentElement);
-    drift.style.transform = `translate3d(0, ${lerp(60, -60, sp)}px, 0) rotate(${lerp(-6, 8, sp)}deg)`;
+    drift.style.transform = `translate3d(0, ${lerp(40, -40, sp)}px, 0) rotate(${lerp(-5, 5, sp)}deg)`;
 
     // reveal: slow zoom into the layers
-    zoomImg.style.transform = `scale(${lerp(.82, 1.12, through(reveal))})`;
+    zoomImg.style.transform = `scale(${lerp(.88, 1.08, through(reveal))})`;
   }
 
   let ticking = false;

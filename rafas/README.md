@@ -1,6 +1,6 @@
 # Rafa's · La Mentirosa
 
-Landing estática (HTML + CSS + JS, sin dependencias). Abre `index.html` o sirve la carpeta:
+Landing estática (HTML + CSS + JS, sin dependencias). El estilo sigue `DESIGN.md` (dorado sobre óxido, tipografía de póster, controles en píldora, sin sombras). Abre `index.html` o sirve la carpeta:
 
 ```
 npx http-server rafas

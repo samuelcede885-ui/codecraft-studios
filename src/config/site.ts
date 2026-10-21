@@ -10,6 +10,8 @@ export const site = {
     whatsapp: "", // número en formato internacional sin "+", p. ej. "584121234567"
     instagram: "", // usuario sin "@", p. ej. "farylabs"
   },
+  /** Cursor contextual en escritorio (círculo con VER / PLAY sobre proyectos). false lo desactiva. */
+  contextCursor: true,
   nav: [
     { label: "Inicio", mobileLabel: "Inicio", href: "#inicio" },
     { label: "Portafolio", mobileLabel: "Proyectos", href: "#portafolio" },

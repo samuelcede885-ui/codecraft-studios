@@ -38,16 +38,19 @@ export function ScrollEffects() {
           }),
       });
 
-      if (document.querySelector(".process__line-fill"))
+      // Línea del proceso: horizontal en escritorio, vertical en móvil y tablet.
+      if (document.querySelector(".process__line-fill")) {
+        const vertical = window.matchMedia("(max-width: 1023px)").matches;
         gsap.fromTo(
           ".process__line-fill",
-          { scaleX: 0 },
+          vertical ? { scaleY: 0, scaleX: 1 } : { scaleX: 0, scaleY: 1 },
           {
-            scaleX: 1,
+            ...(vertical ? { scaleY: 1 } : { scaleX: 1 }),
             ease: "none",
-            scrollTrigger: { trigger: ".process__track", start: "top 75%", end: "bottom 55%", scrub: 0.6 },
+            scrollTrigger: { trigger: ".process__track", start: "top 75%", end: vertical ? "bottom 70%" : "bottom 55%", scrub: 0.6 },
           },
         );
+      }
     });
 
     // Las fuentes cambian alturas: recalcular triggers. Si se entró con un ancla

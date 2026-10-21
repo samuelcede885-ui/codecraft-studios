@@ -1,5 +1,6 @@
 import { processSteps } from "@/data/services";
 
+/** Cuatro pasos en línea de tiempo: horizontal en escritorio, vertical en móvil y tablet. */
 export function Process() {
   return (
     <section id="proceso" className="section process" aria-labelledby="proceso-title">
@@ -21,7 +22,7 @@ export function Process() {
             {processSteps.map((s) => (
               <li key={s.number} className="process__step" data-reveal>
                 <span className="process__dot" aria-hidden="true" />
-                <span className="process__num">{s.number}</span>
+                <span className="process__num">{s.number} —</span>
                 <h3>{s.name}</h3>
                 <p>{s.description}</p>
               </li>

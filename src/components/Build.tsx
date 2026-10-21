@@ -36,6 +36,7 @@ export function Build() {
                 <a
                   href="#catalogo"
                   className="build__row"
+                  data-cursor="ver"
                   onClick={() => window.dispatchEvent(new CustomEvent(FILTER_EVENT, { detail: o.filter }))}
                 >
                   <span className="build__num">{String(i + 1).padStart(2, "0")}</span>

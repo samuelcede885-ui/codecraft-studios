@@ -118,7 +118,7 @@
 }
 .service__head:hover .service__glyph,
 .service.is-open .service__glyph {
-  transform: rotate(-6deg) scale(1.04);
+  transform: translateX(4px);
 }
 .service__name b {
   display: block;
@@ -221,13 +221,29 @@
   color: var(--ink-2);
 }
 .service__cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-top: 28px;
   font-weight: 600;
-  border-bottom: 1.5px solid currentColor;
   padding-bottom: 4px;
+}
+.service__cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
+}
+.service__cta:hover::after,
+.service__cta:focus-visible::after {
+  transform: scaleX(1);
 }
 .service__cta:hover .btn__arrow {
   transform: translateX(4px);
@@ -476,7 +492,7 @@
   border-radius: 8px;
   opacity: 0;
   clip-path: inset(50% 0 50% 0 round 8px);
-  transform: translateY(-50%) rotate(-2deg);
+  transform: translateY(-50%);
   transition:
     clip-path 0.6s var(--ease),
     opacity 0.3s ease;
@@ -484,7 +500,7 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .build__row:hover .build__title {
-    transform: translateX(12px);
+    transform: translateX(6px);
   }
   .build__row:hover .build__go {
     background: var(--ink);
@@ -787,11 +803,11 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .tile__media:hover .tile__play {
-    transform: scale(1.06);
+    transform: scale(1.015);
   }
   .tile__media:hover .tile__thumb,
   .tile__media:hover .tile__video {
-    transform: scale(1.02);
+    transform: scale(1.025);
   }
   .tile__media.is-previewing .tile__play {
     opacity: 0;
@@ -859,11 +875,29 @@
   margin-top: 20px;
 }
 .tile__quote {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  padding-bottom: 4px;
   font-size: 0.92rem;
   color: var(--ink-2);
+}
+.tile__quote::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
+}
+.tile__quote:hover::after,
+.tile__quote:focus-visible::after {
+  transform: scaleX(1);
 }
 .tile__quote .btn__arrow {
   transition: transform 0.28s var(--ease);
@@ -1034,6 +1068,218 @@
 @media (prefers-reduced-motion: reduce) {
   .pv[open],
   .pv[open]::backdrop {
+    animation: none;
+  }
+}
+
+.catalog__aside {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+}
+
+/* ───────────────────────── Showreel "Inspírame" ─────────────────────────
+   Pantalla completa en negro: clips que se funden, frases grandes y un cierre con CTA. */
+.sr {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--negro);
+  color: #fff;
+}
+.sr::backdrop {
+  background: var(--negro);
+}
+.sr[open] {
+  animation: pv-fade 0.4s ease;
+}
+.sr__clip,
+.sr__phrase,
+.sr__end {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.5s ease,
+    visibility 0s linear 0.5s;
+}
+.sr__clip[data-active],
+.sr__phrase[data-active],
+.sr__end[data-active] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease;
+}
+.sr__clip video,
+.sr__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sr__clip video {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.sr__clip video.is-ready {
+  opacity: 1;
+}
+/* En vertical, el clip entero (16:9) centrado sobre negro. */
+@media (orientation: portrait) {
+  .sr__clip video,
+  .sr__cover {
+    top: 50%;
+    bottom: auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transform: translateY(-50%);
+  }
+}
+.sr__caption {
+  position: absolute;
+  left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  bottom: max(28px, env(safe-area-inset-bottom, 0px));
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(9, 10, 11, 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+.sr__caption b {
+  margin-right: 6px;
+  color: #fff;
+  font-weight: 600;
+}
+.sr__phrase {
+  display: grid;
+  place-items: center;
+  padding: 0 var(--gutter);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.8rem, 9vw, 9rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+}
+.sr__phrase[data-active] {
+  animation: sr-rise 0.7s var(--ease);
+}
+@keyframes sr-rise {
+  from {
+    transform: translateY(14px);
+  }
+}
+.sr__end {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 36px;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+.sr__end-title {
+  margin: 0;
+  max-width: 14ch;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(2.4rem, 7vw, 6.4rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.sr__end-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 16px 24px;
+}
+.sr__again {
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--dark-muted);
+  font: 500 0.92rem/1 var(--font-sans), sans-serif;
+  cursor: pointer;
+}
+.sr__again:hover {
+  color: #fff;
+}
+.sr__progress {
+  position: absolute;
+  left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 60px);
+  top: max(28px, env(safe-area-inset-top, 0px));
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+}
+.sr__progress span {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.22);
+}
+.sr__progress i {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.sr__progress .is-done i {
+  transform: scaleX(1);
+}
+.sr__progress .is-now i {
+  animation: sr-fill linear forwards;
+}
+@keyframes sr-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+.sr__close {
+  position: absolute;
+  right: max(var(--gutter), env(safe-area-inset-right, 0px));
+  top: max(12px, env(safe-area-inset-top, 0px));
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(9, 10, 11, 0.5);
+  color: #fff;
+  cursor: pointer;
+}
+.sr__close svg {
+  width: 18px;
+  height: 18px;
+}
+.sr__close:focus-visible,
+.sr__again:focus-visible,
+.sr a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sr__phrase[data-active] {
     animation: none;
   }
 }
@@ -1418,8 +1664,8 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(24px, 4vw, 64px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
 }
 .process__step {
   position: relative;
@@ -1433,29 +1679,35 @@
   height: 11px;
   border-radius: 50%;
   background: var(--ink);
-  box-shadow: 0 0 0 6px var(--surface);
+  box-shadow: 0 0 0 6px var(--tone-1);
 }
 .process__num {
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
 .process__step h3 {
-  margin: 12px 0 14px;
-  font-size: clamp(2rem, 3.4vw, 3.2rem);
-  letter-spacing: -0.02em;
+  margin: 14px 0 14px;
+  font-size: clamp(1.5rem, 2.3vw, 2.3rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
   line-height: 1;
+  text-transform: uppercase;
 }
 .process__step p {
   margin: 0;
-  max-width: 32ch;
+  max-width: 28ch;
   color: var(--ink-2);
 }
-@media (max-width: 760px) {
+/* Móvil y tablet: línea vertical a la izquierda. */
+@media (max-width: 1023px) {
   .process__line {
     left: 5px;
     right: auto;
-    top: 0;
-    bottom: 0;
+    top: 6px;
+    bottom: 6px;
     width: 1px;
     height: auto;
   }
@@ -1464,10 +1716,17 @@
   }
   .process__steps {
     grid-template-columns: minmax(0, 1fr);
-    gap: 48px;
+    gap: 44px;
   }
   .process__step {
     padding: 0 0 0 40px;
+  }
+  .process__step h3 {
+    margin: 10px 0;
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+  }
+  .process__step p {
+    max-width: 40ch;
   }
 }
 

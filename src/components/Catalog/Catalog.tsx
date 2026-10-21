@@ -7,6 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { filters, projects, type FilterId, type Project } from "@/data/projects";
 import { ProjectTile } from "./ProjectTile";
 import { PreviewDialog } from "./PreviewDialog";
+import { SHOWREEL_EVENT } from "../Showreel/Showreel";
+import { ArrowRight } from "../Icon";
 
 gsap.registerPlugin(Flip, ScrollTrigger);
 
@@ -86,9 +88,19 @@ export function Catalog() {
               hemos construido.
             </h2>
           </div>
-          <p className="catalog__lead">
-            Encuentra una página, aplicación o experiencia que se parezca a lo que imaginas para tu marca.
-          </p>
+          <div className="catalog__aside">
+            <p className="catalog__lead">
+              Encuentra una página, aplicación o experiencia que se parezca a lo que imaginas para tu marca.
+            </p>
+            <button
+              type="button"
+              className="btn btn--outline catalog__inspire"
+              data-cursor="play"
+              onClick={() => window.dispatchEvent(new Event(SHOWREEL_EVENT))}
+            >
+              Inspírame <ArrowRight className="btn__arrow" />
+            </button>
+          </div>
         </header>
 
         <div className="catalog__filters" role="group" aria-label="Filtrar proyectos" data-reveal>

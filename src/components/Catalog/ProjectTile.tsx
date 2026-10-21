@@ -129,7 +129,7 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
         onPointerEnter={(e) => e.pointerType === "mouse" && start()}
         onPointerLeave={(e) => e.pointerType === "mouse" && stop()}
       >
-        <a href={href} className="tile__link" aria-label={`Ver proyecto ${name}`} data-cursor="project" tabIndex={-1}>
+        <a href={href} className="tile__link" aria-label={`Ver proyecto ${name}`} data-cursor="ver" tabIndex={-1}>
           {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
           <img className="tile__thumb" src={assetUrl(project.thumbnail)} alt="" width={1600} height={900} loading="lazy" decoding="async" />
           {armed && (
@@ -157,7 +157,7 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
             </video>
           )}
         </a>
-        <button type="button" className="tile__play" aria-label={`Ver preview de ${name}`} onClick={() => onPlay(project)}>
+        <button type="button" className="tile__play" data-cursor="play" aria-label={`Ver preview de ${name}`} onClick={() => onPlay(project)}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9 6.5v11l9-5.5z" fill="currentColor" />
           </svg>

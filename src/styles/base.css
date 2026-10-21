@@ -132,11 +132,12 @@ a {
     background-color 0.28s var(--ease),
     box-shadow 0.28s var(--ease);
 }
+/* Microinteracciones: escala como máximo 1.015 y flecha 4–6 px; sin rebotes ni brillos. */
 .btn:hover {
-  transform: translateY(-2px);
+  transform: scale(1.015);
 }
 .btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: scale(0.98);
   transition-duration: 0.12s;
 }
 .btn__arrow {
@@ -146,7 +147,7 @@ a {
 }
 .btn:hover .btn__arrow,
 .work__link:hover .btn__arrow {
-  transform: translateX(4px);
+  transform: translateX(5px);
 }
 .btn--dark {
   background: var(--ink);
@@ -227,4 +228,39 @@ a {
   .link-arrow:hover .pj-back__icon {
     transform: rotate(180deg) translateX(5px);
   }
+}
+
+/* ───────────────────────── Cursor contextual (solo ratón) ───────────────────────── */
+.ctx-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 90;
+  pointer-events: none;
+}
+.ctx-cursor span {
+  position: absolute;
+  left: -36px;
+  top: -36px;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(9, 10, 11, 0.82);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s var(--ease);
+}
+.ctx-cursor.is-on span {
+  opacity: 1;
+  transform: scale(1);
 }

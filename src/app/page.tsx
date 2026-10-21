@@ -10,6 +10,8 @@ import { Process } from "@/components/Process";
 import { FinalCTA } from "@/components/FinalCTA";
 import { ScrollEffects } from "@/components/ScrollEffects";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { ContextCursor } from "@/components/ContextCursor";
+import { Showreel } from "@/components/Showreel/Showreel";
 
 export default function Home() {
   // Póster del video del hero: solo en la portada, que es donde se usa.
@@ -29,6 +31,8 @@ export default function Home() {
       </main>
       <SmoothScroll />
       <ScrollEffects />
+      <ContextCursor />
+      <Showreel />
     </>
   );
 }

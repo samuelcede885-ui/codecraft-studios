@@ -34,6 +34,8 @@ npm run typecheck
 | `src/app/proyectos/[slug]/`, `src/components/Project/` | Ficha de cada proyecto |
 | `src/components/QuoteForm.tsx` | Formulario de cotización con proyecto de referencia (`?proyecto=<slug>#cotizacion`) |
 | `src/components/reel/`, `src/app/grabar/`, `scripts/record-reels.mjs` | Bobinas: navegación simulada por las pantallas HTML, grabada a video fotograma a fotograma |
+| `src/components/covers/`, `scripts/record-covers.mjs` | Portadas del catálogo (mensaje, identidad y pantalla real de cada concepto), capturadas a `thumb.webp` |
+| `src/components/Featured/` | Proyecto destacado antes del catálogo |
 | `src/components/screens/Screens.tsx` | Pantallas HTML: Gramercy, panel de métricas, asistente IA y estudio |
 | `src/components/Services.tsx`, `Process.tsx`, `FinalCTA.tsx` | Resto de secciones; el cierre negro sustituye al footer |
 | `public/projects/<slug>/` | Miniatura, póster, previews y recorridos en MP4/WebM, galería |
@@ -52,6 +54,7 @@ npm run typecheck
 ```bash
 npm run dev
 node scripts/record-reels.mjs            # todas las bobinas, o: node scripts/record-reels.mjs gramercy
+node scripts/record-covers.mjs           # portadas del catálogo
 ```
 
 Requiere Playwright y ffmpeg. Si se cambian los tiempos en `src/data/heroStages.ts`, hay que regrabar `gramercy`.

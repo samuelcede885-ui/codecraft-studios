@@ -2,7 +2,7 @@ import type { ScreenId } from "./screens";
 
 /**
  * Catálogo de proyectos. Para añadir uno: una entrada aquí y sus archivos en
- * public/projects/<slug>/ (thumb.webp, preview.mp4/.webm, opcionalmente full.mp4/.webm, gallery-*.webp).
+ * public/projects/<slug>/ (thumb.webp = portada diseñada, preview.mp4/.webm, opcionalmente full.mp4/.webm, gallery-*.webp).
  * Los videos de los conceptos se graban de sus pantallas HTML con scripts/record-reels.mjs.
  *
  * Todos los proyectos actuales son conceptos de Fary Labs: no son trabajos de clientes.
@@ -13,6 +13,8 @@ export type Project = {
   category: string;
   /** Una línea para el catálogo. */
   description: string;
+  /** Mensaje de la portada (src/components/covers); cada salto de línea es un renglón. */
+  headline: string;
   tags: string[];
   featured?: boolean;
   /** Concepto propio o trabajo real; los conceptos se marcan siempre como tales. */
@@ -47,6 +49,7 @@ export const projects: Project[] = [
     name: "Gramercy",
     category: "E-commerce / Fashion",
     description: "Una experiencia completa desde catálogo hasta pago.",
+    headline: "Pisa firme.\nCompra fácil.",
     tags: ["E-commerce", "UI/UX", "Checkout"],
     featured: true,
     status: "Concepto",
@@ -71,6 +74,7 @@ export const projects: Project[] = [
     name: "Panel de métricas",
     category: "Plataforma / Dashboard",
     description: "Ventas, usuarios y conversión en una sola vista.",
+    headline: "Tus números,\nen una mirada.",
     tags: ["Dashboard", "Datos"],
     status: "Concepto",
     ...media("panel-de-metricas"),
@@ -86,6 +90,7 @@ export const projects: Project[] = [
     name: "Asistente de reservas",
     category: "Agente IA / Automatización",
     description: "Responde consultas, propone horarios y confirma reservas.",
+    headline: "Pregunta.\nAgenda.\nConfirma.",
     tags: ["Agente IA", "Automatización"],
     status: "Concepto",
     ...media("asistente-de-reservas"),
@@ -101,6 +106,7 @@ export const projects: Project[] = [
     name: "Norte Estudio",
     category: "Sitio corporativo / Arquitectura",
     description: "Una portada editorial para un estudio de arquitectura.",
+    headline: "Espacio, luz\ny estructura.",
     tags: ["Sitio corporativo", "Editorial"],
     status: "Concepto",
     ...media("norte-estudio"),

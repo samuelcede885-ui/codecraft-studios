@@ -7,7 +7,8 @@
  * Requiere Playwright y ffmpeg (con libx264, libvpx-vp9 y libwebp). Si Playwright no está
  * en el proyecto, indicar su módulo con PLAYWRIGHT_MODULE=/ruta/a/playwright/index.mjs.
  * Escribe en public/projects/<slug>/: preview.mp4/.webm, full.mp4/.webm (gramercy),
- * thumb.webp, gallery-*.webp y, si hay recorrido completo, poster.webp (su primer fotograma).
+ * gallery-*.webp y, si hay recorrido completo, poster.webp (su primer fotograma).
+ * Las miniaturas (thumb.webp) son las portadas diseñadas: scripts/record-covers.mjs.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
@@ -25,12 +26,11 @@ const plans = {
     full: true,
     // Preview del catálogo: producto y carrito.
     preview: { from: 6.9, to: 17.3 },
-    thumb: 2.4,
     gallery: [2.4, 10.8, 16.2, 21.4, 26.4],
   },
-  "panel-de-metricas": { thumb: 2.4, gallery: [5.6] },
-  "asistente-de-reservas": { thumb: 5.6, gallery: [5.6] },
-  "norte-estudio": { thumb: 3.0, gallery: [5.0] },
+  "panel-de-metricas": { gallery: [5.6] },
+  "asistente-de-reservas": { gallery: [5.6] },
+  "norte-estudio": { gallery: [5.0] },
 };
 
 const ffmpeg = (...args) => execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", ...args], { stdio: "inherit" });
@@ -81,7 +81,7 @@ for (const id of process.argv.slice(2).length ? process.argv.slice(2) : Object.k
   if (plan.full) encode(frames, join(dir, "full"));
   encode(frames, join(dir, "preview"), plan.preview);
 
-  // Imágenes fijas sin cursor: póster (primer fotograma), miniatura y galería.
+  // Imágenes fijas sin cursor: póster (primer fotograma) y galería.
   await page.evaluate(() => (document.querySelector("[data-reel-cursor]").style.visibility = "hidden"));
   const shot = async (t, name, width) => {
     await seek(t);
@@ -89,7 +89,6 @@ for (const id of process.argv.slice(2).length ? process.argv.slice(2) : Object.k
     await page.screenshot({ path: png });
     still(png, join(dir, `${name}.webp`), width);
   };
-  await shot(plan.thumb, "thumb", 960);
   for (const [i, t] of plan.gallery.entries()) await shot(t, `gallery-${i + 1}`);
   if (plan.full) await shot(0, "poster");
   await page.evaluate(() => (document.querySelector("[data-reel-cursor]").style.visibility = ""));

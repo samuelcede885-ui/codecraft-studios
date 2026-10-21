@@ -11,4 +11,4 @@ La visión principal del proyecto está en `docs/fary-labs-brief.md`. Léela ant
 ## Desarrollo
 
 - Next.js 15 + TypeScript + Tailwind 4 + GSAP/ScrollTrigger. `npm run dev`, `npm run build`, `npm run typecheck`.
-- Textos en `src/data/` (heroStages, services, projects); contacto en `src/config/site.ts`; hero automático en `src/components/Hero/` (tiempos en `src/data/heroStages.ts`; si cambian, regrabar con `scripts/record-reels.mjs`); catálogo en `src/components/Catalog/`; estilos en `src/styles/`.
+- Textos en `src/data/` (heroStages, services, projects); contacto en `src/config/site.ts`; hero automático en `src/components/Hero/` (tiempos en `src/data/heroStages.ts`; si cambian, regrabar con `scripts/record-reels.mjs`); proyecto destacado en `src/components/Featured/`; catálogo en `src/components/Catalog/` (portadas diseñadas en `src/components/covers/`, se capturan con `scripts/record-covers.mjs`); estilos en `src/styles/`.

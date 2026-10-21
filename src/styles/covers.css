@@ -1,0 +1,232 @@
+/* ───────────────────────── Portadas del catálogo ─────────────────────────
+   Solo se usan al capturarlas (/grabar?cover=…). 1cqw = 16 px en la captura de 1600 × 900. */
+.cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  container-type: inline-size;
+  font-family: var(--font-sans), sans-serif;
+}
+.cover--stage {
+  width: 100vw;
+}
+.cv-meta {
+  position: absolute;
+  left: 5cqw;
+  top: 4.4cqw;
+  z-index: 5;
+  display: flex;
+  align-items: baseline;
+  gap: 1.4cqw;
+  font-size: 1.05cqw;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.cv-meta__name {
+  font-weight: 600;
+}
+.cv-meta__cat {
+  opacity: 0.6;
+}
+
+/* Marco de producto: ventana con la pantalla real (sus medidas también van en cqw). */
+.cv-device {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 1.1cqw;
+  background: #fff;
+  box-shadow:
+    0 0 0 0.08cqw rgba(0, 0, 0, 0.08),
+    0 3cqw 6cqw -2cqw rgba(0, 0, 0, 0.35);
+}
+.cv-device__bar {
+  display: flex;
+  gap: 0.45cqw;
+  padding: 0.9cqw 1.1cqw;
+  background: #f4f4f2;
+  border-bottom: 0.06cqw solid rgba(0, 0, 0, 0.08);
+}
+.cv-device__bar i {
+  width: 0.6cqw;
+  height: 0.6cqw;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.16);
+}
+.cv-device__screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  overflow: hidden;
+}
+
+/* Mensaje: renglones apilados. */
+.cover p {
+  margin: 0;
+}
+.cover p span {
+  display: block;
+}
+
+/* Gramercy: crema y verde salvia de la tienda, display condensada, el zueco rompe el marco. */
+.cv-gm {
+  background:
+    radial-gradient(60% 70% at 78% 40%, #fbf8ef 0%, rgba(251, 248, 239, 0) 70%),
+    #efe9d8;
+  color: #57574a;
+}
+.cv-gm__logo {
+  position: absolute;
+  right: 5cqw;
+  top: 3.6cqw;
+  width: 11cqw;
+  opacity: 0.8;
+}
+.cv-gm__msg {
+  position: absolute;
+  left: 5cqw;
+  bottom: 5.5cqw;
+  z-index: 5;
+  font-family: var(--font-gm-display), sans-serif;
+  font-size: 9.4cqw;
+  line-height: 0.9;
+  text-transform: uppercase;
+  color: #4b4b40;
+}
+.cv-gm__msg span:last-child {
+  color: #aea893;
+}
+.cv-gm__device {
+  right: -5cqw;
+  top: 12cqw;
+  width: 52cqw;
+}
+.cv-gm__shoe {
+  position: absolute;
+  left: 20cqw;
+  top: 3cqw;
+  z-index: 4;
+  width: 30cqw;
+  transform: rotate(-9deg);
+  filter: drop-shadow(0 2.4cqw 2cqw rgba(60, 50, 30, 0.28));
+}
+
+/* Panel de métricas: azul noche y el azul de sus gráficas. */
+.cv-dash {
+  background:
+    radial-gradient(50% 70% at 82% 70%, rgba(47, 107, 255, 0.45) 0%, rgba(47, 107, 255, 0) 70%),
+    radial-gradient(40% 50% at 10% 0%, rgba(47, 107, 255, 0.18) 0%, rgba(47, 107, 255, 0) 70%),
+    #0a0f1d;
+  color: #fff;
+}
+.cv-dash__msg {
+  position: absolute;
+  left: 5cqw;
+  top: 12cqw;
+  font-size: 6.2cqw;
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+.cv-dash__msg span:last-child {
+  color: #8fb0ff;
+}
+.cv-dash__device {
+  left: 34cqw;
+  top: 33cqw;
+  width: 70cqw;
+  box-shadow:
+    0 0 0 0.08cqw rgba(255, 255, 255, 0.12),
+    0 4cqw 8cqw -2cqw rgba(0, 0, 0, 0.7);
+}
+
+/* Asistente de reservas: verde suave, conversación en primer plano. */
+.cv-agent {
+  background:
+    radial-gradient(55% 70% at 75% 45%, #f6f9f3 0%, rgba(246, 249, 243, 0) 70%),
+    #dde6d9;
+  color: #1d2a20;
+}
+.cv-agent__msg {
+  position: absolute;
+  left: 5cqw;
+  top: 12cqw;
+  font-family: var(--font-display), sans-serif;
+  font-size: 7.4cqw;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.cv-agent__msg span:nth-child(2) {
+  color: #4f7a58;
+}
+.cv-agent__msg span:nth-child(3) {
+  color: #95b39a;
+}
+.cv-agent__device {
+  right: -3cqw;
+  top: 15cqw;
+  width: 52cqw;
+}
+.cv-agent__bubbles {
+  position: absolute;
+  left: 36cqw;
+  top: 36cqw;
+  z-index: 4;
+  display: grid;
+  justify-items: start;
+  gap: 1cqw;
+}
+.cv-bubble {
+  padding: 1.25cqw 1.8cqw;
+  border-radius: 1.6cqw;
+  font-size: 1.55cqw;
+  font-weight: 500;
+  box-shadow: 0 1.6cqw 3cqw -1.2cqw rgba(20, 40, 25, 0.35);
+}
+.cv-bubble--out {
+  background: #111;
+  color: #fff;
+  border-bottom-right-radius: 0.4cqw;
+}
+.cv-bubble--in {
+  margin-left: 6cqw;
+  background: #fff;
+  color: #1d2a20;
+  border-bottom-left-radius: 0.4cqw;
+}
+.cv-bubble--in b {
+  color: #2f8a4a;
+}
+
+/* Norte Estudio: hormigón claro, volúmenes negros, grotesca grande. */
+.cv-norte {
+  background: #e8e6e1;
+  color: #111;
+}
+.cv-norte__blocks i {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20cqw;
+  height: 44cqw;
+  background: #111;
+}
+.cv-norte__blocks i + i {
+  display: none;
+}
+.cv-norte__msg {
+  position: absolute;
+  left: 5cqw;
+  bottom: 6cqw;
+  font-size: 7.6cqw;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+.cv-norte__device {
+  left: 47cqw;
+  top: 10cqw;
+  width: 49cqw;
+  border-radius: 0.4cqw;
+}

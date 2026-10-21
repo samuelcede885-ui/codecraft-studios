@@ -12,24 +12,45 @@ let playing: HTMLVideoElement | null = null;
 const canHover = () =>
   typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+const clock = (s: number) => {
+  const t = Math.max(0, Math.ceil(s));
+  return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+};
+
 /**
- * Proyecto del catálogo, al estilo de un canal de video: miniatura grande con botón de play.
- * Con ratón, al pasar por encima la miniatura se cambia por un preview en bucle (sin sonido)
- * y vuelve a la imagen al salir. En táctil no hay hover: solo miniatura y play.
+ * Proyecto del catálogo, al estilo de un canal de video: portada diseñada con botón de play.
+ * Con ratón, al pasar por encima la portada se cambia por un preview real en bucle (sin sonido),
+ * con una etiqueta PREVIEW y el tiempo restante, y vuelve a la portada al salir.
+ * En táctil no hay hover: solo portada y play.
  */
-export function ProjectTile({ project, featured }: { project: Project; featured?: boolean }) {
+export function ProjectTile({ project, index }: { project: Project; index: number }) {
   const { slug, name } = project;
   const href = `/proyectos/${slug}`;
   const media = useRef<HTMLAnchorElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const [armed, setArmed] = useState(false); // el <video> solo se crea al primer hover
+  const [armed, setArmed] = useState(false); // el <video> se crea al acercarse (con ratón) o al primer hover
   const [showing, setShowing] = useState(false);
   const hovering = useRef(false);
+  const time = useRef<HTMLTimeElement>(null);
+  const bar = useRef<HTMLSpanElement>(null);
+  const raf = useRef(0);
+
+  // Mientras suena el preview: tiempo restante y línea de progreso, leídos del propio video.
+  function tick() {
+    const v = video.current;
+    if (v && v.duration) {
+      if (time.current) time.current.textContent = clock(v.duration - v.currentTime);
+      if (bar.current) bar.current.style.transform = `scaleX(${v.currentTime / v.duration})`;
+    }
+    raf.current = requestAnimationFrame(tick);
+  }
 
   function stop() {
     hovering.current = false;
     const v = video.current;
     setShowing(false);
+    cancelAnimationFrame(raf.current);
+    if (bar.current) bar.current.style.transform = "scaleX(0)";
     if (!v) return;
     v.pause();
     v.currentTime = 0;
@@ -56,20 +77,35 @@ export function ProjectTile({ project, featured }: { project: Project; featured?
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armed]);
 
-  // Fuera de la vista, ningún preview sigue sonando a imagen.
+  // Con ratón, el video se prepara al acercarse para que el preview arranque sin espera.
+  // Fuera de la vista, ningún preview sigue en marcha.
   useEffect(() => {
     const el = media.current;
     if (!el) return;
+    const near = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && canHover()) {
+          setArmed(true);
+          near.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
     const io = new IntersectionObserver(([e]) => !e.isIntersecting && stop(), { threshold: 0 });
+    near.observe(el);
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      near.disconnect();
+      io.disconnect();
+      cancelAnimationFrame(raf.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const base = project.previewVideo.replace(/\.mp4$/, "");
 
   return (
-    <li className={`tile ${featured ? "tile--featured" : ""}`} data-reveal>
+    <li className="tile" data-reveal>
       <a
         ref={media}
         href={href}
@@ -88,13 +124,18 @@ export function ProjectTile({ project, featured }: { project: Project; featured?
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             poster={assetUrl(project.thumbnail)}
             disablePictureInPicture
             disableRemotePlayback
             aria-hidden="true"
             tabIndex={-1}
-            onPlaying={() => hovering.current && setShowing(true)}
+            onPlaying={() => {
+              if (!hovering.current) return;
+              setShowing(true);
+              cancelAnimationFrame(raf.current);
+              tick();
+            }}
           >
             <source src={assetUrl(`${base}.webm`)} type="video/webm" />
             <source src={assetUrl(`${base}.mp4`)} type="video/mp4" />
@@ -106,23 +147,23 @@ export function ProjectTile({ project, featured }: { project: Project; featured?
           </svg>
         </span>
         <span className="tile__status">{project.status}</span>
+        <span className="tile__live" aria-hidden="true">
+          PREVIEW <time ref={time}>00:00</time>
+        </span>
+        <span className="tile__progress" ref={bar} aria-hidden="true" />
       </a>
       <div className="tile__meta">
+        <div className="tile__top">
+          <span className="tile__index">{String(index).padStart(2, "0")}</span>
+          <span className="tile__cat">
+            {project.category}
+            {project.year && ` · ${project.year}`}
+          </span>
+        </div>
         <h3 className="tile__name">
           <a href={href}>{name}</a>
         </h3>
-        <span className="tile__cat">
-          {project.category}
-          {project.year && ` · ${project.year}`}
-        </span>
         <p className="tile__desc">{project.description}</p>
-        {featured && (
-          <ul className="tile__tags" aria-label="Etiquetas">
-            {project.tags.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        )}
         <div className="tile__actions">
           <a href={href} className="link-arrow">
             Ver proyecto <ArrowRight className="btn__arrow" />

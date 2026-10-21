@@ -12,7 +12,7 @@ export function ProjectPage({ project: p }: { project: Project }) {
     <>
       <section className="pj-hero" aria-labelledby="pj-title">
         <div className="container">
-          <a href="/#portafolio" className="pj-back link-arrow">
+          <a href="/#catalogo" className="pj-back link-arrow">
             <ArrowRight className="btn__arrow pj-back__icon" /> Volver al portafolio
           </a>
           <div className="pj-hero__head">

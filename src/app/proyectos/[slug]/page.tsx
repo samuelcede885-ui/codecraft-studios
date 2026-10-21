@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description: `${p.description} Concepto de Fary Labs.`,
-    openGraph: { title, description: p.description, images: [{ url: p.thumbnail, width: 960, height: 540 }] },
+    openGraph: { title, description: p.description, images: [{ url: p.thumbnail, width: 1600, height: 900 }] },
   };
 }
 

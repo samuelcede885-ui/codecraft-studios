@@ -6,11 +6,22 @@ import { ArrowRight } from "./Icon";
 import { lockScroll } from "@/lib/scroll";
 
 /** Menú móvil a pantalla completa: fondo blanco, opciones que entran desde abajo con un stagger ligero. */
-export function MobileMenu({ open, onClose }: { open: boolean; onClose: (restoreFocus?: boolean) => void }) {
+export function MobileMenu({
+  open,
+  onClose,
+  base = "",
+}: {
+  open: boolean;
+  onClose: (restoreFocus?: boolean) => void;
+  /** "/" fuera de la portada: los enlaces vuelven a ella. */
+  base?: string;
+}) {
   const panel = useRef<HTMLDivElement>(null);
 
   /** Cierra y navega cuando el scroll ya está liberado (con el fondo bloqueado no hay desplazamiento). */
   function go(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    // Fuera de la portada, navegación normal.
+    if (base) return onClose(false);
     e.preventDefault();
     onClose(false);
     requestAnimationFrame(() =>
@@ -61,7 +72,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: (restore
         <ol className="mobile-menu__list">
           {site.nav.map((n, i) => (
             <li key={n.href} style={{ "--i": i } as React.CSSProperties}>
-              <a href={n.href} onClick={(e) => go(e, n.href)}>
+              <a href={base + n.href} onClick={(e) => go(e, n.href)}>
                 <small>{String(i + 1).padStart(2, "0")}</small>
                 {n.mobileLabel}
               </a>
@@ -70,7 +81,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: (restore
         </ol>
       </nav>
       <div className="mobile-menu__foot" style={{ "--i": site.nav.length } as React.CSSProperties}>
-        <a href="#contacto" className="btn btn--dark" onClick={(e) => go(e, "#contacto")}>
+        <a href={`${base}#contacto`} className="btn btn--dark" onClick={(e) => go(e, "#contacto")}>
           Comenzar proyecto <ArrowRight className="btn__arrow" />
         </a>
       </div>

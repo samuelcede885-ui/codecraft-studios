@@ -265,3 +265,10 @@
     display: none;
   }
 }
+
+/* Móvil en horizontal: header compacto. */
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  .header {
+    height: var(--header-h-sm);
+  }
+}

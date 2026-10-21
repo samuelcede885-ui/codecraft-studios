@@ -21,29 +21,43 @@ npm run typecheck
 
 | Ruta | Qué contiene |
 |---|---|
-| `src/data/storySteps.ts` | Los cinco pasos de la secuencia (etapa, título, metadata, mensaje, etiquetas, pantalla) |
-| `src/data/services.ts` | Web, App y Agent Craft (qué incluye cada uno) y los pasos del proceso |
-| `src/data/projects.ts` | Proyecto principal (Gramercy) y "Más proyectos" (conceptos) |
-| `src/data/screens.ts` | Identificadores de las pantallas |
+| `src/data/heroStages.ts` | Etapas del hero con sus segundos en el video (única fuente de tiempos) |
+| `src/data/projects.ts` | Catálogo: slug, categoría, miniatura, videos, galería y ficha de cada proyecto |
+| `src/data/services.ts` | Web, App y Agent Craft y los pasos del proceso |
+| `src/data/screens.ts` | Identificadores de las pantallas HTML |
 | `src/components/brandPaths.ts`, `Logo.tsx` | Firma e isotipo oficiales vectorizados del manual (no redibujar) |
 | `src/config/site.ts` | Navegación y datos de contacto (Instagram, WhatsApp, correo) |
 | `src/components/Intro.tsx` | Intro de marca (≤ 2,7 s, una vez por sesión, botón "Saltar intro") |
 | `src/components/Header.tsx`, `MobileMenu.tsx` | Header fijo que se compacta con blur y menú móvil a pantalla completa |
-| `src/components/ScrollStory/` | Hero + secuencia fijada: una sola laptop, una línea de tiempo GSAP con scrub |
-| `src/components/screens/Screens.tsx` | Pantallas de la laptop: Gramercy en HTML, panel de métricas, asistente IA y estudio |
-| `src/components/Services.tsx` | Servicios en acordeón accesible con vista previa |
-| `src/components/Portfolio.tsx`, `Process.tsx`, `StoryCTA.tsx`, `FinalCTA.tsx` | Resto de secciones; el cierre negro sustituye al footer |
-| `src/styles/*.css` | Estilos por bloque (base, intro, header, laptop, story, screens, sections, form) |
+| `src/components/Hero/HeroShowcase.tsx` | Hero automático: la laptop reproduce el video y los textos siguen su `currentTime` |
+| `src/components/Catalog/` | Catálogo de proyectos con miniatura, play y preview al pasar el ratón |
+| `src/app/proyectos/[slug]/`, `src/components/Project/` | Ficha de cada proyecto |
+| `src/components/QuoteForm.tsx` | Formulario de cotización con proyecto de referencia (`?proyecto=<slug>#cotizacion`) |
+| `src/components/reel/`, `src/app/grabar/`, `scripts/record-reels.mjs` | Bobinas: navegación simulada por las pantallas HTML, grabada a video fotograma a fotograma |
+| `src/components/screens/Screens.tsx` | Pantallas HTML: Gramercy, panel de métricas, asistente IA y estudio |
+| `src/components/Services.tsx`, `Process.tsx`, `FinalCTA.tsx` | Resto de secciones; el cierre negro sustituye al footer |
+| `public/projects/<slug>/` | Miniatura, póster, previews y recorridos en MP4/WebM, galería |
+| `src/styles/*.css` | Estilos por bloque |
 
 ## Comportamiento
 
-- **Logo:** firma completa a 180 px en el header de escritorio; al compactarse y en móvil, solo el isotipo.
-- **Intro:** fondo negro, las piezas del símbolo avanzan en la dirección de la flecha, aparecen "Fary" y "labs" y la página entra. Solo una vez por sesión (`sessionStorage`); se omite con `prefers-reduced-motion`.
-- **Escritorio:** título a la izquierda, laptop centrada, metadata y mensaje a la derecha. Cada gesto de rueda avanza un paso.
-- **Móvil y tablet (< 1024 px):** título, laptop, metadata y mensaje en columna; la laptop no se mueve.
-- **`prefers-reduced-motion`:** la escena sigue fijada pero los pasos cambian sin animación.
+- **Intro:** fondo negro, el símbolo, "Fary" y "labs"; una vez por sesión (`sessionStorage`).
+- **Hero:** al terminar la intro, la laptop reproduce el recorrido de Gramercy (sin sonido, en bucle, sin controles) y los textos de los lados cambian según el tiempo real del video. No depende del scroll; fuera de la vista se pausa y al volver continúa. Un botón discreto permite pausarlo. Si el video no carga, la laptop muestra la misma navegación en HTML.
+- **Catálogo:** con ratón, la miniatura se cambia por un preview al pasar por encima (uno solo a la vez); en táctil, solo miniatura y play. Cada proyecto abre `/proyectos/<slug>`.
+- **"Quiero una página como esta":** lleva al formulario con el proyecto como referencia.
+- **Móvil:** título, laptop e información en columna; en horizontal, texto y laptop lado a lado.
+
+## Volver a grabar los videos
+
+```bash
+npm run dev
+node scripts/record-reels.mjs            # todas las bobinas, o: node scripts/record-reels.mjs gramercy
+```
+
+Requiere Playwright y ffmpeg. Si se cambian los tiempos en `src/data/heroStages.ts`, hay que regrabar `gramercy`.
 
 ## Pendiente
 
-- **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. Mientras estén vacíos, los canales del cierre aparecen como "próximamente" y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
+- **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. El formulario envía por correo o, si solo hay WhatsApp, por WhatsApp. Mientras estén vacíos, los canales del cierre aparecen como "próximamente" y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
 - **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Los proyectos de "Más proyectos" también son conceptos de Fary Labs, no trabajos de clientes. Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.
+- **Presupuestos del formulario:** los rangos son orientativos (`src/components/QuoteForm.tsx`); confirmar.

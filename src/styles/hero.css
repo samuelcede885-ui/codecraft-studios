@@ -1,0 +1,248 @@
+/* ───────────────────────── Hero automático ─────────────────────────
+   Misma escena que antes (texto | laptop | información), pero sin fijarse al scroll:
+   ocupa una pantalla y la secuencia la marca el video de la laptop. Los paneles de cada lado
+   se apilan en la misma celda, así que cambiar de texto nunca mueve la laptop. */
+.hero-auto .stage {
+  height: 100vh;
+  height: 100svh;
+}
+@media (min-height: 481px) {
+  .hero-auto .stage {
+    min-height: 560px;
+  }
+}
+.hero-auto .zone--lead {
+  grid-template-rows: auto auto;
+  align-content: center;
+}
+.hero-panels {
+  display: grid;
+  min-width: 0;
+}
+.hero-panel {
+  grid-area: 1 / 1;
+  align-self: center;
+  min-width: 0;
+}
+
+/* Entrada y salida de textos: el que sale sube 12 px, el que entra llega desde 18 px abajo. */
+.hero-panel[data-state="active"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s var(--ease-out, var(--ease)) 0.12s,
+    transform 0.5s var(--ease-out, var(--ease)) 0.12s;
+}
+.hero-panel[data-state="past"] {
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+  pointer-events: none;
+}
+.hero-panel[data-state="next"] {
+  opacity: 0;
+  transform: translateY(18px);
+  pointer-events: none;
+}
+
+.hero-auto .hero-copy__title {
+  white-space: normal;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+.hero-auto .step-lead__title {
+  max-width: 12ch;
+}
+.hero-auto__cta {
+  justify-self: start;
+  margin-top: clamp(28px, 4.5svh, 48px);
+}
+
+/* Video dentro de la pantalla: ocupa exactamente la máscara, sin deformarse. */
+.hero-video,
+.hero-auto .laptop__screen > .reel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #f3efe2;
+}
+
+/* Derecha: indicador de etapa + eyebrow y descripción. */
+.zone--aside .stage-ind {
+  justify-self: end;
+  width: 100%;
+  max-width: 300px;
+}
+.stage-ind {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.stage-ind__num {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  transition: opacity 0.3s ease;
+}
+.stage-ind__num b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.stage-ind__num.is-idle {
+  opacity: 0.45;
+}
+.stage-ind__bar {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+.stage-ind__bar > i {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(9, 10, 11, 0.14);
+}
+.stage-ind__bar > i > i {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.stage-ind__toggle {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(9, 10, 11, 0.16);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out, var(--ease)),
+    border-color 0.2s ease;
+}
+.stage-ind__toggle:active {
+  transform: scale(0.94);
+}
+.stage-ind__toggle svg {
+  width: 12px;
+  height: 12px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .stage-ind__toggle:hover {
+    border-color: var(--ink);
+  }
+}
+.hero-auto .zone--aside .hero-panels {
+  justify-self: end;
+  width: 100%;
+  max-width: 300px;
+}
+.hero-aside__eyebrow {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hero-aside__desc {
+  margin: 14px 0 0;
+  max-width: 30ch;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Móvil y tablet: título, laptop e información sincronizada, en columna. */
+@media (max-width: 1023px) {
+  .hero-auto .zone--aside .stage-ind,
+  .hero-auto .zone--aside .hero-panels {
+    justify-self: stretch;
+    max-width: none;
+  }
+  .hero-auto .zone--aside .stage-ind {
+    margin-bottom: 12px;
+  }
+  .hero-auto .hero-aside__desc {
+    margin-top: 8px;
+    max-width: 44ch;
+    font-size: 1rem;
+  }
+  .hero-auto .hero-copy__title {
+    max-width: 16ch;
+  }
+  .hero-auto .step-lead__title {
+    max-width: 20ch;
+  }
+  .hero-auto__cta {
+    margin-top: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-panel[data-state] {
+    transform: none;
+  }
+}
+
+/* Móvil en horizontal (muy poca altura): texto a la izquierda y laptop a la derecha. */
+@media (max-width: 1023px) and (max-height: 480px) and (orientation: landscape) {
+  .hero-auto .stage__grid {
+    --lw: min(48vw, calc((100svh - 96px) * 1.75));
+    grid-template-columns: minmax(0, 1fr) var(--lw);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "lead device"
+      "aside device";
+    justify-items: stretch;
+    align-content: center;
+    gap: 8px 24px;
+    padding-top: 68px;
+    padding-bottom: 16px;
+  }
+  .hero-auto .zone--lead {
+    grid-area: lead;
+    align-self: end;
+  }
+  .hero-auto .zone--device {
+    grid-area: device;
+    align-self: center;
+  }
+  .hero-auto .zone--aside {
+    grid-area: aside;
+    align-self: start;
+  }
+  .hero-auto .hero-copy__rule,
+  .hero-auto .hero-copy__sub,
+  .hero-auto .stage__hint {
+    display: none;
+  }
+  .hero-auto .hero-copy__title,
+  .hero-auto .step-lead__title {
+    font-size: clamp(1.3rem, 7svh, 1.9rem);
+  }
+  .hero-auto__cta {
+    margin-top: 12px;
+    padding: 0.8em 1.2em;
+  }
+  .hero-auto .zone--aside .stage-ind {
+    margin-bottom: 6px;
+  }
+  .hero-auto .hero-aside__desc {
+    margin-top: 4px;
+    font-size: 0.875rem;
+  }
+}

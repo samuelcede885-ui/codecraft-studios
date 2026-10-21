@@ -32,10 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
-        {/* Imágenes de la historia de la laptop: listas antes de que empiece la secuencia. */}
-        <link rel="preload" as="image" href="/projects/gramercy-shoe-clean.webp" fetchPriority="high" />
-        <link rel="preload" as="image" href="/projects/gramercy-shoe.webp" />
-        <link rel="preload" as="image" href="/projects/gramercy-logo.webp" />
+        {/* Primer fotograma del video del hero: la laptop nunca se ve vacía. */}
+        <link rel="preload" as="image" href="/projects/gramercy/poster.webp" fetchPriority="high" />
       </head>
       <body>
         <a href="#contenido" className="skip-link">

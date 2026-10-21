@@ -12,8 +12,8 @@ export const site = {
   },
   nav: [
     { label: "Inicio", mobileLabel: "Inicio", href: "#inicio" },
-    { label: "Servicios", mobileLabel: "Servicios", href: "#servicios" },
     { label: "Portafolio", mobileLabel: "Proyectos", href: "#portafolio" },
+    { label: "Servicios", mobileLabel: "Servicios", href: "#servicios" },
     { label: "Proceso", mobileLabel: "Proceso", href: "#proceso" },
     { label: "Contacto", mobileLabel: "Contacto", href: "#contacto" },
   ],

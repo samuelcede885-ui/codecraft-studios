@@ -72,3 +72,41 @@
   font-size: 0.88rem;
   color: var(--dark-muted);
 }
+
+/* ───────────────────────── Cotización ───────────────────────── */
+.quote {
+  max-width: 880px;
+}
+.quote__title {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.field__hint {
+  font-size: 0.8125rem;
+  color: var(--dark-muted);
+}
+.field [aria-invalid="true"] {
+  border-bottom-color: #ff8a80;
+}
+.field__error {
+  font-size: 0.8125rem;
+  color: #ff8a80;
+}
+.form__status.is-error {
+  color: #ff8a80;
+}
+.form__status.is-sent {
+  color: #8fd19e;
+}
+.quote__note {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.875rem;
+  color: var(--dark-muted);
+}
+/* El formulario se abre con su título visible bajo el header fijo. */
+#cotizacion {
+  scroll-margin-top: 96px;
+}

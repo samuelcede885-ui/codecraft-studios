@@ -6,9 +6,11 @@ import { Logo, LogoMark } from "./Logo";
 import { ArrowRight } from "./Icon";
 import { MobileMenu } from "./MobileMenu";
 
-export function Header() {
+/** `home`: en la portada los enlaces son anclas; en otras páginas (fichas de proyecto) vuelven a la portada. */
+export function Header({ home = true }: { home?: boolean }) {
+  const base = home ? "" : "/";
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("#inicio");
+  const [active, setActive] = useState(home ? "#inicio" : "");
   const [scrolled, setScrolled] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 
@@ -49,20 +51,20 @@ export function Header() {
         }`}
       >
         <div className="header__inner">
-          <a href="#inicio" className="header__logo" aria-label="Fary Labs, ir al inicio">
+          <a href={home ? "#inicio" : "/"} className="header__logo" aria-label="Fary Labs, ir al inicio">
             <Logo className="header__firma" />
             <LogoMark className="header__mark" />
           </a>
 
           <nav className="header__nav" aria-label="Principal">
             {site.nav.map((n) => (
-              <a key={n.href} href={n.href} aria-current={active === n.href ? "true" : undefined}>
+              <a key={n.href} href={base + n.href} aria-current={active === n.href ? "true" : undefined}>
                 {n.label}
               </a>
             ))}
           </nav>
 
-          <a href="#contacto" className="btn btn--dark btn--sm header__cta">
+          <a href={`${base}#contacto`} className="btn btn--dark btn--sm header__cta">
             Comenzar proyecto <ArrowRight className="btn__arrow" />
           </a>
 
@@ -81,7 +83,7 @@ export function Header() {
         </div>
       </header>
       {/* Fuera del header: su backdrop-filter limitaría un hijo fixed al tamaño del header. */}
-      <MobileMenu open={open} onClose={close} />
+      <MobileMenu open={open} onClose={close} base={base} />
     </>
   );
 }

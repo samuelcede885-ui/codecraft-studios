@@ -177,3 +177,42 @@ a {
   color: #fff;
 }
 
+
+/* Enlace con flecha: subrayado que se completa y flecha que avanza al pasar el ratón. */
+.link-arrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  font-weight: 600;
+}
+.link-arrow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
+}
+.link-arrow .btn__arrow {
+  transition: transform 0.28s var(--ease);
+}
+.link-arrow:focus-visible::after {
+  transform: scaleX(1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .link-arrow:hover::after {
+    transform: scaleX(1);
+  }
+  .link-arrow:hover .btn__arrow {
+    transform: translateX(5px);
+  }
+  .link-arrow:hover .pj-back__icon {
+    transform: rotate(180deg) translateX(5px);
+  }
+}

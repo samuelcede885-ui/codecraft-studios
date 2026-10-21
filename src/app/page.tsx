@@ -12,6 +12,7 @@ import { ScrollEffects } from "@/components/ScrollEffects";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ContextCursor } from "@/components/ContextCursor";
 import { Showreel } from "@/components/Showreel/Showreel";
+import { MobileQuoteBar } from "@/components/MobileQuoteBar";
 
 export default function Home() {
   // Póster del video del hero: solo en la portada, que es donde se usa.
@@ -33,6 +34,7 @@ export default function Home() {
       <ScrollEffects />
       <ContextCursor />
       <Showreel />
+      <MobileQuoteBar />
     </>
   );
 }

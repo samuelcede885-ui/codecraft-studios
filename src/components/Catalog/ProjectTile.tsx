@@ -17,16 +17,27 @@ const clock = (s: number) => {
   return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
 };
 
+type Props = {
+  project: Project;
+  index: number;
+  /** Fuera del filtro activo: se oculta (el catálogo anima la salida). */
+  hidden: boolean;
+  /** Segunda columna de la rejilla editorial: va desplazada hacia abajo. */
+  shifted: boolean;
+  /** Botón de play: abre el preview en grande (en táctil es la única forma de verlo). */
+  onPlay: (p: Project) => void;
+};
+
 /**
  * Proyecto del catálogo, al estilo de un canal de video: portada diseñada con botón de play.
  * Con ratón, al pasar por encima la portada se cambia por un preview real en bucle (sin sonido),
  * con una etiqueta PREVIEW y el tiempo restante, y vuelve a la portada al salir.
- * En táctil no hay hover: solo portada y play.
+ * En táctil no hay hover ni videos automáticos: portada, play (abre el preview), nombre y categoría.
  */
-export function ProjectTile({ project, index }: { project: Project; index: number }) {
+export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) {
   const { slug, name } = project;
   const href = `/proyectos/${slug}`;
-  const media = useRef<HTMLAnchorElement>(null);
+  const frame = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [armed, setArmed] = useState(false); // el <video> se crea al acercarse (con ratón) o al primer hover
   const [showing, setShowing] = useState(false);
@@ -77,10 +88,16 @@ export function ProjectTile({ project, index }: { project: Project; index: numbe
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [armed]);
 
+  // Al salir del filtro, el preview se detiene.
+  useEffect(() => {
+    if (hidden) stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hidden]);
+
   // Con ratón, el video se prepara al acercarse para que el preview arranque sin espera.
   // Fuera de la vista, ningún preview sigue en marcha.
   useEffect(() => {
-    const el = media.current;
+    const el = frame.current;
     if (!el) return;
     const near = new IntersectionObserver(
       ([e]) => {
@@ -105,53 +122,52 @@ export function ProjectTile({ project, index }: { project: Project; index: numbe
   const base = project.previewVideo.replace(/\.mp4$/, "");
 
   return (
-    <li className="tile" data-reveal>
-      <a
-        ref={media}
-        href={href}
+    <li className="tile" data-reveal data-flip-id={slug} hidden={hidden} data-shift={shifted || undefined}>
+      <div
+        ref={frame}
         className={`tile__media ${showing ? "is-previewing" : ""}`}
-        aria-label={`Ver proyecto ${name}`}
-        data-cursor="project"
-        onPointerEnter={start}
-        onPointerLeave={stop}
+        onPointerEnter={(e) => e.pointerType === "mouse" && start()}
+        onPointerLeave={(e) => e.pointerType === "mouse" && stop()}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
-        <img className="tile__thumb" src={assetUrl(project.thumbnail)} alt="" width={960} height={540} loading="lazy" decoding="async" />
-        {armed && (
-          <video
-            ref={video}
-            className="tile__video"
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster={assetUrl(project.thumbnail)}
-            disablePictureInPicture
-            disableRemotePlayback
-            aria-hidden="true"
-            tabIndex={-1}
-            onPlaying={() => {
-              if (!hovering.current) return;
-              setShowing(true);
-              cancelAnimationFrame(raf.current);
-              tick();
-            }}
-          >
-            <source src={assetUrl(`${base}.webm`)} type="video/webm" />
-            <source src={assetUrl(`${base}.mp4`)} type="video/mp4" />
-          </video>
-        )}
-        <span className="tile__play" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
+        <a href={href} className="tile__link" aria-label={`Ver proyecto ${name}`} data-cursor="project" tabIndex={-1}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
+          <img className="tile__thumb" src={assetUrl(project.thumbnail)} alt="" width={1600} height={900} loading="lazy" decoding="async" />
+          {armed && (
+            <video
+              ref={video}
+              className="tile__video"
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster={assetUrl(project.thumbnail)}
+              disablePictureInPicture
+              disableRemotePlayback
+              aria-hidden="true"
+              tabIndex={-1}
+              onPlaying={() => {
+                if (!hovering.current) return;
+                setShowing(true);
+                cancelAnimationFrame(raf.current);
+                tick();
+              }}
+            >
+              <source src={assetUrl(`${base}.webm`)} type="video/webm" />
+              <source src={assetUrl(`${base}.mp4`)} type="video/mp4" />
+            </video>
+          )}
+        </a>
+        <button type="button" className="tile__play" aria-label={`Ver preview de ${name}`} onClick={() => onPlay(project)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M9 6.5v11l9-5.5z" fill="currentColor" />
           </svg>
-        </span>
+        </button>
         <span className="tile__status">{project.status}</span>
         <span className="tile__live" aria-hidden="true">
           PREVIEW <time ref={time}>00:00</time>
         </span>
         <span className="tile__progress" ref={bar} aria-hidden="true" />
-      </a>
+      </div>
       <div className="tile__meta">
         <div className="tile__top">
           <span className="tile__index">{String(index).padStart(2, "0")}</span>

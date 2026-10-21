@@ -32,8 +32,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
-        {/* Primer fotograma del video del hero: la laptop nunca se ve vacía. */}
-        <link rel="preload" as="image" href="/projects/gramercy/poster.webp" fetchPriority="high" />
       </head>
       <body>
         <a href="#contenido" className="skip-link">

@@ -20,6 +20,24 @@ export function ScrollEffects() {
           gsap.to(els, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.09, ease: "expo.out", overwrite: true }),
       });
 
+      // Imágenes del case study: un recorte que se abre, con opacidad y un desplazamiento corto.
+      if (document.querySelector("[data-media]")) gsap.set("[data-media]", { autoAlpha: 0, y: 24, clipPath: "inset(14% 0% 0% 0% round 12px)" });
+      ScrollTrigger.batch("[data-media]", {
+        start: "top 90%",
+        once: true,
+        onEnter: (els) =>
+          gsap.to(els, {
+            autoAlpha: 1,
+            y: 0,
+            clipPath: "inset(0% 0% 0% 0% round 12px)",
+            duration: 1,
+            stagger: 0.12,
+            ease: "power3.out",
+            overwrite: true,
+            clearProps: "clipPath",
+          }),
+      });
+
       if (document.querySelector(".process__line-fill"))
         gsap.fromTo(
           ".process__line-fill",

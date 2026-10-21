@@ -26,11 +26,51 @@ export type Project = {
   gallery: { src: string; alt: string }[];
   /** Pantalla HTML de respaldo si un video no puede reproducirse. */
   screen: ScreenId;
+  /** Filtros del portafolio en los que aparece. */
+  filters: FilterId[];
   /** Ficha del proyecto. */
   built: string;
   problem: string;
   services: string[];
   technologies: string[];
+  /** Case study: el reto, capítulos visuales y lo que permite la solución (sin métricas inventadas). */
+  story: {
+    challenge: string[];
+    chapters: Chapter[];
+    result: string[];
+  };
+};
+
+/** Filtros del portafolio. Los que no tienen proyectos no se muestran. */
+export const filters = [
+  { id: "all", label: "Todos" },
+  { id: "web", label: "Web" },
+  { id: "ecommerce", label: "E-commerce" },
+  { id: "apps", label: "Aplicaciones" },
+  { id: "ia", label: "IA / Automatización" },
+  { id: "brand", label: "Brand Experiences" },
+] as const;
+export type FilterId = Exclude<(typeof filters)[number]["id"], "all">;
+
+/** Visual de un capítulo: video del recorrido, imagen, o pasos de una automatización. */
+export type Visual =
+  | { kind: "video"; src: string; poster: string; label: string }
+  | { kind: "image"; src: string; alt: string }
+  | { kind: "flow"; steps: string[] };
+
+export type Chapter = {
+  key: "experience" | "product" | "conversion" | "system";
+  title: string;
+  text: string;
+  visuals: Visual[];
+};
+
+/** Etiqueta de cada capítulo del case study. */
+export const chapterLabels: Record<Chapter["key"], string> = {
+  experience: "La experiencia",
+  product: "El producto",
+  conversion: "La conversión",
+  system: "El sistema",
 };
 
 /** Rutas de los archivos de un proyecto. Sin recorrido largo propio, el video completo es el mismo preview. */
@@ -68,6 +108,45 @@ export const projects: Project[] = [
       "Comprar calzado en línea genera dudas: talla, envío y forma de pago. Cada duda es un paso más donde la compra se pierde.",
     services: ["Web Craft", "Diseño UI/UX", "E-commerce", "Panel de métricas"],
     technologies: conceptStack,
+    filters: ["ecommerce", "web"],
+    story: {
+      challenge: [
+        "Comprar calzado en línea genera dudas: talla, envío y forma de pago. Cada duda es un paso más donde la compra se pierde.",
+        "La tienda tenía que verse como una campaña y, a la vez, llevar al cliente hasta el pago sin rodeos.",
+      ],
+      chapters: [
+        {
+          key: "experience",
+          title: "Una portada que se siente como campaña.",
+          text: "El producto es protagonista desde el primer segundo y el recorrido completo se entiende sin instrucciones.",
+          visuals: [{ kind: "video", src: "/projects/gramercy/full", poster: "/projects/gramercy/poster.webp", label: "Recorrido completo por Gramercy" }],
+        },
+        {
+          key: "product",
+          title: "Todo lo que hace falta para decidir.",
+          text: "Precio, stock, envío y descripción en una sola vista, con el botón de compra siempre a mano.",
+          visuals: [{ kind: "image", src: "/projects/gramercy/gallery-2.webp", alt: "Ficha del producto con precio, stock y botón de compra" }],
+        },
+        {
+          key: "conversion",
+          title: "Del carrito al pago, en pocos pasos.",
+          text: "Talla, dirección y método de pago en pantallas cortas y claras.",
+          visuals: [
+            { kind: "image", src: "/projects/gramercy/gallery-3.webp", alt: "Carrito con selección de talla y dirección de envío" },
+            { kind: "image", src: "/projects/gramercy/gallery-4.webp", alt: "Métodos de pago disponibles en el checkout" },
+          ],
+        },
+        {
+          key: "system",
+          title: "Las ventas, en un panel.",
+          text: "Ventas, usuarios y conversión reunidos para seguir la tienda día a día. Datos de ejemplo.",
+          visuals: [{ kind: "image", src: "/projects/gramercy/gallery-5.webp", alt: "Panel de métricas de la tienda" }],
+        },
+      ],
+      result: [
+        "Con esta solución, una marca puede presentar su producto con la fuerza de una campaña, guiar cada compra paso a paso y seguir sus ventas desde un solo lugar.",
+      ],
+    },
   },
   {
     slug: "panel-de-metricas",
@@ -84,6 +163,30 @@ export const projects: Project[] = [
     problem: "Los datos del negocio están repartidos entre varias herramientas y revisarlos lleva tiempo.",
     services: ["App Craft", "Visualización de datos"],
     technologies: conceptStack,
+    filters: ["apps"],
+    story: {
+      challenge: [
+        "Los datos del negocio están repartidos entre varias herramientas y revisarlos lleva tiempo.",
+        "Hacía falta una sola vista que se entienda en segundos, sin hojas de cálculo.",
+      ],
+      chapters: [
+        {
+          key: "experience",
+          title: "Una lectura en segundos.",
+          text: "Ventas, usuarios, productos y conversión aparecen ordenados por importancia.",
+          visuals: [{ kind: "video", src: "/projects/panel-de-metricas/preview", poster: "/projects/panel-de-metricas/gallery-1.webp", label: "Recorrido por el panel de métricas" }],
+        },
+        {
+          key: "product",
+          title: "Gráficas simples, datos claros.",
+          text: "Cada tarjeta responde a una pregunta del negocio. Las cifras son datos de ejemplo.",
+          visuals: [{ kind: "image", src: "/projects/panel-de-metricas/gallery-1.webp", alt: "Panel con ventas, usuarios, productos y conversión" }],
+        },
+      ],
+      result: [
+        "El equipo puede revisar el estado del negocio de un vistazo y decidir con la información a mano, sin saltar entre herramientas.",
+      ],
+    },
   },
   {
     slug: "asistente-de-reservas",
@@ -100,6 +203,36 @@ export const projects: Project[] = [
     problem: "Responder mensajes para agendar citas ocupa horas del equipo y deja clientes esperando.",
     services: ["Agent Craft", "Integraciones"],
     technologies: [...conceptStack, "Integración con calendario"],
+    filters: ["ia"],
+    story: {
+      challenge: [
+        "Responder mensajes para agendar citas ocupa horas del equipo y deja clientes esperando.",
+        "El reto era atender cada consulta al momento sin perder el tono cercano de la marca.",
+      ],
+      chapters: [
+        {
+          key: "experience",
+          title: "Una conversación que termina en reserva.",
+          text: "El asistente responde, ofrece horarios disponibles y confirma, todo en el mismo chat.",
+          visuals: [{ kind: "video", src: "/projects/asistente-de-reservas/preview", poster: "/projects/asistente-de-reservas/gallery-1.webp", label: "Conversación con el asistente de reservas" }],
+        },
+        {
+          key: "product",
+          title: "Claro para quien escribe.",
+          text: "Mensajes cortos, opciones concretas y una confirmación al final.",
+          visuals: [{ kind: "image", src: "/projects/asistente-de-reservas/gallery-1.webp", alt: "Conversación del asistente y pasos de la automatización" }],
+        },
+        {
+          key: "system",
+          title: "Lo que pasa detrás.",
+          text: "Cada reserva actualiza el calendario y envía la confirmación sin trabajo manual.",
+          visuals: [{ kind: "flow", steps: ["Consulta recibida", "Horario reservado", "Calendario actualizado", "Confirmación enviada"] }],
+        },
+      ],
+      result: [
+        "El negocio puede atender consultas a cualquier hora y dedicar el tiempo del equipo a lo que necesita una persona.",
+      ],
+    },
   },
   {
     slug: "norte-estudio",
@@ -116,6 +249,30 @@ export const projects: Project[] = [
     problem: "Un estudio con buen trabajo necesita una web que lo presente con la misma calidad.",
     services: ["Web Craft", "Dirección de arte"],
     technologies: conceptStack,
+    filters: ["web", "brand"],
+    story: {
+      challenge: [
+        "Un estudio con buen trabajo necesita una web que lo presente con la misma calidad.",
+        "Norte Estudio es una marca ficticia: este concepto explora cómo dar a cada obra el protagonismo de una revista.",
+      ],
+      chapters: [
+        {
+          key: "experience",
+          title: "Arquitectura que se habita.",
+          text: "Tipografía grande, mucho aire y la obra como protagonista.",
+          visuals: [{ kind: "video", src: "/projects/norte-estudio/preview", poster: "/projects/norte-estudio/gallery-1.webp", label: "Recorrido por la portada de Norte Estudio" }],
+        },
+        {
+          key: "product",
+          title: "Una portada editorial.",
+          text: "Cada proyecto se presenta como en una publicación de arquitectura.",
+          visuals: [{ kind: "image", src: "/projects/norte-estudio/gallery-1.webp", alt: "Portada editorial de Norte Estudio" }],
+        },
+      ],
+      result: [
+        "El estudio puede mostrar su obra con el cuidado de una publicación y dejar que los proyectos hablen por sí mismos.",
+      ],
+    },
   },
 ];
 

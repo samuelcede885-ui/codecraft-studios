@@ -98,12 +98,9 @@
 .stage-ind__num.is-idle {
   opacity: 0.45;
 }
+/* Una sola pista: el relleno avanza con video.currentTime / video.duration; las marcas
+   señalan dónde empieza cada etapa. */
 .stage-ind__bar {
-  flex: 1;
-  display: flex;
-  gap: 4px;
-}
-.stage-ind__bar > i {
   position: relative;
   flex: 1;
   height: 2px;
@@ -111,12 +108,20 @@
   border-radius: 2px;
   background: rgba(9, 10, 11, 0.14);
 }
-.stage-ind__bar > i > i {
+.stage-ind__fill {
   position: absolute;
   inset: 0;
   background: var(--ink);
   transform: scaleX(0);
   transform-origin: left;
+}
+.stage-ind__tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: #f1f1ef;
 }
 .stage-ind__toggle {
   display: grid;
@@ -166,6 +171,63 @@
   color: var(--ink-2);
 }
 
+/* Etiquetas editoriales sobre la laptop: discretas, una visible por etapa. */
+.hero-tags {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + clamp(14px, 2.4svh, 26px));
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+.hero-tag {
+  grid-area: 1 / 1;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.hero-tag[data-state="active"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s var(--ease-out, var(--ease)) 0.18s,
+    transform 0.6s var(--ease-out, var(--ease)) 0.18s;
+}
+.hero-tag[data-state="past"] {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.hero-tag[data-state="next"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Frase de paso al portafolio: aparece solo al salir del hero (GSAP la anima). */
+.hero-exit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 4svh, 40px);
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--ink);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* Móvil y tablet: título, laptop e información sincronizada, en columna. */
 @media (max-width: 1023px) {
   .hero-auto .zone--aside .stage-ind,
@@ -190,10 +252,15 @@
   .hero-auto__cta {
     margin-top: 20px;
   }
+  .hero-tags,
+  .hero-exit {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-panel[data-state] {
+  .hero-panel[data-state],
+  .hero-tag[data-state] {
     transform: none;
   }
 }

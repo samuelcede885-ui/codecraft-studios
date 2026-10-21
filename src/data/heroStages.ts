@@ -14,6 +14,8 @@ export type HeroStage = {
   /** Pantalla de Gramercy que muestra el video en esta etapa. */
   screen: ScreenId;
   eyebrow: string;
+  /** Etiqueta editorial discreta sobre la laptop ("" en la apertura). */
+  tag: string;
   title: string;
   description: string;
 };
@@ -25,6 +27,7 @@ export const heroStages: HeroStage[] = [
     end: 3,
     screen: "home",
     eyebrow: "",
+    tag: "",
     title: "Transformamos ideas en productos digitales.",
     description: "Diseño, desarrollo y automatización para que la tecnología impulse tu negocio.",
   },
@@ -34,6 +37,7 @@ export const heroStages: HeroStage[] = [
     end: 7.6,
     screen: "home",
     eyebrow: "Concepto",
+    tag: "Idea → Experience",
     title: "Ideas que cobran vida.",
     description: "Convertimos ideas en experiencias digitales claras y memorables.",
   },
@@ -43,6 +47,7 @@ export const heroStages: HeroStage[] = [
     end: 12.6,
     screen: "product",
     eyebrow: "Producto",
+    tag: "UI / UX",
     title: "Diseño que convierte.",
     description: "Interfaces pensadas para destacar el producto y facilitar la decisión.",
   },
@@ -52,6 +57,7 @@ export const heroStages: HeroStage[] = [
     end: 17.6,
     screen: "cart",
     eyebrow: "Conversión",
+    tag: "Commerce",
     title: "Interfaces creadas para vender.",
     description: "Experiencias de compra simples, rápidas y sin fricción.",
   },
@@ -61,6 +67,7 @@ export const heroStages: HeroStage[] = [
     end: 22.4,
     screen: "payment",
     eyebrow: "Tecnología",
+    tag: "Systems",
     title: "Tecnología que hace que todo funcione.",
     description: "Pagos, integraciones y automatización trabajando juntos.",
   },
@@ -70,6 +77,7 @@ export const heroStages: HeroStage[] = [
     end: 28.2,
     screen: "dashboard",
     eyebrow: "Resultados",
+    tag: "Growth",
     title: "Datos que impulsan decisiones.",
     description: "Soluciones diseñadas para medir, aprender y crecer.",
   },

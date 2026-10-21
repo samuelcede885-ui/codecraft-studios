@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { HERO_DURATION, heroStages, numberedStages, stageAt } from "@/data/heroStages";
 import { LogoMark } from "../Logo";
 import { ArrowRight } from "../Icon";
 import { LaptopFrame } from "../ScrollStory/LaptopFrame";
 import { Reel } from "../reel/Reel";
 import { assetUrl } from "@/lib/assets";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const VIDEO = "/projects/gramercy/full";
 const POSTER = "/projects/gramercy/poster.webp";
@@ -26,7 +29,7 @@ export function HeroShowcase() {
   const root = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const reel = useRef<gsap.core.Timeline | null>(null);
-  const fills = useRef<(HTMLElement | null)[]>([]);
+  const fill = useRef<HTMLElement>(null);
   const [source, setSource] = useState<Source>("video");
   const [stage, setStage] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -40,19 +43,22 @@ export function HeroShowcase() {
     return video.current?.currentTime ?? 0;
   }, []);
 
-  /** Lee el tiempo y actualiza etapa y barra de progreso (la barra se escribe directo en el DOM). */
+  /** Duración real del recorrido: la del video cuando ya se conoce. */
+  const duration = useCallback(() => {
+    const d = sourceRef.current === "video" ? video.current?.duration : NaN;
+    return d && Number.isFinite(d) ? d : HERO_DURATION;
+  }, []);
+
+  /**
+   * Lee el tiempo y actualiza etapa y barra. La barra es currentTime / duration del video,
+   * escrita directo en el DOM (sin re-render en cada fotograma).
+   */
   const sync = useCallback(() => {
     const t = time();
     const i = stageAt(t);
     setStage((prev) => (prev === i ? prev : i));
-    const s = heroStages[i];
-    const n = numberedStages.indexOf(s);
-    fills.current.forEach((el, k) => {
-      if (!el) return;
-      const p = k < n ? 1 : k === n ? Math.min(1, (t - s.start) / (s.end - s.start)) : 0;
-      el.style.transform = `scaleX(${p})`;
-    });
-  }, [time]);
+    if (fill.current) fill.current.style.transform = `scaleX(${Math.min(1, t / duration())})`;
+  }, [time, duration]);
 
   const play = useCallback(() => {
     if (userPaused.current || !wanted.current) return;
@@ -155,6 +161,32 @@ export function HeroShowcase() {
     };
   }, []);
 
+  // Salida hacia el portafolio: al empezar a bajar, una transición breve de duración fija
+  // (no ligada al scroll) aleja la escena y presenta la siguiente sección. Al volver, se revierte.
+  // No toca la secuencia del video, que sigue siendo automática.
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const q = gsap.utils.selector(el);
+      const tl = gsap.timeline({ paused: true, defaults: { duration: 0.75, ease: "power3.inOut" } });
+      tl.to(q(".stage__grid"), { scale: 0.97, transformOrigin: "50% 40%" }, 0)
+        .to(q(".zone--lead .hero-panels, .hero-auto__cta, .zone--aside, .hero-tags, .stage__hint"), { autoAlpha: 0, y: -10, duration: 0.5, ease: "power2.in", stagger: 0.03 }, 0)
+        .to(q(".zone--device .laptop"), { y: -20 }, 0)
+        .to(q(".stage__ghost"), { autoAlpha: 0.35, duration: 0.6 }, 0)
+        .fromTo(q(".hero-exit"), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+      ScrollTrigger.create({
+        trigger: el,
+        start: "top+=40 top",
+        onEnter: () => tl.play(),
+        onLeaveBack: () => tl.reverse(),
+      });
+      return () => tl.revert();
+    });
+    return () => mm.revert();
+  }, []);
+
   function togglePause() {
     userPaused.current = !userPaused.current;
     setPaused(userPaused.current);
@@ -197,6 +229,16 @@ export function HeroShowcase() {
           </div>
 
           <div className="zone zone--device">
+            {/* Etiqueta editorial de cada etapa, sobre la laptop. */}
+            <div className="hero-tags" aria-hidden="true">
+              {heroStages.map((s, i) =>
+                s.tag ? (
+                  <span key={s.tag} className="hero-tag" data-state={i === stage ? "active" : i < stage ? "past" : "next"}>
+                    {s.tag}
+                  </span>
+                ) : null,
+              )}
+            </div>
             <LaptopFrame>
               {source === "video" ? (
                 <video
@@ -233,10 +275,9 @@ export function HeroShowcase() {
                 <b>{String(n).padStart(2, "0")}</b> / {String(numberedStages.length).padStart(2, "0")}
               </span>
               <span className="stage-ind__bar" aria-hidden="true">
-                {numberedStages.map((s, k) => (
-                  <i key={s.id}>
-                    <i ref={(el) => void (fills.current[k] = el)} />
-                  </i>
+                <i className="stage-ind__fill" ref={fill} />
+                {numberedStages.map((s) => (
+                  <i key={s.id} className="stage-ind__tick" style={{ left: `${(s.start / HERO_DURATION) * 100}%` }} />
                 ))}
               </span>
               <button
@@ -274,6 +315,9 @@ export function HeroShowcase() {
             </div>
           </div>
         </div>
+        <p className="hero-exit" aria-hidden="true">
+          Ahora mira lo que podemos construir.
+        </p>
         <div className="stage__hint" aria-hidden="true">
           <span className="stage__mouse" />
           Scroll

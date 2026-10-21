@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { projects, type Project } from "@/data/projects";
+import { CONCEPT_NOTE, projects, typeLabel, type Project } from "@/data/projects";
 import { selectQuoteReference } from "@/lib/quote";
 import { assetUrl } from "@/lib/assets";
 import { ArrowRight } from "../Icon";
@@ -54,7 +54,7 @@ export function Featured() {
     <section id="portafolio" className="featured" aria-labelledby="destacado-title">
       <div className="featured__head container" data-reveal>
         <span className="eyebrow featured__eyebrow">Proyecto destacado</span>
-        <span className="featured__status">{project.status}</span>
+        <span className="featured__status">{typeLabel(project)}</span>
       </div>
       <h2 id="destacado-title" className="featured__title container" data-reveal>
         {project.name}
@@ -92,13 +92,14 @@ export function Featured() {
         <span className="featured__cat">{project.category}</span>
         <p className="featured__desc">{project.description}</p>
         <div className="featured__actions">
-          <a href={href} className="btn btn--light">
+          <a href={href} className="btn btn--dark">
             Explorar proyecto <ArrowRight className="btn__arrow" />
           </a>
-          <a href="#cotizacion" className="btn featured__quote" onClick={() => selectQuoteReference(project.slug)}>
+          <a href="#cotizacion" className="btn btn--outline" onClick={() => selectQuoteReference(project.slug)}>
             Quiero algo así <ArrowRight className="btn__arrow" />
           </a>
         </div>
+        {project.projectType === "concept" && <p className="featured__note">{CONCEPT_NOTE}</p>}
       </div>
     </section>
   );

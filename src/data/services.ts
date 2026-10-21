@@ -17,7 +17,7 @@ export const services: Service[] = [
     name: "Web Craft",
     kind: "Desarrollo web",
     description:
-      "Diseño y desarrollo de páginas web profesionales, landing pages, sitios corporativos y tiendas online.",
+      "Creamos páginas profesionales, rápidas y claras para presentar tu negocio, vender y facilitar el contacto.",
     detail: "Creamos una web clara para presentar tu negocio y facilitar el contacto.",
     includes: ["Landing pages", "Sitios corporativos", "E-commerce", "Desarrollo web"],
     preview: "home",
@@ -27,7 +27,7 @@ export const services: Service[] = [
     name: "App Craft",
     kind: "Aplicaciones",
     description:
-      "Desarrollo de aplicaciones web, plataformas digitales y sistemas personalizados para empresas.",
+      "Diseñamos aplicaciones, plataformas y sistemas personalizados para resolver necesidades reales.",
     detail: "Diseñamos una herramienta para organizar la información y simplificar tareas.",
     includes: ["Apps web", "Plataformas", "Sistemas a medida"],
     preview: "dashboard",
@@ -37,7 +37,7 @@ export const services: Service[] = [
     name: "Agent Craft",
     kind: "Inteligencia artificial",
     description:
-      "Creación de agentes inteligentes, asistentes virtuales, integraciones y automatizaciones empresariales.",
+      "Creamos agentes inteligentes y automatizaciones que conectan procesos, información y personas.",
     detail: "Automatizamos procesos definidos para que tu equipo dedique tiempo a tareas de valor.",
     includes: ["Agentes IA", "Asistentes", "Automatización", "Integraciones"],
     preview: "agent",

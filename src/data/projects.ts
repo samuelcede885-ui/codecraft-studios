@@ -5,7 +5,8 @@ import type { ScreenId } from "./screens";
  * public/projects/<slug>/ (thumb.webp = portada diseñada, preview.mp4/.webm, opcionalmente full.mp4/.webm, gallery-*.webp).
  * Los videos de los conceptos se graban de sus pantallas HTML con scripts/record-reels.mjs.
  *
- * Todos los proyectos actuales son conceptos de Fary Labs: no son trabajos de clientes.
+ * Todos los proyectos actuales son conceptos de Fary Labs (projectType "concept"): no son trabajos
+ * de clientes y se marcan siempre como tales. Un trabajo real lleva projectType "client".
  */
 export type Project = {
   slug: string;
@@ -17,8 +18,8 @@ export type Project = {
   headline: string;
   tags: string[];
   featured?: boolean;
-  /** Concepto propio o trabajo real; los conceptos se marcan siempre como tales. */
-  status: "Concepto";
+  /** Trabajo real para un cliente o concepto propio. Un concepto nunca se presenta como cliente. */
+  projectType: "client" | "concept";
   year?: string;
   thumbnail: string;
   previewVideo: string;
@@ -32,7 +33,10 @@ export type Project = {
   built: string;
   problem: string;
   services: string[];
-  technologies: string[];
+  /** Solo tecnologías verificadas en el proyecto real; sin datos, la sección no se muestra. */
+  technologies?: string[];
+  /** Antes y después con imágenes reales del proyecto; sin ellas, no se muestra la comparación. */
+  beforeAfter?: { before: { src: string; alt: string }; after: { src: string; alt: string }; caption?: string };
   /** Case study: el reto, capítulos visuales y lo que permite la solución (sin métricas inventadas). */
   story: {
     challenge: string[];
@@ -80,8 +84,6 @@ const media = (slug: string, hasFull = false) => ({
   fullVideo: `/projects/${slug}/${hasFull ? "full" : "preview"}.mp4`,
 });
 
-/** Tecnologías con las que está construido cada concepto en esta web. */
-const conceptStack = ["Next.js", "React", "TypeScript", "GSAP"];
 
 export const projects: Project[] = [
   {
@@ -92,7 +94,7 @@ export const projects: Project[] = [
     headline: "Pisa firme.\nCompra fácil.",
     tags: ["E-commerce", "UI/UX", "Checkout"],
     featured: true,
-    status: "Concepto",
+    projectType: "concept",
     ...media("gramercy", true),
     gallery: [
       { src: "/projects/gramercy/gallery-1.webp", alt: "Portada de la tienda Gramercy con el zueco Boston" },
@@ -107,7 +109,6 @@ export const projects: Project[] = [
     problem:
       "Comprar calzado en línea genera dudas: talla, envío y forma de pago. Cada duda es un paso más donde la compra se pierde.",
     services: ["Web Craft", "Diseño UI/UX", "E-commerce", "Panel de métricas"],
-    technologies: conceptStack,
     filters: ["ecommerce", "web"],
     story: {
       challenge: [
@@ -155,14 +156,13 @@ export const projects: Project[] = [
     description: "Ventas, usuarios y conversión en una sola vista.",
     headline: "Tus números,\nen una mirada.",
     tags: ["Dashboard", "Datos"],
-    status: "Concepto",
+    projectType: "concept",
     ...media("panel-de-metricas"),
     gallery: [{ src: "/projects/panel-de-metricas/gallery-1.webp", alt: "Panel con ventas, usuarios, productos y conversión" }],
     screen: "dashboard",
     built: "Un panel que reúne ventas, usuarios y conversión con gráficas simples y una lectura en segundos.",
     problem: "Los datos del negocio están repartidos entre varias herramientas y revisarlos lleva tiempo.",
     services: ["App Craft", "Visualización de datos"],
-    technologies: conceptStack,
     filters: ["apps"],
     story: {
       challenge: [
@@ -195,14 +195,13 @@ export const projects: Project[] = [
     description: "Responde consultas, propone horarios y confirma reservas.",
     headline: "Pregunta.\nAgenda.\nConfirma.",
     tags: ["Agente IA", "Automatización"],
-    status: "Concepto",
+    projectType: "concept",
     ...media("asistente-de-reservas"),
     gallery: [{ src: "/projects/asistente-de-reservas/gallery-1.webp", alt: "Conversación del asistente y pasos de la automatización" }],
     screen: "agent",
     built: "Un asistente que contesta, ofrece horarios disponibles, actualiza el calendario y envía la confirmación.",
     problem: "Responder mensajes para agendar citas ocupa horas del equipo y deja clientes esperando.",
     services: ["Agent Craft", "Integraciones"],
-    technologies: [...conceptStack, "Integración con calendario"],
     filters: ["ia"],
     story: {
       challenge: [
@@ -241,14 +240,13 @@ export const projects: Project[] = [
     description: "Una portada editorial para un estudio de arquitectura.",
     headline: "Espacio, luz\ny estructura.",
     tags: ["Sitio corporativo", "Editorial"],
-    status: "Concepto",
+    projectType: "concept",
     ...media("norte-estudio"),
     gallery: [{ src: "/projects/norte-estudio/gallery-1.webp", alt: "Portada editorial de Norte Estudio" }],
     screen: "studio",
     built: "Una portada editorial con tipografía grande, mucho aire y el proyecto como protagonista. La marca Norte Estudio es ficticia.",
     problem: "Un estudio con buen trabajo necesita una web que lo presente con la misma calidad.",
     services: ["Web Craft", "Dirección de arte"],
-    technologies: conceptStack,
     filters: ["web", "brand"],
     story: {
       challenge: [
@@ -275,6 +273,12 @@ export const projects: Project[] = [
     },
   },
 ];
+
+/** Aviso obligatorio en los conceptos (nunca en trabajos de clientes). */
+export const CONCEPT_NOTE = "Concepto de diseño de Fary Labs. No es un trabajo de cliente.";
+
+/** Etiqueta corta para portadas y fichas. */
+export const typeLabel = (p: Project) => (p.projectType === "concept" ? "Concepto" : "Cliente");
 
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
 

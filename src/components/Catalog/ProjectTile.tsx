@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Project } from "@/data/projects";
+import { typeLabel, type Project } from "@/data/projects";
 import { selectQuoteReference } from "@/lib/quote";
 import { ArrowRight } from "../Icon";
 import { assetUrl } from "@/lib/assets";
@@ -162,7 +162,7 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
             <path d="M9 6.5v11l9-5.5z" fill="currentColor" />
           </svg>
         </button>
-        <span className="tile__status">{project.status}</span>
+        <span className="tile__status">{typeLabel(project)}</span>
         <span className="tile__live" aria-hidden="true">
           PREVIEW <time ref={time}>00:00</time>
         </span>

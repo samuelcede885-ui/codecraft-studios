@@ -55,7 +55,7 @@
 
 /* ───────────────────────── Servicios (desplegables) ───────────────────────── */
 .services {
-  background: var(--surface);
+  background: var(--tone-0);
 }
 .services__list {
   list-style: none;
@@ -65,6 +65,23 @@
 }
 .service {
   border-top: 1px solid var(--line);
+  transition: opacity 0.45s var(--ease);
+}
+/* Con un servicio abierto, los demás bajan de tono para que el abierto marque el ritmo. */
+.services__list:has(.is-open) .service:not(.is-open) .service__head {
+  opacity: 0.5;
+  transition: opacity 0.45s var(--ease);
+}
+.service__head {
+  transition: opacity 0.45s var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .services__list .service .service__head:hover {
+    opacity: 1;
+  }
+}
+.service.is-open .service__num {
+  color: var(--ink);
 }
 .service__heading {
   margin: 0;
@@ -262,10 +279,8 @@
    Pieza de campaña: nombre monumental y el recorrido a sangre, sin marco de tarjeta. */
 .featured {
   padding: clamp(88px, 11vw, 150px) 0 clamp(72px, 9vw, 120px);
-  background:
-    radial-gradient(45% 50% at 80% 8%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 70%),
-    var(--dark);
-  color: #fff;
+  background: var(--tone-1);
+  color: var(--ink);
 }
 .featured__head {
   display: flex;
@@ -274,17 +289,17 @@
   gap: 16px;
 }
 .featured__eyebrow {
-  color: var(--dark-muted);
+  color: var(--muted);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 0.75rem;
 }
 .featured__status {
   padding: 6px 12px;
-  border: 1px solid var(--dark-line);
+  border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 0.8125rem;
-  color: var(--dark-muted);
+  color: var(--ink-2);
 }
 .featured__title {
   margin-top: clamp(20px, 3vw, 36px);
@@ -348,7 +363,7 @@
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--dark-muted);
+  color: var(--muted);
 }
 .featured__desc {
   margin: 0;
@@ -364,13 +379,11 @@
   flex-wrap: wrap;
   gap: 12px;
 }
-.featured__quote {
-  background: transparent;
-  color: #fff;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
-}
-.featured__quote:hover {
-  box-shadow: inset 0 0 0 1px #fff;
+.featured__note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
 }
 @media (max-width: 1023px) {
   .featured__info {
@@ -381,8 +394,7 @@
 /* ───────────────────────── ¿Qué quieres construir? ─────────────────────────
    Índice editorial: renglones grandes separados por líneas finas, sin tarjetas. */
 .build {
-  background: var(--bg);
-  padding-bottom: 0;
+  background: var(--tone-2);
 }
 .build__head {
   margin-bottom: clamp(36px, 5vw, 64px);
@@ -611,7 +623,7 @@
    Como un canal de video: portada diseñada con play; con ratón, el preview real se reproduce
    al pasar por encima (uno a la vez). Rejilla editorial de dos columnas, la segunda desplazada. */
 .catalog {
-  background: var(--bg);
+  background: var(--tone-0);
 }
 .catalog__head {
   display: grid;
@@ -1029,7 +1041,12 @@
 /* ───────────────────────── Ficha de proyecto ───────────────────────── */
 .pj-hero {
   padding: calc(var(--header-h) + clamp(32px, 5vw, 64px)) 0 clamp(64px, 8vw, 110px);
-  background: var(--bg);
+  background: var(--tone-0);
+}
+.pj-concept {
+  margin: 14px 0 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
 }
 .pj-back {
   font-size: 0.92rem;
@@ -1084,6 +1101,90 @@
   object-fit: cover;
 }
 
+/* Antes / después: la imagen "antes" se recorta hasta la línea (--ba). */
+.ba {
+  margin: 0;
+}
+.ba__stage {
+  --ba: 50%;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  background: #e9e7e1;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+.ba__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.ba__img--before {
+  clip-path: inset(0 calc(100% - var(--ba)) 0 0);
+}
+.ba__tag {
+  position: absolute;
+  top: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(9, 10, 11, 0.72);
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.ba__tag--before {
+  left: 14px;
+}
+.ba__tag--after {
+  right: 14px;
+}
+.ba__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--ba);
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  outline: none;
+}
+.ba__knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.4);
+}
+.ba__knob svg {
+  width: 20px;
+  height: 20px;
+}
+.ba__handle:focus-visible .ba__knob {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.ba__caption {
+  margin-top: 14px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
 /* Rótulo de capítulo: pequeño, en mayúsculas, con número. */
 .pj-label {
   display: inline-flex;
@@ -1108,8 +1209,8 @@
 
 /* El reto: pocas líneas, grandes y con aire. */
 .pj-challenge {
-  padding: clamp(88px, 11vw, 160px) 0 clamp(40px, 5vw, 72px);
-  background: var(--bg);
+  padding: clamp(88px, 11vw, 160px) 0;
+  background: var(--tone-1);
 }
 .pj-challenge__text p {
   margin: 0;
@@ -1130,7 +1231,10 @@
 /* Capítulos: título corto, una frase y el visual a lo ancho. */
 .pj-chapter {
   padding: clamp(72px, 9vw, 140px) 0 0;
-  background: var(--bg);
+  background: var(--tone-0);
+}
+.pj-chapter:has(+ .pj-result) {
+  padding-bottom: clamp(72px, 9vw, 140px);
 }
 .pj-chapter__head {
   display: grid;
@@ -1220,7 +1324,7 @@
 /* Resultado: lo que permite la solución, sin cifras. */
 .pj-result {
   padding: clamp(96px, 12vw, 180px) 0;
-  background: var(--bg);
+  background: var(--tone-2);
 }
 .pj-result__text {
   margin: 0;
@@ -1290,7 +1394,7 @@
 
 /* ───────────────────────── Proceso ───────────────────────── */
 .process {
-  background: var(--surface);
+  background: var(--tone-1);
 }
 .process__track {
   position: relative;

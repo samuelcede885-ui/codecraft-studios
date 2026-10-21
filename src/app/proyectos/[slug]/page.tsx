@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const title = `${p.name} — ${p.category} | Fary Labs`;
   return {
     title,
-    description: `${p.description} Concepto de Fary Labs.`,
+    description: p.projectType === "concept" ? `${p.description} Concepto de Fary Labs.` : p.description,
     openGraph: { title, description: p.description, images: [{ url: p.thumbnail, width: 1600, height: 900 }] },
   };
 }

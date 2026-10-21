@@ -1,8 +1,9 @@
-import { chapterLabels, projects, quoteHref, type Project, type Visual } from "@/data/projects";
+import { CONCEPT_NOTE, chapterLabels, projects, quoteHref, typeLabel, type Project, type Visual } from "@/data/projects";
 import { ArrowRight } from "../Icon";
 import { Logo } from "../Logo";
 import { Channels } from "../Channels";
 import { ProjectVideo } from "./ProjectVideo";
+import { BeforeAfterComparison } from "./BeforeAfterComparison";
 import { assetUrl } from "@/lib/assets";
 
 function VisualBlock({ v }: { v: Visual }) {
@@ -52,13 +53,14 @@ export function ProjectPage({ project: p }: { project: Project }) {
           <div className="pj-hero__head">
             <div>
               <span className="pj-hero__cat">
-                {p.category} · {p.status}
+                {p.category} · {typeLabel(p)}
                 {p.year && ` · ${p.year}`}
               </span>
               <h1 id="pj-title" className="pj-hero__title">
                 {p.name}
               </h1>
               <p className="pj-hero__lead">{p.description}</p>
+              {p.projectType === "concept" && <p className="pj-concept">{CONCEPT_NOTE}</p>}
             </div>
             <a href={quoteHref(p.slug)} className="btn btn--dark">
               Quiero una página como esta <ArrowRight className="btn__arrow" />
@@ -67,7 +69,7 @@ export function ProjectPage({ project: p }: { project: Project }) {
         </div>
         <figure className="pj-hero__media" data-media>
           {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
-          <img src={assetUrl(p.thumbnail)} alt={`Portada del concepto ${p.name}`} width={1600} height={900} decoding="async" fetchPriority="high" />
+          <img src={assetUrl(p.thumbnail)} alt={`Portada de ${p.name}`} width={1600} height={900} decoding="async" fetchPriority="high" />
         </figure>
       </section>
 
@@ -86,6 +88,14 @@ export function ProjectPage({ project: p }: { project: Project }) {
           </div>
         </div>
       </section>
+
+      {p.beforeAfter && (
+        <section className="pj-chapter pj-ba" aria-label="Antes y después">
+          <div className="container">
+            <BeforeAfterComparison {...p.beforeAfter} />
+          </div>
+        </section>
+      )}
 
       {story.chapters.map((c, i) => (
         <section key={c.key} className={`pj-chapter pj-chapter--${c.key}`} aria-labelledby={`pj-${c.key}`}>
@@ -122,12 +132,14 @@ export function ProjectPage({ project: p }: { project: Project }) {
                 <dt>Servicios</dt>
                 <dd>{p.services.join(" · ")}</dd>
               </div>
-              <div>
-                <dt>Tecnologías</dt>
-                <dd>{p.technologies.join(" · ")}</dd>
-              </div>
+              {p.technologies?.length ? (
+                <div>
+                  <dt>Tecnologías</dt>
+                  <dd>{p.technologies.join(" · ")}</dd>
+                </div>
+              ) : null}
             </dl>
-            <p className="catalog__note">Concepto de diseño de Fary Labs. No es un trabajo de cliente, por eso no mostramos métricas.</p>
+            {p.projectType === "concept" && <p className="catalog__note">{CONCEPT_NOTE}</p>}
           </div>
         </div>
       </section>

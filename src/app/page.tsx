@@ -21,8 +21,8 @@ export default function Home() {
       <main id="contenido">
         <HeroShowcase />
         <Featured />
-        <Build />
         <Catalog />
+        <Build />
         <Services />
         <Process />
         <FinalCTA />

@@ -123,9 +123,11 @@ export function Catalog() {
             />
           ))}
         </ul>
-        <p className="catalog__note" data-reveal>
-          Conceptos de diseño de Fary Labs. No son trabajos de clientes.
-        </p>
+        {projects.some((p) => p.projectType === "concept") && (
+          <p className="catalog__note" data-reveal>
+            Los proyectos marcados como Concepto son conceptos de diseño de Fary Labs. No son trabajos de clientes.
+          </p>
+        )}
       </div>
       <PreviewDialog project={preview} onClose={() => setPreview(null)} />
     </section>

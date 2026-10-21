@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Project } from "@/data/projects";
+import { typeLabel, type Project } from "@/data/projects";
 import { selectQuoteReference } from "@/lib/quote";
 import { assetUrl } from "@/lib/assets";
 import { ArrowRight } from "../Icon";
@@ -60,7 +60,9 @@ export function PreviewDialog({ project, onClose }: { project: Project | null; o
           </div>
           <div className="pv__bar">
             <div>
-              <span className="pv__cat">{project.category}</span>
+              <span className="pv__cat">
+                {project.category} · {typeLabel(project)}
+              </span>
               <p className="pv__name">{project.name}</p>
             </div>
             <div className="pv__actions">

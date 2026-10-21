@@ -13,8 +13,8 @@ const options: { title: string; kind: string; filter: FilterId }[] = [
 ];
 
 /**
- * Navegación por intención, antes del catálogo: cuatro renglones grandes, como un índice editorial.
- * Cada uno filtra el portafolio y baja hasta él. Con ratón asoma la portada de un proyecto relacionado.
+ * Navegación por intención, después del catálogo: cuatro renglones grandes, como un índice editorial.
+ * Cada uno filtra el portafolio y vuelve a él. Con ratón asoma la portada de un proyecto relacionado.
  */
 export function Build() {
   return (

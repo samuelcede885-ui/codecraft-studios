@@ -15,7 +15,7 @@ import { join } from "node:path";
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright");
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const OUT = join(process.cwd(), "public/projects");
-const ids = ["g-talent", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
+const ids = ["g-talent", "gaba", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
 
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });

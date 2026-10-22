@@ -10,8 +10,8 @@ import { Screen } from "../screens/Screens";
  * scripts/record-covers.mjs las captura a public/projects/<slug>/thumb.webp.
  * Todo se mide en cqw (1cqw = 1 % del ancho), así que la portada se ve igual a cualquier tamaño.
  */
-export type CoverId = "g-talent" | "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
-export const coverIds: CoverId[] = ["g-talent", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
+export type CoverId = "g-talent" | "gaba" | "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
+export const coverIds: CoverId[] = ["g-talent", "gaba", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
 
 /** Ventana con la pantalla HTML de un concepto o, en trabajos reales, una captura del sitio. */
 function Device({ id, shot, className = "" }: { id?: ScreenId; shot?: string; className?: string }) {
@@ -62,6 +62,14 @@ export function Cover({ slug }: { slug: CoverId }) {
           <Headline text={p.headline} className="cv-gt__msg" />
           <Device shot="/projects/g-talent/gallery-1.webp" className="cv-gt__device" />
           <img className="cv-gt__iso" src="/projects/g-talent-isotipo.webp" alt="" />
+        </Frame>
+      );
+    case "gaba":
+      return (
+        <Frame slug={slug} className="cv-gaba">
+          <Headline text={p.headline} className="cv-gaba__msg" />
+          <Device shot="/projects/gaba/gallery-1.webp" className="cv-gaba__device" />
+          <span className="cv-gaba__star" aria-hidden="true" />
         </Frame>
       );
     case "gramercy":

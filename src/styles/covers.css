@@ -121,6 +121,54 @@
   width: 5.5cqw;
 }
 
+/* GABA: papel kraft, azul tinta y rosa de la propia web, con su estrella de cartel. */
+.cv-gaba {
+  background:
+    radial-gradient(50% 70% at 78% 55%, #f8f3ea 0%, rgba(248, 243, 234, 0) 70%),
+    #ebe4d8;
+  color: #1f3556;
+}
+.cv-gaba__msg {
+  position: absolute;
+  left: 5cqw;
+  top: 12cqw;
+  z-index: 5;
+  font-size: 6.4cqw;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+.cv-gaba__msg span {
+  width: fit-content;
+  margin-bottom: 0.5cqw;
+  padding: 0.2cqw 1.4cqw;
+  background: #1f3556;
+  color: #fbf6ec;
+}
+.cv-gaba__msg span:last-child {
+  margin-left: 2.4cqw;
+  background: #e27fa6;
+  color: #1f3556;
+}
+.cv-gaba__device {
+  left: 44cqw;
+  top: 29cqw;
+  width: 60cqw;
+  box-shadow:
+    0 0 0 0.12cqw #1f3556,
+    0 3cqw 6cqw -2cqw rgba(31, 53, 86, 0.4);
+}
+.cv-gaba__star {
+  position: absolute;
+  left: 6cqw;
+  bottom: 6cqw;
+  width: 10cqw;
+  aspect-ratio: 1;
+  background: #c46a6e;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
 /* Gramercy: crema y verde salvia de la tienda, display condensada, el zueco rompe el marco. */
 .cv-gm {
   background:

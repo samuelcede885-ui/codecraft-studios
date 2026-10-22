@@ -11,7 +11,7 @@ import { withBase } from "@/lib/paths";
  * (reto, resultado, tecnologías, servicios, galería, antes/después, enlace público) no se muestran.
  *
  * Los conceptos de Fary Labs (projectType "concept") no son trabajos de clientes y se marcan siempre
- * como tales. Un trabajo real lleva projectType "client" (hoy, G-Talent).
+ * como tales. Un trabajo real lleva projectType "client" (hoy, G-Talent y la web del GABA).
  */
 export type Project = {
   slug: string;
@@ -63,6 +63,7 @@ export const filters = [
   { id: "apps", label: "Aplicaciones" },
   { id: "ia", label: "IA / Automatización" },
   { id: "brand", label: "Brand Experiences" },
+  { id: "personal", label: "Webs personales" },
 ] as const;
 export type FilterId = Exclude<(typeof filters)[number]["id"], "all">;
 
@@ -147,6 +148,62 @@ export const projects: Project[] = [
     ],
     result: [
       "G-Talent cuenta con una página que presenta el programa completo en un recorrido ordenado y guía a cada visitante hacia la reserva de su cupo.",
+    ],
+  },
+  {
+    slug: "gaba",
+    name: "GABA, el freno del cerebro",
+    category: "Web personal / Divulgación",
+    industry: "Educación universitaria",
+    description: "Web educativa y animada sobre el GABA para estudiantes de la UNIMET.",
+    headline: "Ciencia que\nse entiende.",
+    projectType: "client",
+    publicUrl: "https://samuelcede885-ui.github.io/backward/",
+    ...media("gaba", true),
+    gallery: [
+      { src: "/projects/gaba/gallery-1.webp", alt: "Portada: GABA, el freno del cerebro, con la molécula en 3D" },
+      { src: "/projects/gaba/gallery-2.webp", alt: "Ruta metabólica animada de la derivación del GABA" },
+      { src: "/projects/gaba/gallery-3.webp", alt: "Mapa del encéfalo con las regiones con más neuronas GABAérgicas" },
+      { src: "/projects/gaba/gallery-4.webp", alt: "Simulación de la sinapsis GABAérgica con su registro de potencial" },
+      { src: "/projects/gaba/gallery-5.webp", alt: "Control de actividad GABAérgica con el registro de membrana" },
+    ],
+    solution:
+      "Una web de una sola página que explica el GABA con un modelo 3D de la molécula, la ruta metabólica animada, un mapa del encéfalo, una simulación de la sinapsis y un control para ver qué pasa con el déficit y el exceso.",
+    services: ["Web Craft", "Diseño UI/UX"],
+    technologies: ["HTML", "CSS", "JavaScript", "SVG", "Canvas 2D"],
+    filters: ["personal", "web"],
+    challenge: [
+      "Un trabajo universitario de neurociencia suele quedarse en diapositivas y texto denso.",
+      "El reto era explicar cómo actúa el GABA de forma visual e interactiva, con sus fuentes citadas y sin perder rigor.",
+    ],
+    chapters: [
+      {
+        key: "experience",
+        title: "Una portada con carácter.",
+        text: "Tipografía de cartel, papel kraft y la molécula girando: el tema se presenta como una revista, no como un apunte.",
+        visuals: [{ kind: "video", src: "/projects/gaba/full", poster: "/projects/gaba/poster.webp", label: "Recorrido por la web del GABA" }],
+      },
+      {
+        key: "product",
+        title: "Cada concepto, dibujado.",
+        text: "La ruta metabólica se anima paso a paso y el mapa del encéfalo explica cada región al tocarla.",
+        visuals: [
+          { kind: "image", src: "/projects/gaba/gallery-2.webp", alt: "Ruta metabólica animada de la derivación del GABA" },
+          { kind: "image", src: "/projects/gaba/gallery-3.webp", alt: "Mapa del encéfalo con las regiones con más neuronas GABAérgicas" },
+        ],
+      },
+      {
+        key: "system",
+        title: "Simulaciones que se pueden tocar.",
+        text: "Se dispara la sinapsis, se añade una benzodiacepina o se mueve el nivel de GABA y la neurona responde en pantalla.",
+        visuals: [
+          { kind: "image", src: "/projects/gaba/gallery-4.webp", alt: "Simulación de la sinapsis GABAérgica con su registro de potencial" },
+          { kind: "image", src: "/projects/gaba/gallery-5.webp", alt: "Control de actividad GABAérgica con el registro de membrana" },
+        ],
+      },
+    ],
+    result: [
+      "Las estudiantes cuentan con una web publicada que explica el GABA paso a paso y que cualquiera puede abrir desde el navegador, sin instalar nada.",
     ],
   },
   {

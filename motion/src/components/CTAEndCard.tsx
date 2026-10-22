@@ -52,7 +52,7 @@ export function CTAEndCard({ headline, process, subtext, cta }: { headline: stri
           ))}
         </div>
         <div style={{ ...enterStyle(sub), marginTop: 30, font: `500 34px/1.4 ${fary.font.ui}`, color: fary.color.muted, maxWidth: 760, marginInline: "auto" }}>{subtext}</div>
-        <div style={{ ...enterStyle(btn), marginTop: 50, display: "inline-flex", alignItems: "center", gap: 16, padding: "26px 48px", borderRadius: 999, background: fary.color.marfil, color: fary.color.negro, font: `800 38px ${fary.font.ui}` }}>
+        <div style={{ ...enterStyle(btn), marginTop: 50, display: "inline-flex", alignItems: "center", gap: 16, padding: "26px 48px", borderRadius: 999, background: fary.color.signal, color: fary.color.blanco, font: `800 38px ${fary.font.ui}` }}>
           {cta}
           <Icon name="arrow" size={38} stroke={3} />
         </div>

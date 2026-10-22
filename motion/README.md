@@ -48,8 +48,8 @@ src/
   `setInterval`, `Date.now` ni CSS en tiempo real. El mismo frame siempre da la misma imagen.
 - Entradas de UI: opacity 0 → 1, translateY 30 → 0, scale .96 → 1, stagger 3–6 frames; salidas más breves.
 - Marca según el Manual v1.1: "El contraste es la identidad". Monocromía deliberada (Negro, Carbón,
-  Grafito, Marfil, Blanco), sin color de acento. La señal (datos, sistemas activos, palabra clave,
-  CTA) es el marfil con un brillo suave; la palabra del problema va sobre grafito.
+  Grafito, Marfil, Blanco). Única excepción: la señal (datos, sistemas activos, palabra clave,
+  CTA) es un azul eléctrico (#2F7BFF) con brillo suave; la palabra del problema va sobre grafito.
 - Voz del manual: clara, cercana y precisa. Beneficios reales, sin jerga ni promesas absolutas.
 - Una palabra protagonista por escena.
 - Texto importante dentro de la zona segura (arriba 250, derecha 180, abajo 440 px).

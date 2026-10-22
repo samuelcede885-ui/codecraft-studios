@@ -14,7 +14,7 @@ export function BrowserMockup({ width = 860, url = "tunegocio.com", active = tru
   const scale = width / BROWSER_VIEW.width;
   const bar = 56 * scale;
   return (
-    <div style={{ width, borderRadius: 26 * scale + 6, overflow: "hidden", background: fary.color.carbon, boxShadow: `0 0 0 2px rgba(255,255,255,0.1), 0 50px 90px -30px rgba(0,0,0,0.95), 0 0 ${70 * a}px rgba(245,245,243,${0.1 * a})` }}>
+    <div style={{ width, borderRadius: 26 * scale + 6, overflow: "hidden", background: fary.color.carbon, boxShadow: `0 0 0 2px rgba(255,255,255,0.1), 0 50px 90px -30px rgba(0,0,0,0.95), 0 0 ${70 * a}px rgba(${fary.signalRgb},${0.18 * a})` }}>
       <div style={{ height: bar, display: "flex", alignItems: "center", gap: 10 * scale, padding: `0 ${22 * scale}px`, background: "#1D1D1D" }}>
         {[0, 1, 2].map((i) => (
           <span key={i} style={{ width: 14 * scale, height: 14 * scale, borderRadius: 20, background: "rgba(255,255,255,0.18)" }} />

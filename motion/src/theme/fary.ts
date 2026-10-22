@@ -2,8 +2,8 @@
  * Identidad de motion de Fary Labs, según el Manual de Marca v1.1:
  * "El contraste es la identidad. Monocromía deliberada."
  * Negro (principal), Carbón (superficies), Grafito (apoyo), Marfil (fondos) y Blanco (contraste).
- * No hay color de acento: la señal (datos, sistemas activos, palabra clave, CTA) es el marfil
- * con un brillo suave; el problema se marca en grafito.
+ * Única excepción de color: la señal (datos, sistemas activos, palabra clave, CTA) es un azul
+ * eléctrico con brillo suave; el problema se marca en grafito.
  */
 export const fary = {
   color: {
@@ -15,10 +15,10 @@ export const fary = {
     /** Texto secundario sobre negro (deriva del grafito, AA en texto grande). */
     muted: "#8C8E92",
     /** Señal: lo activo, lo conectado, la palabra protagonista, el CTA. */
-    signal: "#F5F5F3",
+    signal: "#2F7BFF",
   },
   /** Señal en rgba para brillos y transparencias. */
-  signalRgb: "245,245,243",
+  signalRgb: "47,123,255",
   /** Tonos del mundo isométrico, construidos con la paleta (negro → grafito). */
   world: {
     ground: "#090A0B",

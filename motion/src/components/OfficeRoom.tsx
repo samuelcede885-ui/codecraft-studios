@@ -5,7 +5,7 @@ import { DigitalPerson } from "./DigitalPerson";
 /**
  * Oficina en corte (sin las paredes frontales) para ver el negocio "por dentro".
  * `lamp` enciende la luz cálida; `occupied` muestra a la persona trabajando;
- * `system` enciende el monitor en marfil (el sistema trabaja solo).
+ * `system` enciende el monitor en azul (el sistema trabaja solo).
  */
 export function OfficeRoom({
   x,

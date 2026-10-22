@@ -10,7 +10,7 @@ export type HighlightTiming = { appear: number; grow: number; reveal: number };
  * Palabra protagonista, siempre con la misma transición:
  * 1. aparece una barra fina al pie; 2. crece de izquierda a derecha;
  * 3. sube a toda la altura y revela la palabra (oscura sobre el color).
- * Tono: marfil (señal: sistema, resultado) o grafito (el problema).
+ * Tono: azul (señal: sistema, resultado) o grafito (el problema).
  */
 export function HighlightWord({
   children,
@@ -46,7 +46,7 @@ export function HighlightWord({
         style={{
           position: "relative",
           display: "inline-block",
-          color: tone === "signal" ? fary.color.negro : fary.color.marfil,
+          color: tone === "signal" ? fary.color.blanco : fary.color.marfil,
           clipPath: `inset(-0.1em ${(1 - reveal) * 100}% -0.1em 0)`,
           transform: `translateY(${(1 - reveal) * 0.16}em)`,
         }}

@@ -12,8 +12,8 @@ export function SystemNode({ size = 140, active = 0, children, style }: { size?:
         display: "grid",
         placeItems: "center",
         background: fary.color.carbon,
-        border: `2px solid ${active > 0.01 ? `rgba(245,245,243,${0.25 + 0.75 * active})` : "rgba(255,255,255,0.12)"}`,
-        boxShadow: `0 0 ${50 * active}px rgba(245,245,243,${0.22 * active}), 0 30px 60px -30px rgba(0,0,0,0.9)`,
+        border: `2px solid ${active > 0.01 ? `rgba(${fary.signalRgb},${0.3 + 0.7 * active})` : "rgba(255,255,255,0.12)"}`,
+        boxShadow: `0 0 ${50 * active}px rgba(${fary.signalRgb},${0.35 * active}), 0 30px 60px -30px rgba(0,0,0,0.9)`,
         color: fary.color.blanco,
         ...style,
       }}

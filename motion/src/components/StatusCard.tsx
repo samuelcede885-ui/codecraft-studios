@@ -4,7 +4,7 @@ import { enterStyle, useEnter } from "../lib/motion";
 import { spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { Icon } from "./Icon";
 
-/** Tarjeta de estado: título y lista de tareas que se completan con check marfil, en stagger. */
+/** Tarjeta de estado: título y lista de tareas que se completan con check azul, en stagger. */
 export function StatusCard({ title, items, delay = 0, stagger = 6, style }: { title: string; items: string[]; delay?: number; stagger?: number; style?: CSSProperties }) {
   const p = useEnter(delay);
   const frame = useCurrentFrame();
@@ -16,7 +16,7 @@ export function StatusCard({ title, items, delay = 0, stagger = 6, style }: { ti
         const q = spring({ frame: frame - delay - 8 - i * stagger, fps, durationInFrames: 16, config: { damping: 200 } });
         return (
           <div key={it} style={{ display: "flex", alignItems: "center", gap: 20, marginTop: 22, ...enterStyle(q, 20) }}>
-            <span style={{ width: 40, height: 40, borderRadius: 40, background: fary.color.signal, color: fary.color.negro, display: "grid", placeItems: "center", transform: `scale(${0.6 + 0.4 * q})` }}>
+            <span style={{ width: 40, height: 40, borderRadius: 40, background: fary.color.signal, color: fary.color.blanco, display: "grid", placeItems: "center", transform: `scale(${0.6 + 0.4 * q})` }}>
               <Icon name="check" size={26} stroke={3.2} />
             </span>
             <span style={{ font: `600 32px ${fary.font.ui}`, color: fary.color.blanco }}>{it}</span>

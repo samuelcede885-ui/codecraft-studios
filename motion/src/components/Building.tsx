@@ -18,7 +18,7 @@ export type BuildingProps = {
   level?: number;
   /** Ventanas encendidas en reposo (vida nocturna). */
   idle?: number;
-  /** Pantalla en la fachada frontal (se ilumina en marfil al activarse). */
+  /** Pantalla en la fachada frontal (se ilumina en azul al activarse). */
   screen?: boolean;
 };
 
@@ -27,7 +27,7 @@ type Face = { o: [number, number]; u: [number, number]; len: number };
 /**
  * Edificio por capas: caras, ventanas, pantalla, glow y azotea.
  * Activo: se enciende la pantalla, sube el brillo, las ventanas se iluminan en orden
- * determinista y aparece un halo marfil sutil en el suelo.
+ * determinista y aparece un halo azul sutil en el suelo.
  */
 export function Building({ id, x, y, w, d, h, active = false, since = 0, level, idle = 0.1, screen = false }: BuildingProps) {
   const activation = useActivation(active, since, 30);

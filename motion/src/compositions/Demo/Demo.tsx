@@ -1,55 +1,38 @@
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { fary } from "../../theme/fary";
-import { routes } from "../../data/city";
+import { anchors, routes, systems } from "../../data/city";
 import { demo } from "../../data/reels";
-import { AudioLayer } from "../../components/AudioLayer";
+import { progress } from "../../lib/motion";
 import { City } from "../../components/City";
 import { DataFlow } from "../../components/DataFlow";
 import { FloatingLabel } from "../../components/FloatingLabel";
 import { IsometricCamera, useCameraPath } from "../../components/IsometricCamera";
 import { IsometricWorld, WorldLayer } from "../../components/IsometricWorld";
 import { KineticTitle } from "../../components/KineticTitle";
-import { SafeArea } from "../../components/SafeArea";
 
-/** Momentos de la demo (frames a 30 fps). */
-const T = {
-  powerOn: 36, // el edificio del agente IA se enciende
-  flow: 62, // la línea de datos sale hacia el CRM
-  title: 100, // entra el título
-};
-
-/**
- * Demo de 6 s: ciudad nocturna, cámara lenta, el agente IA se enciende, sus datos viajan al
- * CRM y entra "Tu negocio debería TRABAJAR." con la palabra clave resaltada.
- */
-export function Demo({ guides = false }: { guides?: boolean }) {
+/** Demo base (6 s): el agente se enciende, sus datos salen hacia la torre de datos y entra el título. */
+export function Demo() {
+  const frame = useCurrentFrame();
   const camera = useCameraPath([
-    { frame: 0, x: 5.3, y: 5.5, scale: 1.0 },
-    { frame: demo.durationInFrames, x: 4.3, y: 6.5, scale: 1.14 },
+    { frame: 0, x: 11.2, y: 5.6, z: 1.6, scale: 1.0, anchorY: 0.5 },
+    { frame: demo.durationInFrames, x: 11.4, y: 5.0, z: 1.8, scale: 1.15, anchorY: 0.5 },
   ]);
+  const ai = progress(frame, 36, 26);
   return (
-    <AbsoluteFill style={{ background: fary.color.bg }}>
-      <IsometricCamera {...camera} anchor={{ x: 0.5, y: 0.4 }}>
+    <AbsoluteFill style={{ background: fary.color.ink }}>
+      <IsometricCamera {...camera}>
         <IsometricWorld>
-          <City states={{ ia: { active: true, since: T.powerOn, idle: 0 } }} />
+          <City state={{ ambient: 0.1, systems: { ai, datos: progress(frame, 100, 26) }, office: { lamp: 1, occupied: 1, system: 0 } }} />
           <WorldLayer name="data">
-            <DataFlow path={routes.iaToCrm} since={T.flow} drawFrames={42} />
+            <DataFlow path={routes.aiDatos} since={62} drawFrames={40} />
           </WorldLayer>
           <WorldLayer name="labels">
-            <FloatingLabel at={[6.6, 6.6, 3.4]} text="Agente IA" active delay={T.powerOn + 8} lift={60} />
-            <FloatingLabel at={[1.7, 6.5, 2.8]} text="CRM" delay={T.flow + 30} lift={60} />
+            <FloatingLabel at={anchors.ai} text={systems.ai.label} active delay={46} />
           </WorldLayer>
         </IsometricWorld>
       </IsometricCamera>
-      {/* Viñeta: concentra la mirada y oscurece los bordes del mundo. */}
-      <AbsoluteFill style={{ background: "radial-gradient(120% 70% at 50% 38%, rgba(8,8,8,0) 45%, rgba(8,8,8,0.92) 100%)" }} />
-      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(8,8,8,0) 50%, rgba(8,8,8,0.94) 66%)" }} />
-      <SafeArea guides={guides}>
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}>
-          <KineticTitle lines={demo.title} from={T.title} size={118} />
-        </div>
-      </SafeArea>
-      {demo.audio && <AudioLayer {...demo.audio} />}
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(11,11,11,0.9) 0%, rgba(11,11,11,0) 32%)" }} />
+      <KineticTitle {...demo.title} from={96} />
     </AbsoluteFill>
   );
 }

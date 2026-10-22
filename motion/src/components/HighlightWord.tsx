@@ -3,27 +3,25 @@ import { useCurrentFrame } from "remotion";
 import { fary } from "../theme/fary";
 import { easeInOut, easeOut, progress } from "../lib/motion";
 
+export type HighlightTone = "accent" | "warm";
 export type HighlightTiming = { appear: number; grow: number; reveal: number };
 
 /**
- * Palabra clave resaltada en tres tiempos:
- * 1. aparece una barra fina al pie de la palabra;
- * 2. la barra crece de izquierda a derecha;
- * 3. sube a toda la altura y revela el texto (oscuro sobre verde).
- * `from` es el frame (relativo a la secuencia) en el que empieza.
+ * Palabra protagonista, siempre con la misma transición:
+ * 1. aparece una barra fina al pie; 2. crece de izquierda a derecha;
+ * 3. sube a toda la altura y revela la palabra (oscura sobre el color).
+ * Tono: verde (sistema, resultado) o cálido (el problema).
  */
 export function HighlightWord({
   children,
   from = 0,
-  color = fary.color.accent,
-  textColor = fary.color.bg,
-  timing = { appear: 6, grow: 14, reveal: 12 },
+  tone = "accent",
+  timing = { appear: 5, grow: 12, reveal: 10 },
   style,
 }: {
   children: string;
   from?: number;
-  color?: string;
-  textColor?: string;
+  tone?: HighlightTone;
   timing?: HighlightTiming;
   style?: CSSProperties;
 }) {
@@ -32,13 +30,13 @@ export function HighlightWord({
   const grow = progress(f, timing.appear, timing.grow, easeInOut);
   const reveal = progress(f, timing.appear + timing.grow - 2, timing.reveal, easeOut);
   return (
-    <span style={{ position: "relative", display: "inline-block", padding: "0 0.14em", ...style }}>
+    <span style={{ position: "relative", display: "inline-block", padding: "0 0.1em", ...style }}>
       <span
         aria-hidden
         style={{
           position: "absolute",
-          inset: "0.08em 0 0.02em",
-          background: color,
+          inset: "0.1em 0 0.04em",
+          background: tone === "accent" ? fary.color.accent : fary.color.warm,
           opacity: appear,
           transformOrigin: "left bottom",
           transform: `scaleX(${0.05 + 0.95 * grow}) scaleY(${0.12 + 0.88 * reveal})`,
@@ -48,9 +46,9 @@ export function HighlightWord({
         style={{
           position: "relative",
           display: "inline-block",
-          color: textColor,
-          clipPath: `inset(0 ${(1 - reveal) * 100}% 0 0)`,
-          transform: `translateY(${(1 - reveal) * 0.18}em)`,
+          color: fary.color.black,
+          clipPath: `inset(-0.1em ${(1 - reveal) * 100}% -0.1em 0)`,
+          transform: `translateY(${(1 - reveal) * 0.16}em)`,
         }}
       >
         {children}

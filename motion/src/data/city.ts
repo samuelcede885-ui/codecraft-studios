@@ -1,67 +1,93 @@
-import type { Vec3 } from "../lib/iso";
+import { random } from "remotion";
+import { arc, arcs, type Vec3 } from "../lib/iso";
 
 /**
- * Ecosistema digital de Fary Labs: una manzana nocturna donde cada edificio es un sistema.
- * Las coordenadas van en tiles (ver lib/iso.ts). Los reels reutilizan esta misma ciudad para
- * mantener la continuidad entre escenas.
+ * La ciudad de Fary Labs: una cuadrícula de manzanas separadas por avenidas cada 5 tiles.
+ * Los sistemas del ecosistema son edificios fijos; el resto se genera de forma determinista
+ * para llenar el plano cuando la cámara se aleja.
  */
-export type SystemId = "negocio" | "web" | "app" | "ia" | "crm" | "analytics" | "ecommerce" | "automatizaciones";
+export type SystemId = "web" | "app" | "ai" | "datos";
+export type BuildingSpec = { id: string; x: number; y: number; w: number; d: number; h: number; screen?: boolean };
 
-export type CityBuilding = { id: SystemId; label: string; x: number; y: number; w: number; d: number; h: number; screen?: boolean };
+const STEP = 5; // una manzana (3.6) + acera + avenida
+const RANGE = [-3, -2, -1, 0, 1, 2, 3, 4];
 
-export const buildings: CityBuilding[] = [
-  { id: "web", label: "Web", x: 0.5, y: 0.6, w: 1.5, d: 1.4, h: 2.4 },
-  { id: "negocio", label: "Negocio", x: 2.3, y: 2.0, w: 1.3, d: 1.4, h: 1.6 },
-  { id: "analytics", label: "Analytics", x: 5.6, y: 0.6, w: 1.4, d: 1.4, h: 4.6 },
-  { id: "ecommerce", label: "E-commerce", x: 7.4, y: 1.4, w: 1.6, d: 1.9, h: 2.2 },
-  { id: "crm", label: "CRM", x: 0.6, y: 5.6, w: 2.2, d: 1.8, h: 2.8 },
-  { id: "automatizaciones", label: "Automatización", x: 1.4, y: 7.9, w: 1.6, d: 1.1, h: 1.4 },
-  { id: "ia", label: "Agente IA", x: 5.6, y: 5.6, w: 2.0, d: 2.0, h: 3.4, screen: true },
-  { id: "app", label: "App", x: 8.1, y: 6.1, w: 1.1, d: 1.2, h: 2.0 },
+export const systems: Record<SystemId, BuildingSpec & { label: string }> = {
+  web: { id: "web", label: "Web", x: 0.6, y: 5.7, w: 2.4, d: 2.2, h: 3.0, screen: true },
+  app: { id: "app", label: "App", x: 5.7, y: 0.6, w: 2.4, d: 2.0, h: 3.6, screen: true },
+  ai: { id: "ai", label: "AI", x: 10.6, y: 5.6, w: 2.4, d: 2.4, h: 4.2, screen: true },
+  datos: { id: "datos", label: "Datos", x: 10.8, y: 0.8, w: 1.9, d: 1.9, h: 5.2, screen: true },
+};
+
+/** Oficina del hook, en la manzana central. */
+export const office = { x: 5.7, y: 5.7, w: 2.6, d: 2.6 };
+
+export const blocks = RANGE.flatMap((i) => RANGE.map((j) => ({ x: i * STEP + 0.2, y: j * STEP + 0.2, w: 3.6, d: 3.6 })));
+export const roads = RANGE.flatMap((i) => [
+  { axis: "x" as const, at: i * STEP + 4, from: -16, to: 32 },
+  { axis: "y" as const, at: i * STEP + 4, from: -16, to: 32 },
+]);
+
+const reserved = [...Object.values(systems), { ...office, h: 0 }];
+const overlaps = (x: number, y: number, w: number, d: number) =>
+  reserved.some((r) => x < r.x + r.w + 0.2 && x + w > r.x - 0.2 && y < r.y + r.d + 0.2 && y + d > r.y - 0.2);
+
+/** Edificios de relleno: cuatro solares por manzana, alturas y huellas variadas. */
+export const fillers: BuildingSpec[] = blocks.flatMap((b, bi) =>
+  [
+    [0.25, 0.25],
+    [1.95, 0.25],
+    [0.25, 1.95],
+    [1.95, 1.95],
+  ].flatMap(([ox, oy], li) => {
+    const r = random(`lot-${bi}-${li}`);
+    if (r < 0.14) return []; // solar libre (árboles)
+    const w = 1.1 + random(`w-${bi}-${li}`) * 0.3;
+    const d = 1.1 + random(`d-${bi}-${li}`) * 0.3;
+    const x = b.x + ox;
+    const y = b.y + oy;
+    if (overlaps(x, y, w, d)) return [];
+    return [{ id: `f-${bi}-${li}`, x, y, w, d, h: 0.9 + random(`h-${bi}-${li}`) * 2.6 }];
+  }),
+);
+
+export const trees: { x: number; y: number; size?: number }[] = blocks.flatMap((b, bi) =>
+  [0, 1].map((k) => ({ x: b.x + 0.25 + random(`tx-${bi}-${k}`) * 3.1, y: b.y + (k ? 3.35 : 0.25 + random(`ty-${bi}`) * 3.1), size: 0.7 + random(`ts-${bi}-${k}`) * 0.35 })).filter((t) => !overlaps(t.x - 0.3, t.y - 0.3, 0.6, 0.6) && !fillers.some((f) => t.x > f.x - 0.3 && t.x < f.x + f.w + 0.3 && t.y > f.y - 0.3 && t.y < f.y + f.d + 0.3)),
+);
+
+/** Farolas en las esquinas de las avenidas (sobre la acera). */
+export const lights = RANGE.flatMap((i) => RANGE.filter((j) => (i + j) % 2 === 0).map((j) => ({ x: i * STEP + 3.85, y: j * STEP + 3.85 })));
+
+export const people: Vec3[] = [
+  [4.5, 9.0],
+  [9.4, 3.2],
+  [3.4, 4.6],
+  [14.6, 8.2],
 ];
 
-/** Manzanas (aceras) y calles: una avenida en cada eje que se cruzan en el centro. */
-export const blocks = [
-  { x: 0.2, y: 0.2, w: 3.6, d: 3.6 },
-  { x: 5.2, y: 0.2, w: 4.2, d: 3.6 },
-  { x: 0.2, y: 5.2, w: 3.6, d: 4.2 },
-  { x: 5.2, y: 5.2, w: 4.2, d: 4.2 },
-];
-export const roads = [
-  { axis: "x" as const, at: 4, from: -3, to: 13 },
-  { axis: "y" as const, at: 4, from: -3, to: 13 },
-];
-
-export const lights: { x: number; y: number }[] = [
-  { x: 3.85, y: 1.6 },
-  { x: 5.15, y: 2.6 },
-  { x: 1.8, y: 3.85 },
-  { x: 7.6, y: 5.15 },
-  { x: 3.85, y: 7.2 },
-  { x: 5.15, y: 8.6 },
-];
-export const trees: { x: number; y: number; size?: number }[] = [
-  { x: 0.7, y: 3.2 },
-  { x: 3.3, y: 0.6, size: 0.8 },
-  { x: 8.8, y: 0.7, size: 0.9 },
-  { x: 3.3, y: 5.6, size: 0.85 },
-  { x: 0.7, y: 9.0 },
-  { x: 8.9, y: 8.8 },
-  { x: 7.9, y: 8.9, size: 0.8 },
-];
-export const people: { x: number; y: number }[] = [
-  { x: 3.6, y: 3.5 },
-  { x: 5.5, y: 8.1 },
-  { x: 8.6, y: 4.6 },
-];
-
-/** Puntos de conexión entre sistemas, sobre las fachadas visibles y las calles. */
+/** Puntos de anclaje en azoteas y personas. */
+const roof = (s: BuildingSpec, extra = 0.15): Vec3 => [s.x + s.w / 2, s.y + s.d / 2, s.h + extra];
 export const anchors = {
-  iaFront: [6.6, 7.65, 0.02] as Vec3,
-  crmSide: [2.85, 6.5, 0.02] as Vec3,
+  cliente: [2.2, 9.4, 0.7] as Vec3,
+  web: roof(systems.web),
+  app: roof(systems.app),
+  ai: roof(systems.ai),
+  datos: roof(systems.datos),
+  officeDesk: [7.0, 7.0, 1.0] as Vec3,
+  email: [14.6, 8.2, 0.7] as Vec3,
+  chat: [9.4, 3.2, 0.7] as Vec3,
+  social: [8.6, 11.6, 2.4] as Vec3,
 };
 
 export const routes = {
-  /** Del agente IA al CRM, por la acera y la avenida. */
-  iaToCrm: [anchors.iaFront, [6.6, 8.5, 0.02], [4.5, 8.5, 0.02], [4.5, 6.5, 0.02], anchors.crmSide] as Vec3[],
+  clienteWeb: arc(anchors.cliente, anchors.web, 0.8),
+  webApp: arc(anchors.web, anchors.app, 1.8),
+  appAi: arc(anchors.app, anchors.ai, 1.6),
+  aiDatos: arc(anchors.ai, anchors.datos, 1.0),
+  chain: arcs([anchors.cliente, anchors.web, anchors.app, anchors.ai, anchors.datos], 1.2),
+  // Canales que llegan al agente.
+  inWeb: arc(anchors.web, anchors.ai, 2.0),
+  inEmail: arc(anchors.email, anchors.ai, 1.0),
+  inChat: arc(anchors.chat, anchors.ai, 1.4),
+  inSocial: arc(anchors.social, anchors.ai, 1.2),
 };

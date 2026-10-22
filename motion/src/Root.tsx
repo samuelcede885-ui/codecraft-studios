@@ -1,9 +1,9 @@
 import { Composition, Folder } from "remotion";
 import { fary } from "./theme/fary";
 import { loadFaryFonts } from "./theme/fonts";
-import { demo } from "./data/reels";
+import { demo, reel01 } from "./data/reels";
 import { Demo } from "./compositions/Demo/Demo";
-import { PhonePreview } from "./compositions/PhonePreview/PhonePreview";
+import { Reel01 } from "./compositions/Reel01TuNegocioNoDeberiaDependerDeTi/Reel01";
 
 loadFaryFonts();
 
@@ -12,9 +12,11 @@ const { width, height, fps } = fary.video;
 export function Root() {
   return (
     <>
+      <Folder name="Reels">
+        <Composition id={reel01.id} component={Reel01} durationInFrames={reel01.durationInFrames} fps={fps} width={width} height={height} defaultProps={{ guides: false }} />
+      </Folder>
       <Folder name="Base">
-        <Composition id={demo.id} component={Demo} durationInFrames={demo.durationInFrames} fps={fps} width={width} height={height} defaultProps={{ guides: false }} />
-        <Composition id="PhonePreview" component={PhonePreview} durationInFrames={90} fps={fps} width={width} height={height} />
+        <Composition id={demo.id} component={Demo} durationInFrames={demo.durationInFrames} fps={fps} width={width} height={height} />
       </Folder>
     </>
   );

@@ -1,7 +1,7 @@
 import { continueRender, delayRender, staticFile } from "remotion";
 
-/** Tipografías locales (OFL): Lato para titulares, Inter para texto. Sin red en el render. */
-const faces: { family: string; file: string; weight: string }[] = [
+/** Lato (comunicación) e Inter (UI), locales y con licencia OFL: el render no depende de la red. */
+const faces = [
   { family: "Lato", file: "lato-700.woff2", weight: "700" },
   { family: "Lato", file: "lato-900.woff2", weight: "900" },
   { family: "Inter", file: "inter-variable.woff2", weight: "400 700" },
@@ -9,7 +9,6 @@ const faces: { family: string; file: string; weight: string }[] = [
 
 let requested = false;
 
-/** Carga las fuentes una sola vez y retiene el render hasta que estén listas. */
 export function loadFaryFonts() {
   if (requested || typeof document === "undefined") return;
   requested = true;

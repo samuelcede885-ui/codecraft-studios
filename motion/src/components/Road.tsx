@@ -1,13 +1,9 @@
 import { fary } from "../theme/fary";
 import { iso, pts, rect } from "../lib/iso";
 
-/**
- * Calle recta de un tile de ancho. `axis` indica la dirección: "x" (abajo-derecha) o "y"
- * (abajo-izquierda). Incluye bordillos y la línea discontinua central.
- */
+/** Calle recta: `axis` "x" (abajo-derecha) o "y" (abajo-izquierda); bordillos y línea central. */
 export function Road({ axis, at, from, to, width = 1 }: { axis: "x" | "y"; at: number; from: number; to: number; width?: number }) {
-  const len = to - from;
-  const body = axis === "x" ? rect(from, at, len, width) : rect(at, from, width, len);
+  const body = axis === "x" ? rect(from, at, to - from, width) : rect(at, from, width, to - from);
   const c = at + width / 2;
   const a = axis === "x" ? iso(from, c) : iso(c, from);
   const b = axis === "x" ? iso(to, c) : iso(c, to);

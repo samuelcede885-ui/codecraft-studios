@@ -1,32 +1,43 @@
 import { fary } from "../theme/fary";
 import { depth, rect } from "../lib/iso";
-import { blocks, buildings, lights, people, roads, trees, type SystemId } from "../data/city";
+import { blocks, fillers, lights, office, people, roads, systems, trees, type SystemId } from "../data/city";
 import { Building } from "./Building";
 import { DigitalPerson } from "./DigitalPerson";
 import { WorldLayer } from "./IsometricWorld";
+import { OfficeRoom } from "./OfficeRoom";
 import { Road } from "./Road";
 import { StreetLight } from "./StreetLight";
 import { Tree } from "./Tree";
 
-export type SystemState = { active: boolean; since?: number; idle?: number };
+export type CityState = {
+  /** Vida nocturna de los edificios de relleno (0 = ciudad dormida). */
+  ambient: number;
+  /** Nivel de encendido de cada sistema (0–1). */
+  systems: Partial<Record<SystemId, number>>;
+  office: { lamp: number; occupied: number; system: number };
+  /** Personas que usan el sistema (anillo verde). */
+  peopleActive?: number;
+};
 
-/**
- * La ciudad de Fary Labs por capas: suelo (manzanas y calles) y estructuras ordenadas por
- * profundidad. Cada escena decide qué sistemas están encendidos con `states`.
- */
-export function City({ states = {} }: { states?: Partial<Record<SystemId, SystemState>> }) {
+/** La ciudad completa por capas, con su estado decidido por la escena. */
+export function City({ state }: { state: CityState }) {
   const items = [
-    ...buildings.map((b) => ({ key: b.id, z: depth(b.x, b.y, b.w, b.d), node: <Building key={b.id} {...b} {...states[b.id]} /> })),
-    ...trees.map((t, i) => ({ key: `t${i}`, z: depth(t.x, t.y), node: <Tree key={`t${i}`} {...t} /> })),
-    ...lights.map((l, i) => ({ key: `l${i}`, z: depth(l.x, l.y), node: <StreetLight key={`l${i}`} {...l} /> })),
-    ...people.map((p, i) => ({ key: `p${i}`, z: depth(p.x, p.y), node: <DigitalPerson key={`p${i}`} {...p} tone={fary.color.muted} /> })),
+    ...fillers.map((b) => ({ z: depth(b.x, b.y, b.w, b.d), node: <Building key={b.id} {...b} idle={state.ambient} level={0} /> })),
+    ...(Object.keys(systems) as SystemId[]).map((id) => {
+      const s = systems[id];
+      return { z: depth(s.x, s.y, s.w, s.d), node: <Building key={id} {...s} level={state.systems[id] ?? 0} idle={0.04} /> };
+    }),
+    { z: depth(office.x, office.y, office.w, office.d), node: <OfficeRoom key="office" {...office} {...state.office} /> },
+    ...trees.map((t, i) => ({ z: depth(t.x, t.y), node: <Tree key={`t${i}`} {...t} /> })),
+    ...lights.map((l, i) => ({ z: depth(l.x, l.y), node: <StreetLight key={`l${i}`} {...l} /> })),
+    ...people.map(([x, y], i) => ({ z: depth(x, y), node: <DigitalPerson key={`p${i}`} x={x} y={y} tone={fary.color.gray} active={state.peopleActive ?? 0} /> })),
   ].sort((a, b) => a.z - b.z);
 
   return (
     <>
       <WorldLayer name="ground">
         {blocks.map((b, i) => (
-          <polygon key={i} points={rect(b.x, b.y, b.w, b.d)} fill="#0E0F0E" stroke="#171917" strokeWidth={3} />
+          <polygon key={i} points={rect(b.x, b.y, b.w, b.d)} fill={fary.world.block} stroke={fary.world.blockEdge} strokeWidth={3} />
         ))}
         {roads.map((r, i) => (
           <Road key={i} {...r} />

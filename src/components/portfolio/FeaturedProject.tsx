@@ -6,6 +6,7 @@ import { track, trackAttrs } from "@/lib/analytics";
 import { selectQuoteReference } from "@/lib/quote";
 import { assetUrl } from "@/lib/assets";
 import { ArrowRight } from "../Icon";
+import { withBase } from "@/lib/paths";
 
 /**
  * Proyecto destacado, antes del catálogo: una pieza de campaña a sangre, no una tarjeta.
@@ -15,7 +16,7 @@ import { ArrowRight } from "../Icon";
  */
 export function FeaturedProject() {
   const project: Project = projects.find((p) => p.featured) ?? projects[0];
-  const href = `/proyectos/${project.slug}`;
+  const href = withBase(`/proyectos/${project.slug}`);
   const media = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const src = fullVideoOf(project);

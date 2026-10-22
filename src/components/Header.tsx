@@ -5,10 +5,11 @@ import { site } from "@/config/site";
 import { Logo, LogoMark } from "./Logo";
 import { ArrowRight } from "./Icon";
 import { MobileMenu } from "./MobileMenu";
+import { withBase } from "@/lib/paths";
 
 /** `home`: en la portada los enlaces son anclas; en otras páginas (fichas de proyecto) vuelven a la portada. */
 export function Header({ home = true }: { home?: boolean }) {
-  const base = home ? "" : "/";
+  const base = home ? "" : withBase("/");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(home ? "#inicio" : "");
   const [scrolled, setScrolled] = useState(false);
@@ -51,7 +52,7 @@ export function Header({ home = true }: { home?: boolean }) {
         }`}
       >
         <div className="header__inner">
-          <a href={home ? "#inicio" : "/"} className="header__logo" aria-label="Fary Labs, ir al inicio">
+          <a href={home ? "#inicio" : withBase("/")} className="header__logo" aria-label="Fary Labs, ir al inicio">
             <Logo className="header__firma" />
             <LogoMark className="header__mark" />
           </a>

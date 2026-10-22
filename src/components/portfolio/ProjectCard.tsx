@@ -7,6 +7,7 @@ import { trackAttrs } from "@/lib/analytics";
 import { ArrowRight } from "../Icon";
 import { assetUrl } from "@/lib/assets";
 import { ProjectPreviewVideo } from "./ProjectPreviewVideo";
+import { withBase } from "@/lib/paths";
 
 /** Solo un preview a la vez en toda la página. */
 let playing: HTMLVideoElement | null = null;
@@ -38,7 +39,7 @@ type Props = {
  */
 export function ProjectCard({ project, index, hidden, shifted, onPlay }: Props) {
   const { slug, name } = project;
-  const href = `/proyectos/${slug}`;
+  const href = withBase(`/proyectos/${slug}`);
   const frame = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [armed, setArmed] = useState(false); // el <video> se crea al primer hover

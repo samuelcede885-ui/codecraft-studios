@@ -2,13 +2,14 @@ import { CONCEPT_NOTE, coverOf, quoteHref, typeLabel, type Project } from "@/dat
 import { assetUrl } from "@/lib/assets";
 import { trackAttrs } from "@/lib/analytics";
 import { ArrowRight } from "../Icon";
+import { withBase } from "@/lib/paths";
 
 /** Hero del case study: nombre, categoría, descripción, CTA y la portada de campaña a lo ancho. */
 export function CaseStudyHero({ project: p }: { project: Project }) {
   return (
     <section className="pj-hero" aria-labelledby="pj-title">
       <div className="container">
-        <a href="/#catalogo" className="pj-back link-arrow">
+        <a href={withBase("/#catalogo")} className="pj-back link-arrow">
           <ArrowRight className="btn__arrow pj-back__icon" /> Volver al portafolio
         </a>
         <div className="pj-hero__head">

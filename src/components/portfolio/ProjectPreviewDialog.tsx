@@ -6,6 +6,7 @@ import { selectQuoteReference } from "@/lib/quote";
 import { trackAttrs } from "@/lib/analytics";
 import { ArrowRight } from "../Icon";
 import { ProjectPreviewVideo } from "./ProjectPreviewVideo";
+import { withBase } from "@/lib/paths";
 
 /**
  * Preview en grande al tocar play (en táctil es la forma de verlo, sin hover ni autoplay en la rejilla).
@@ -53,7 +54,7 @@ export function ProjectPreviewDialog({ project, onClose }: { project: Project | 
             </div>
             <div className="pv__actions">
               <a
-                href={`/proyectos/${project.slug}`}
+                href={withBase(`/proyectos/${project.slug}`)}
                 className="btn btn--light btn--sm"
                 {...trackAttrs("project_opened", { project: project.slug, from: "preview" })}
               >

@@ -1,3 +1,5 @@
+import { withBase } from "@/lib/paths";
+
 /**
  * Catálogo de proyectos. Para añadir uno: una entrada aquí y sus archivos en
  * public/projects/<slug>/ (thumb.webp = portada diseñada, preview.mp4/.webm y, si existe,
@@ -280,4 +282,4 @@ export const typeLabel = (p: Project) => (p.projectType === "concept" ? "Concept
 export const getProject = (slug: string) => projects.find((p) => p.slug === slug);
 
 /** Enlace al formulario de cotización con el proyecto como referencia. */
-export const quoteHref = (slug: string) => `/?proyecto=${slug}#cotizacion`;
+export const quoteHref = (slug: string) => withBase(`/?proyecto=${slug}#cotizacion`);

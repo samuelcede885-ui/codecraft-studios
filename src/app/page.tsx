@@ -14,6 +14,7 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { ContextCursor } from "@/components/ContextCursor";
 import { InspirationShowreel } from "@/components/showreel/InspirationShowreel";
 import { MobileQuoteBar } from "@/components/MobileQuoteBar";
+import { withBase } from "@/lib/paths";
 
 /** Datos estructurados: solo lo que es real (nombre, descripción y, si existe, el dominio). */
 const organization = {
@@ -26,7 +27,7 @@ const organization = {
 
 export default function Home() {
   // Póster del video del hero: solo en la portada, que es donde se usa.
-  preload("/projects/gramercy/poster.webp", { as: "image", fetchPriority: "high" });
+  preload(withBase("/projects/gramercy/poster.webp"), { as: "image", fetchPriority: "high" });
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />

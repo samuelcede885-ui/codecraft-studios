@@ -60,6 +60,18 @@ node scripts/record-covers.mjs           # portadas del catálogo
 
 Requiere Playwright y ffmpeg. Si se cambian los tiempos en `src/data/heroStages.ts`, hay que regrabar `gramercy`.
 
+## Publicación en GitHub Pages
+
+El flujo `.github/workflows/pages.yml` compila la web como sitio estático (`STATIC_EXPORT=true`) con el
+prefijo del repositorio (`/codecraft-studios`) y la publica en GitHub Pages en cada push a `main` o a
+`add-cinematic-hero-banners-skill` (también se puede lanzar a mano desde la pestaña Actions).
+
+Requisito único en el repositorio: **Settings → Pages → Build and deployment → Source: "GitHub Actions"**.
+Con "Deploy from a branch", Pages muestra este README en lugar de la web.
+
+Los enlaces y archivos internos pasan por `withBase()` (`src/lib/paths.ts`), así que funcionan tanto en la
+subcarpeta de Pages como en un dominio propio (en ese caso, el prefijo queda vacío).
+
 ## Pendiente
 
 - **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. El formulario envía por correo o, si solo hay WhatsApp, por WhatsApp. Mientras estén vacíos, los canales del cierre no se publican (en desarrollo se ven como "próximamente") y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.

@@ -8,6 +8,7 @@ import { BeforeAfterComparison } from "./BeforeAfterComparison";
 import { CaseStudyHero } from "./CaseStudyHero";
 import { CaseStudySection } from "./CaseStudySection";
 import { ProjectGallery } from "./ProjectGallery";
+import { withBase } from "@/lib/paths";
 
 /**
  * Case study como relato visual: hero con la portada, el reto en pocas líneas, capítulos
@@ -128,7 +129,7 @@ export function CaseStudy({ project: p }: { project: Project }) {
           <ul>
             {others.map((o) => (
               <li key={o.slug}>
-                <a href={`/proyectos/${o.slug}`} className="link-arrow" {...trackAttrs("project_opened", { project: o.slug, from: "case_study_more" })}>
+                <a href={withBase(`/proyectos/${o.slug}`)} className="link-arrow" {...trackAttrs("project_opened", { project: o.slug, from: "case_study_more" })}>
                   {o.name} <ArrowRight className="btn__arrow" />
                 </a>
               </li>

@@ -1,7 +1,7 @@
-import { processSteps } from "@/data/services";
+import { processSteps } from "@/data/process";
 
 /** Cuatro pasos en línea de tiempo: horizontal en escritorio, vertical en móvil y tablet. */
-export function Process() {
+export function ProcessTimeline() {
   return (
     <section id="proceso" className="section process" aria-labelledby="proceso-title">
       <div className="container">

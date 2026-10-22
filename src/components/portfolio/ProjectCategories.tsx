@@ -2,8 +2,8 @@
 
 import { projects, type FilterId } from "@/data/projects";
 import { assetUrl } from "@/lib/assets";
-import { FILTER_EVENT } from "./Catalog/Catalog";
-import { ArrowRight } from "./Icon";
+import { FILTER_EVENT } from "./ProjectFilters";
+import { ArrowRight } from "../Icon";
 
 const options: { title: string; kind: string; filter: FilterId }[] = [
   { title: "Una marca que venda", kind: "E-commerce", filter: "ecommerce" },
@@ -16,7 +16,7 @@ const options: { title: string; kind: string; filter: FilterId }[] = [
  * Navegación por intención, después del catálogo: cuatro renglones grandes, como un índice editorial.
  * Cada uno filtra el portafolio y vuelve a él. Con ratón asoma la portada de un proyecto relacionado.
  */
-export function Build() {
+export function ProjectCategories() {
   return (
     <section className="section build" aria-labelledby="build-title">
       <div className="container">

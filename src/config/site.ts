@@ -4,6 +4,11 @@
 // y los canales del cierre se muestran como "próximamente".
 export const site = {
   name: "Fary Labs",
+  /** Dominio público (p. ej. "https://farylabs.com"). Vacío: no se generan URLs absolutas
+   *  (canónicas, sitemap, Open Graph absolutas) hasta que exista. */
+  url: "",
+  description:
+    "Estudio de desarrollo digital y consultoría tecnológica. Sitios web, software a medida y automatización para negocios que quieren avanzar.",
   tagline: "Transformamos ideas en productos digitales.",
   contact: {
     email: "", // p. ej. "hola@farylabs.com"

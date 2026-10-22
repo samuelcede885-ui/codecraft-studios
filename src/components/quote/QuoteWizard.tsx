@@ -2,10 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { site } from "@/config/site";
-import { getProject, projects, typeLabel, type Project } from "@/data/projects";
+import { getProject, type Project } from "@/data/projects";
 import { QUOTE_EVENT, quoteReferenceFromUrl } from "@/lib/quote";
-import { assetUrl } from "@/lib/assets";
-import { ArrowRight } from "./Icon";
+import { track } from "@/lib/analytics";
+import { ArrowRight } from "../Icon";
+import { QuoteStep } from "./QuoteStep";
+import { ProjectReference } from "./ProjectReference";
 
 type Field = "name" | "email" | "type" | "message";
 type Status = "idle" | "error" | "pending" | "sent";
@@ -27,7 +29,6 @@ const steps: { title: string; fields: Field[] }[] = [
 const projectTypes = ["Web", "E-commerce", "App", "Agente IA", "Otro"];
 /** Tipo sugerido según el proyecto de referencia (la persona puede cambiarlo). */
 const typeFromFilter: Record<string, string> = { ecommerce: "E-commerce", web: "Web", apps: "App", ia: "Agente IA" };
-const likes = ["Diseño", "Animaciones", "Estructura", "Experiencia móvil", "E-commerce", "Todo el concepto"];
 /** Rangos orientativos para el cliente: Fary Labs debe confirmarlos. */
 const budgets = ["Por definir", "Menos de 1.000 USD", "1.000 – 3.000 USD", "3.000 – 8.000 USD", "Más de 8.000 USD"];
 const timings = ["Sin fecha definida", "Lo antes posible", "En 1 mes", "En 2 – 3 meses", "Más adelante"];
@@ -40,7 +41,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * ?proyecto=<slug> desde una ficha): se muestra como "Tu referencia" y nunca hay que volver
  * a elegirla. Todos los campos viven en un único <form>; los pasos solo cambian qué se ve.
  */
-export function QuoteForm() {
+export function QuoteWizard() {
   const form = useRef<HTMLFormElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const [step, setStep] = useState(0);
@@ -52,6 +53,7 @@ export function QuoteForm() {
   const { email, whatsapp } = site.contact;
   const project = getProject(ref);
   const moved = useRef(false);
+  const started = useRef(false);
 
   function applyReference(p: Project | undefined) {
     if (!p) return;
@@ -95,6 +97,7 @@ export function QuoteForm() {
   function go(to: number) {
     if (to > step && !validate(steps[step].fields)) return setStatus("error");
     setStatus("idle");
+    if (to > step) track("quote_step_completed", { step: step + 1, name: steps[step].title, project: ref || undefined });
     moved.current = true;
     setStep(to);
     // Si el inicio del formulario quedó arriba, volver a él para ver el paso entero.
@@ -127,6 +130,9 @@ export function QuoteForm() {
       requestAnimationFrame(() => validate(steps[bad].fields));
       return setStatus("error");
     }
+    track("quote_step_completed", { step: steps.length, name: steps[steps.length - 1].title, project: ref || undefined });
+    const channel = email ? "email" : whatsapp ? "whatsapp" : "pending";
+    track("quote_submitted", { project: ref || undefined, type, channel });
     // Sin destino configurado no se simula un envío.
     if (!email && !whatsapp) return setStatus("pending");
     const body = summary(new FormData(e.currentTarget));
@@ -134,6 +140,7 @@ export function QuoteForm() {
       const subject = `Proyecto${project ? ` — referencia ${project.name}` : ""}`;
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     } else {
+      track("whatsapp_clicked", { from: "quote" });
       window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(body)}`, "_blank", "noopener");
     }
     setStatus("sent");
@@ -156,7 +163,17 @@ export function QuoteForm() {
     );
 
   return (
-    <form ref={form} id="cotizacion" className="form quote wizard" noValidate onSubmit={onSubmit} aria-labelledby="quote-title" data-reveal>
+    <form
+      ref={form}
+      id="cotizacion"
+      className="form quote wizard"
+      noValidate
+      onSubmit={onSubmit}
+      onFocus={() => {
+        if (started.current) return;
+        started.current = true;
+        track("quote_started", { project: ref || undefined });
+      }} aria-labelledby="quote-title" data-reveal>
       <div className="wizard__top">
         <h3 id="quote-title" className="quote__title">
           Cuéntanos tu proyecto
@@ -191,12 +208,7 @@ export function QuoteForm() {
       <input type="hidden" name="projectName" value={project?.name ?? ""} />
       <input type="hidden" name="projectCategory" value={project?.category ?? ""} />
 
-      <fieldset className="wizard__step" hidden={step !== 0}>
-        <legend>
-          <h4 ref={step === 0 ? heading : undefined} tabIndex={-1}>
-            01 — Sobre ti
-          </h4>
-        </legend>
+      <QuoteStep index={0} title={steps[0].title} active={step === 0} headingRef={heading}>
         <div className="form__row">
           <label className="field">
             <span>Nombre</span>
@@ -223,14 +235,9 @@ export function QuoteForm() {
             <input name="whatsapp" type="tel" inputMode="tel" autoComplete="tel" />
           </label>
         </div>
-      </fieldset>
+      </QuoteStep>
 
-      <fieldset className="wizard__step" hidden={step !== 1}>
-        <legend>
-          <h4 ref={step === 1 ? heading : undefined} tabIndex={-1}>
-            02 — Qué quieres construir
-          </h4>
-        </legend>
+      <QuoteStep index={1} title={steps[1].title} active={step === 1} headingRef={heading}>
         <div className="choices" role="radiogroup" aria-describedby={errors.type ? "quote-type-error" : undefined}>
           {projectTypes.map((t) => (
             <label key={t} className="choice">
@@ -250,64 +257,13 @@ export function QuoteForm() {
           ))}
         </div>
         {err("type")}
-      </fieldset>
+      </QuoteStep>
 
-      <fieldset className="wizard__step" hidden={step !== 2}>
-        <legend>
-          <h4 ref={step === 2 ? heading : undefined} tabIndex={-1}>
-            03 — Tu referencia
-          </h4>
-        </legend>
-        {project && !picking ? (
-          <div className="ref-card">
-            {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
-            <img src={assetUrl(project.thumbnail)} alt="" width={1600} height={900} loading="lazy" decoding="async" />
-            <div>
-              <span className="ref-card__label">Tu referencia</span>
-              <p className="ref-card__name">{project.name}</p>
-              <span className="ref-card__cat">
-                {project.category} · {typeLabel(project)}
-              </span>
-              <button type="button" className="ref-card__change" onClick={() => setPicking(true)}>
-                Cambiar referencia
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="choices" role="radiogroup" aria-label="Proyecto de referencia (opcional)">
-            <label className="choice">
-              <input type="radio" name="refpick" checked={!ref} onChange={() => (setRef(""), setPicking(false))} />
-              <span>Sin referencia</span>
-            </label>
-            {projects.map((p) => (
-              <label key={p.slug} className="choice">
-                <input type="radio" name="refpick" checked={ref === p.slug} onChange={() => applyReference(p)} />
-                <span>{p.name}</span>
-              </label>
-            ))}
-          </div>
-        )}
-        {project && (
-          <div className="wizard__likes">
-            <p className="wizard__q">¿Qué te gustó?</p>
-            <div className="choices">
-              {likes.map((l) => (
-                <label key={l} className="choice">
-                  <input type="checkbox" name="liked" value={l} />
-                  <span>{l}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-      </fieldset>
+      <QuoteStep index={2} title={steps[2].title} active={step === 2} headingRef={heading}>
+        <ProjectReference project={project} picking={picking} onPick={setPicking} onSelect={(p) => (p ? applyReference(p) : (setRef(""), setPicking(false)))} />
+      </QuoteStep>
 
-      <fieldset className="wizard__step" hidden={step !== 3}>
-        <legend>
-          <h4 ref={step === 3 ? heading : undefined} tabIndex={-1}>
-            04 — Tu proyecto
-          </h4>
-        </legend>
+      <QuoteStep index={3} title={steps[3].title} active={step === 3} headingRef={heading}>
         <div className="form__row">
           <label className="field">
             <span>Presupuesto aproximado</span>
@@ -331,7 +287,7 @@ export function QuoteForm() {
           <textarea name="message" rows={4} required minLength={10} {...invalid("message")} />
           {err("message")}
         </label>
-      </fieldset>
+      </QuoteStep>
 
       <div className="form__footer">
         {step > 0 && (

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Inter, Lato, Oswald } from "next/font/google";
 import "./globals.css";
+import { site } from "@/config/site";
+import { AnalyticsClicks } from "@/components/analytics/AnalyticsClicks";
 
 // Tipografías de marca: Lato en pesos altos para titulares e Inter para texto e interfaces.
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -13,10 +15,24 @@ const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "-
 // en esta sesión o si se pide menos movimiento.
 const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
 
+const title = "Fary Labs — Transformamos ideas en productos digitales";
+
 export const metadata: Metadata = {
-  title: "Fary Labs — Transformamos ideas en productos digitales",
-  description:
-    "Estudio de desarrollo digital y consultoría tecnológica. Sitios web, software a medida y automatización para negocios que quieren avanzar.",
+  ...(site.url ? { metadataBase: new URL(site.url), alternates: { canonical: "/" } } : {}),
+  title: { default: title, template: "%s | Fary Labs" },
+  description: site.description,
+  applicationName: site.name,
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    siteName: site.name,
+    title,
+    description: site.description,
+    // Las imágenes de Open Graph necesitan URL absoluta: solo con dominio definido.
+    ...(site.url ? { images: [{ url: "/projects/gramercy/thumb.webp", width: 1600, height: 900, alt: "Gramercy, concepto de e-commerce de Fary Labs" }] } : {}),
+  },
+  twitter: { card: "summary_large_image", title, description: site.description },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -38,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Saltar al contenido
         </a>
         {children}
+        <AnalyticsClicks />
       </body>
     </html>
   );

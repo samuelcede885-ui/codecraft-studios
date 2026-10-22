@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { typeLabel, type Project } from "@/data/projects";
 import { selectQuoteReference } from "@/lib/quote";
+import { trackAttrs } from "@/lib/analytics";
 import { ArrowRight } from "../Icon";
 import { assetUrl } from "@/lib/assets";
+import { ProjectPreviewVideo } from "./ProjectPreviewVideo";
 
 /** Solo un preview a la vez en toda la página. */
 let playing: HTMLVideoElement | null = null;
@@ -34,7 +36,7 @@ type Props = {
  * con una etiqueta PREVIEW y el tiempo restante, y vuelve a la portada al salir.
  * En táctil no hay hover ni videos automáticos: portada, play (abre el preview), nombre y categoría.
  */
-export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) {
+export function ProjectCard({ project, index, hidden, shifted, onPlay }: Props) {
   const { slug, name } = project;
   const href = `/proyectos/${slug}`;
   const frame = useRef<HTMLDivElement>(null);
@@ -68,7 +70,10 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
     if (playing === v) playing = null;
   }
 
+  const hasPreview = !!project.previewVideo;
+
   function start() {
+    if (!hasPreview) return;
     // Con movimiento reducido no hay previews automáticos: el botón play sigue disponible.
     if (!canHover() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     hovering.current = true;
@@ -109,8 +114,6 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const base = project.previewVideo.replace(/\.mp4$/, "");
-
   return (
     <li className="tile" data-reveal data-flip-id={slug} hidden={hidden} data-shift={shifted || undefined}>
       <div
@@ -119,39 +122,31 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
         onPointerEnter={(e) => e.pointerType === "mouse" && start()}
         onPointerLeave={(e) => e.pointerType === "mouse" && stop()}
       >
-        <a href={href} className="tile__link" aria-label={`Ver proyecto ${name}`} data-cursor="ver" tabIndex={-1}>
+        <a href={href} className="tile__link" aria-label={`Ver proyecto ${name}`} data-cursor="ver" tabIndex={-1} {...trackAttrs("project_opened", { project: slug, from: "card" })}>
           {/* eslint-disable-next-line @next/next/no-img-element -- export estático sin optimizador de imágenes */}
           <img className="tile__thumb" src={assetUrl(project.thumbnail)} alt="" width={1600} height={900} loading="lazy" decoding="async" />
           {armed && (
-            <video
+            <ProjectPreviewVideo
               ref={video}
+              project={project}
+              context="hover"
               className="tile__video"
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster={assetUrl(project.thumbnail)}
-              disablePictureInPicture
-              disableRemotePlayback
-              aria-hidden="true"
-              tabIndex={-1}
               onPlaying={() => {
                 if (!hovering.current) return;
                 setShowing(true);
                 cancelAnimationFrame(raf.current);
                 tick();
               }}
-            >
-              <source src={assetUrl(`${base}.webm`)} type="video/webm" />
-              <source src={assetUrl(`${base}.mp4`)} type="video/mp4" />
-            </video>
+            />
           )}
         </a>
-        <button type="button" className="tile__play" data-cursor="play" aria-label={`Ver preview de ${name}`} onClick={() => onPlay(project)}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 6.5v11l9-5.5z" fill="currentColor" />
-          </svg>
-        </button>
+        {hasPreview && (
+          <button type="button" className="tile__play" data-cursor="play" aria-label={`Ver preview de ${name}`} onClick={() => onPlay(project)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 6.5v11l9-5.5z" fill="currentColor" />
+            </svg>
+          </button>
+        )}
         <span className="tile__status">{typeLabel(project)}</span>
         <span className="tile__live" aria-hidden="true">
           PREVIEW <time ref={time}>00:00</time>
@@ -167,14 +162,16 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
           </span>
         </div>
         <h3 className="tile__name">
-          <a href={href}>{name}</a>
+          <a href={href} {...trackAttrs("project_opened", { project: slug, from: "card" })}>
+            {name}
+          </a>
         </h3>
         <p className="tile__desc">{project.description}</p>
         <div className="tile__actions">
-          <a href={href} className="link-arrow">
+          <a href={href} className="link-arrow" {...trackAttrs("project_opened", { project: slug, from: "card" })}>
             Ver proyecto <ArrowRight className="btn__arrow" />
           </a>
-          <a href="#cotizacion" className="tile__quote" onClick={() => selectQuoteReference(slug)}>
+          <a href="#cotizacion" className="tile__quote" onClick={() => selectQuoteReference(slug, "card")}>
             Quiero una página como esta <ArrowRight className="btn__arrow" />
           </a>
         </div>

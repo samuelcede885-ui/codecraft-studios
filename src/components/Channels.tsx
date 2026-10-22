@@ -1,4 +1,5 @@
 import { site } from "@/config/site";
+import { trackAttrs } from "@/lib/analytics";
 
 const { email, whatsapp, instagram } = site.contact;
 
@@ -20,7 +21,12 @@ export function Channels() {
         {channels.map((c) =>
           !c.href && !dev ? null : c.href ? (
             <li key={c.label}>
-              <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+              <a
+                href={c.href}
+                target={c.href.startsWith("http") ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                {...(c.label === "WhatsApp" ? trackAttrs("whatsapp_clicked", { from: "footer" }) : {})}
+              >
                 {c.label}
               </a>
             </li>

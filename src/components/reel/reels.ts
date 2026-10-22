@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import { heroStages } from "@/data/heroStages";
 import type { ScreenId } from "@/data/screens";
-import { enterScreen, gm } from "../ScrollStory/screenMotion";
+import { enterScreen, gm } from "./screenMotion";
 
 /*
  * Líneas de tiempo de las "bobinas": una navegación simulada por las pantallas HTML,

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getProject, typeLabel } from "@/data/projects";
+import { getProject, typeLabel, videoBase } from "@/data/projects";
+import { track } from "@/lib/analytics";
 import { assetUrl } from "@/lib/assets";
 import { ArrowRight } from "../Icon";
 
@@ -15,7 +16,7 @@ import { ArrowRight } from "../Icon";
  */
 type Step = { kind: "clip"; slug: string; from: number; dur: number } | { kind: "phrase"; text: string; dur: number } | { kind: "end" };
 
-const steps: Step[] = [
+const allSteps: Step[] = [
   { kind: "clip", slug: "gramercy", from: 1, dur: 3 },
   { kind: "phrase", text: "Diseñamos.", dur: 1.4 },
   { kind: "clip", slug: "panel-de-metricas", from: 1.5, dur: 3 },
@@ -26,12 +27,14 @@ const steps: Step[] = [
   { kind: "phrase", text: "Hacemos que funcione.", dur: 1.8 },
   { kind: "end" },
 ];
+// Solo clips de proyectos que existen y tienen preview: si falta uno, el showreel sigue con el resto.
+const steps = allSteps.filter((s) => s.kind !== "clip" || !!getProject(s.slug)?.previewVideo);
 const clips = steps.flatMap((s, i) => (s.kind === "clip" ? [{ ...s, index: i }] : []));
 const timed = steps.filter((s) => s.kind !== "end") as Exclude<Step, { kind: "end" }>[];
 
 export const SHOWREEL_EVENT = "fary:showreel";
 
-export function Showreel() {
+export function InspirationShowreel() {
   const dialog = useRef<HTMLDialogElement>(null);
   const videos = useRef<Record<string, HTMLVideoElement | null>>({});
   const [open, setOpen] = useState(false);
@@ -41,6 +44,7 @@ export function Showreel() {
   // Se abre desde cualquier botón con el evento.
   useEffect(() => {
     const on = () => {
+      track("inspire_opened");
       setStep(0);
       setRun((r) => r + 1);
       setOpen(true);
@@ -85,7 +89,10 @@ export function Showreel() {
       nv.preload = "auto";
       nv.load();
     }
-    if (s.kind === "end") return;
+    if (s.kind === "end") {
+      track("inspire_completed");
+      return;
+    }
     const t = window.setTimeout(() => setStep((i) => i + 1), s.dur * 1000);
     return () => window.clearTimeout(t);
   }, [open, step, run]);
@@ -113,7 +120,7 @@ export function Showreel() {
           {clips.map((c) => {
             const p = getProject(c.slug);
             if (!p) return null;
-            const base = p.previewVideo.replace(/\.mp4$/, "");
+            const base = videoBase(p.previewVideo ?? "");
             const active = current.kind === "clip" && current.slug === c.slug;
             return (
               <figure key={c.slug} className="sr__clip" data-active={active || undefined}>

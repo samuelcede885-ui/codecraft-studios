@@ -28,7 +28,7 @@ function Device({ id, className = "" }: { id: ScreenId; className?: string }) {
   );
 }
 
-function Headline({ text, className }: { text: string; className: string }) {
+function Headline({ text = "", className }: { text?: string; className: string }) {
   return (
     <p className={className}>
       {text.split("\n").map((line) => (

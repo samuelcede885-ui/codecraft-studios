@@ -1,39 +1,50 @@
 import { preload } from "react-dom";
+import { site } from "@/config/site";
 import { Header } from "@/components/Header";
 import { Intro } from "@/components/Intro";
-import { HeroShowcase } from "@/components/Hero/HeroShowcase";
-import { Featured } from "@/components/Featured/Featured";
-import { Build } from "@/components/Build";
-import { Catalog } from "@/components/Catalog/Catalog";
-import { Services } from "@/components/Services";
-import { Process } from "@/components/Process";
+import { HeroExperience } from "@/components/hero/HeroExperience";
+import { FeaturedProject } from "@/components/portfolio/FeaturedProject";
+import { ProjectCategories } from "@/components/portfolio/ProjectCategories";
+import { ProjectGrid } from "@/components/portfolio/ProjectGrid";
+import { ServicesAccordion } from "@/components/services/ServicesAccordion";
+import { ProcessTimeline } from "@/components/process/ProcessTimeline";
 import { FinalCTA } from "@/components/FinalCTA";
 import { ScrollEffects } from "@/components/ScrollEffects";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ContextCursor } from "@/components/ContextCursor";
-import { Showreel } from "@/components/Showreel/Showreel";
+import { InspirationShowreel } from "@/components/showreel/InspirationShowreel";
 import { MobileQuoteBar } from "@/components/MobileQuoteBar";
+
+/** Datos estructurados: solo lo que es real (nombre, descripción y, si existe, el dominio). */
+const organization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  description: site.description,
+  ...(site.url ? { url: site.url } : {}),
+};
 
 export default function Home() {
   // Póster del video del hero: solo en la portada, que es donde se usa.
   preload("/projects/gramercy/poster.webp", { as: "image", fetchPriority: "high" });
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />
       <Intro />
       <Header />
       <main id="contenido">
-        <HeroShowcase />
-        <Featured />
-        <Catalog />
-        <Build />
-        <Services />
-        <Process />
+        <HeroExperience />
+        <FeaturedProject />
+        <ProjectGrid />
+        <ProjectCategories />
+        <ServicesAccordion />
+        <ProcessTimeline />
         <FinalCTA />
       </main>
       <SmoothScroll />
       <ScrollEffects />
       <ContextCursor />
-      <Showreel />
+      <InspirationShowreel />
       <MobileQuoteBar />
     </>
   );

@@ -12,4 +12,12 @@ La visión principal del proyecto está en `docs/fary-labs-brief.md`. Léela ant
 ## Desarrollo
 
 - Next.js 15 + TypeScript + Tailwind 4 + GSAP/ScrollTrigger. `npm run dev`, `npm run build`, `npm run typecheck`.
-- Textos en `src/data/` (heroStages, services, projects); contacto en `src/config/site.ts`; hero automático en `src/components/Hero/` (tiempos en `src/data/heroStages.ts`; si cambian, regrabar con `scripts/record-reels.mjs`); proyecto destacado en `src/components/Featured/`; "¿Qué quieres construir?" en `src/components/Build.tsx` (filtra el catálogo); antes/después reutilizable en `src/components/Project/BeforeAfterComparison.tsx` (solo con imágenes reales); showreel "Inspírame" en `src/components/Showreel/`; cursor contextual en `src/components/ContextCursor.tsx` (se desactiva con `site.contextCursor`); catálogo en `src/components/Catalog/` (portadas diseñadas en `src/components/covers/`, se capturan con `scripts/record-covers.mjs`); estilos en `src/styles/`.
+- Datos en `src/data/` (projects, services, process, heroStages); contacto y dominio en `src/config/site.ts`; medición en `src/lib/analytics.ts` (`track()`, sin plataformas integradas).
+- Componentes por área en `src/components/`:
+  - `hero/` — HeroExperience (sincronía con el video), HeroLaptop, HeroStage, HeroProgress. Tiempos en `src/data/heroStages.ts`; si cambian, regrabar con `scripts/record-reels.mjs`.
+  - `portfolio/` — FeaturedProject, ProjectGrid, ProjectCard, ProjectPreviewVideo, ProjectPreviewDialog, ProjectFilters, ProjectCategories ("¿Qué quieres construir?").
+  - `projects/` — CaseStudy, CaseStudyHero, CaseStudySection, ProjectGallery, ProjectVideo, BeforeAfterComparison (solo con imágenes reales).
+  - `showreel/` — InspirationTrigger, InspirationShowreel. `quote/` — QuoteWizard, QuoteStep, ProjectReference.
+  - `services/ServicesAccordion`, `process/ProcessTimeline`, `covers/` (portadas, se capturan con `scripts/record-covers.mjs`), `reel/` y `screens/` (pantallas HTML de los conceptos).
+  - Cursor contextual en `ContextCursor.tsx` (se desactiva con `site.contextCursor`).
+- Estilos en `src/styles/`.

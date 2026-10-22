@@ -1,6 +1,6 @@
 import { Logo } from "./Logo";
 import { ArrowRight } from "./Icon";
-import { QuoteForm } from "./QuoteForm";
+import { QuoteWizard } from "./quote/QuoteWizard";
 import { Channels } from "./Channels";
 
 /** Cierre de la página: título protagonista, dos llamadas a la acción, formulario por pasos y canales. Sustituye al footer. */
@@ -26,7 +26,7 @@ export function FinalCTA() {
       </div>
 
       <div className="container final__body">
-        <QuoteForm />
+        <QuoteWizard />
       </div>
 
       <Channels />

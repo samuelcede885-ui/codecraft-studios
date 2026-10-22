@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProject, projects } from "@/data/projects";
+import { coverOf, getProject, projects } from "@/data/projects";
+import { site } from "@/config/site";
 import { Header } from "@/components/Header";
-import { ProjectPage } from "@/components/Project/ProjectPage";
+import { CaseStudy } from "@/components/projects/CaseStudy";
 import { ScrollEffects } from "@/components/ScrollEffects";
 
 export const dynamicParams = false;
@@ -14,11 +15,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const p = getProject((await params).slug);
   if (!p) return {};
-  const title = `${p.name} — ${p.category} | Fary Labs`;
+  const title = `${p.name} — ${p.category}`;
+  const description = p.projectType === "concept" ? `${p.description} Concepto de Fary Labs.` : p.description;
   return {
     title,
-    description: p.projectType === "concept" ? `${p.description} Concepto de Fary Labs.` : p.description,
-    openGraph: { title, description: p.description, images: [{ url: p.thumbnail, width: 1600, height: 900 }] },
+    description,
+    ...(site.url ? { alternates: { canonical: `/proyectos/${p.slug}` } } : {}),
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      ...(site.url ? { images: [{ url: coverOf(p), width: 1600, height: 900, alt: `Portada de ${p.name}` }] } : {}),
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -29,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <>
       <Header home={false} />
       <main id="contenido">
-        <ProjectPage project={project} />
+        <CaseStudy project={project} />
       </main>
       <ScrollEffects />
     </>

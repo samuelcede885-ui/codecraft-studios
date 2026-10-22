@@ -6,7 +6,7 @@ import { assetUrl } from "@/lib/assets";
  * Pantallas que se muestran dentro de la laptop y en el portafolio.
  * Las cuatro primeras reconstruyen en HTML la tienda Gramercy (diseño 16:9) para poder
  * animar cada pieza; el zueco es un recorte con transparencia en public/projects.
- * Los atributos data-gm son los puntos de anclaje de las animaciones de ScrollStory (screenMotion.ts).
+ * Los atributos data-gm son los puntos de anclaje de las animaciones de las bobinas (reel/screenMotion.ts).
  */
 
 const SHOE = "/projects/gramercy-shoe.webp";

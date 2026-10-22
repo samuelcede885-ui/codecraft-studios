@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { services } from "@/data/services";
-import { Screen } from "./screens/Screens";
-import { ArrowRight, Plus } from "./Icon";
+import { Screen } from "../screens/Screens";
+import { ArrowRight, Plus } from "../Icon";
 
 function ServiceGlyph({ id }: { id: string }) {
   return (
@@ -35,7 +35,7 @@ function ServiceGlyph({ id }: { id: string }) {
 }
 
 /** Tres servicios en formato editorial; cada uno se expande para ver qué incluye y una vista previa. */
-export function Services() {
+export function ServicesAccordion() {
   const [open, setOpen] = useState<string | null>(services[0].id);
 
   // En móvil empiezan todos cerrados: la sección ocupa menos y cada uno se abre al tocarlo.

@@ -29,15 +29,16 @@ npm run typecheck
 | `src/config/site.ts` | Navegación y datos de contacto (Instagram, WhatsApp, correo) |
 | `src/components/Intro.tsx` | Intro de marca (≤ 2,7 s, una vez por sesión, botón "Saltar intro") |
 | `src/components/Header.tsx`, `MobileMenu.tsx` | Header fijo que se compacta con blur y menú móvil a pantalla completa |
-| `src/components/Hero/HeroShowcase.tsx` | Hero automático: la laptop reproduce el video y los textos siguen su `currentTime` |
-| `src/components/Catalog/` | Catálogo de proyectos con miniatura, play y preview al pasar el ratón |
-| `src/app/proyectos/[slug]/`, `src/components/Project/` | Ficha de cada proyecto |
-| `src/components/QuoteForm.tsx` | Formulario de cotización con proyecto de referencia (`?proyecto=<slug>#cotizacion`) |
+| `src/components/hero/` | Hero automático (HeroExperience, HeroLaptop, HeroStage, HeroProgress): la laptop reproduce el video y los textos siguen su `currentTime` |
+| `src/components/portfolio/` | Destacado, catálogo con filtros, fichas con preview (hover / lightbox) y "¿Qué quieres construir?" |
+| `src/app/proyectos/[slug]/`, `src/components/projects/` | Case study de cada proyecto (hero, reto, capítulos, resultado, antes/después) |
+| `src/components/quote/` | Cotización en 4 pasos con proyecto de referencia (`?proyecto=<slug>#cotizacion`) |
+| `src/components/showreel/` | Showreel "Inspírame" a pantalla completa |
+| `src/lib/analytics.ts` | Eventos de medición (`track()`): emite `fary:analytics` y usa `dataLayer` si existe; sin plataformas integradas |
 | `src/components/reel/`, `src/app/grabar/`, `scripts/record-reels.mjs` | Bobinas: navegación simulada por las pantallas HTML, grabada a video fotograma a fotograma |
 | `src/components/covers/`, `scripts/record-covers.mjs` | Portadas del catálogo (mensaje, identidad y pantalla real de cada concepto), capturadas a `thumb.webp` |
-| `src/components/Featured/` | Proyecto destacado antes del catálogo |
 | `src/components/screens/Screens.tsx` | Pantallas HTML: Gramercy, panel de métricas, asistente IA y estudio |
-| `src/components/Services.tsx`, `Process.tsx`, `FinalCTA.tsx` | Resto de secciones; el cierre negro sustituye al footer |
+| `src/components/services/`, `process/`, `FinalCTA.tsx` | Servicios (acordeón), proceso (línea de tiempo) y cierre negro con el formulario |
 | `public/projects/<slug>/` | Miniatura, póster, previews y recorridos en MP4/WebM, galería |
 | `src/styles/*.css` | Estilos por bloque |
 
@@ -61,6 +62,8 @@ Requiere Playwright y ffmpeg. Si se cambian los tiempos en `src/data/heroStages.
 
 ## Pendiente
 
-- **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. El formulario envía por correo o, si solo hay WhatsApp, por WhatsApp. Mientras estén vacíos, los canales del cierre aparecen como "próximamente" y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
+- **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. El formulario envía por correo o, si solo hay WhatsApp, por WhatsApp. Mientras estén vacíos, los canales del cierre no se publican (en desarrollo se ven como "próximamente") y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
 - **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Los proyectos de "Más proyectos" también son conceptos de Fary Labs, no trabajos de clientes. Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.
-- **Presupuestos del formulario:** los rangos son orientativos (`src/components/QuoteForm.tsx`); confirmar.
+- **Presupuestos del formulario:** los rangos y las fechas son orientativos (`src/components/quote/QuoteWizard.tsx`); confirmar.
+- **Dominio:** rellenar `url` en `src/config/site.ts` para activar URL canónicas, imágenes de Open Graph y el sitemap.
+- **Medición:** los eventos (`src/lib/analytics.ts`) ya se emiten; falta conectar la herramienta que se elija escuchando `fary:analytics` o con un `dataLayer`.

@@ -3,17 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HERO_DURATION, heroStages, numberedStages, stageAt } from "@/data/heroStages";
+import { HERO_DURATION, heroStages, stageAt } from "@/data/heroStages";
+import { track } from "@/lib/analytics";
 import { LogoMark } from "../Logo";
 import { ArrowRight } from "../Icon";
-import { LaptopFrame } from "../ScrollStory/LaptopFrame";
-import { Reel } from "../reel/Reel";
-import { assetUrl } from "@/lib/assets";
+import { HeroLaptop } from "./HeroLaptop";
+import { HeroStage } from "./HeroStage";
+import { HeroProgress } from "./HeroProgress";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO = "/projects/gramercy/full";
-const POSTER = "/projects/gramercy/poster.webp";
 /** Si el video no está listo en este tiempo, la laptop pasa a la bobina HTML en vivo. */
 const VIDEO_TIMEOUT = 6000;
 
@@ -24,8 +23,9 @@ type Source = "video" | "reel";
  * cambian con él. El tiempo real del video (`currentTime`) es la única fuente de verdad:
  * no hay temporizadores propios, así que si el video se retrasa o se pausa, los textos esperan.
  * El scroll no controla nada: solo sirve para salir del hero. Fuera de la vista, el video se pausa.
+ * Piezas: HeroStage (textos), HeroLaptop (laptop, etiquetas y video) y HeroProgress (01 / 05).
  */
-export function HeroShowcase() {
+export function HeroExperience() {
   const root = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const reel = useRef<gsap.core.Timeline | null>(null);
@@ -151,6 +151,15 @@ export function HeroShowcase() {
     };
   }, [source]);
 
+  // Medición: cada etapa numerada que se llega a ver (una vez por etapa y visita).
+  const seenStages = useRef(new Set<number>());
+  useEffect(() => {
+    const s = heroStages[stage];
+    if (!s.id || seenStages.current.has(stage)) return;
+    seenStages.current.add(stage);
+    track("hero_stage_view", { stage: s.id, title: s.title });
+  }, [stage]);
+
   // Entrada del hero (una vez, sin scroll): la laptop aparece en su sitio y no vuelve a moverse.
   useEffect(() => {
     const el = root.current;
@@ -199,125 +208,31 @@ export function HeroShowcase() {
     else play();
   }
 
-  const current = heroStages[stage];
-  const n = Math.max(1, numberedStages.indexOf(current) + 1);
-
   return (
     <section id="inicio" className="story hero-auto" aria-label="Fary Labs: de la idea al producto" ref={root}>
       <div className="stage">
         <LogoMark className="stage__ghost" />
         <div className="stage__grid">
           <div className="zone zone--lead" data-hero-in>
-            <div className="hero-panels">
-              {heroStages.map((s, i) => (
-                <div
-                  className="hero-panel"
-                  key={s.title}
-                  data-state={i === stage ? "active" : i < stage ? "past" : "next"}
-                  aria-hidden={i === 0 ? undefined : i !== stage}
-                >
-                  {i === 0 ? (
-                    <>
-                      <span className="hero-copy__rule" />
-                      <h1 className="hero-copy__title">{s.title}</h1>
-                      <p className="hero-copy__sub">{s.description}</p>
-                    </>
-                  ) : (
-                    <h2 className="step-lead__title">{s.title}</h2>
-                  )}
-                </div>
-              ))}
-            </div>
+            <HeroStage side="lead" stage={stage} />
             <a href="#contacto" className="btn btn--dark hero-auto__cta">
               Comenzar proyecto <ArrowRight className="btn__arrow" />
             </a>
           </div>
 
-          <div className="zone zone--device">
-            {/* Etiqueta editorial de cada etapa, sobre la laptop. */}
-            <div className="hero-tags" aria-hidden="true">
-              {heroStages.map((s, i) =>
-                s.tag ? (
-                  <span key={s.tag} className="hero-tag" data-state={i === stage ? "active" : i < stage ? "past" : "next"}>
-                    {s.tag}
-                  </span>
-                ) : null,
-              )}
-            </div>
-            <LaptopFrame>
-              {source === "video" ? (
-                <video
-                  ref={video}
-                  className="hero-video"
-                  muted
-                  playsInline
-                  loop
-                  preload="auto"
-                  poster={assetUrl(POSTER)}
-                  disablePictureInPicture
-                  disableRemotePlayback
-                  aria-hidden="true"
-                  tabIndex={-1}
-                >
-                  <source src={assetUrl(`${VIDEO}.webm`)} type="video/webm" />
-                  <source src={assetUrl(`${VIDEO}.mp4`)} type="video/mp4" />
-                </video>
-              ) : (
-                <Reel
-                  id="gramercy"
-                  onReady={(tl) => {
-                    reel.current = tl;
-                    if (!wanted.current || userPaused.current) tl.pause();
-                  }}
-                />
-              )}
-            </LaptopFrame>
-          </div>
+          <HeroLaptop
+            stage={stage}
+            source={source}
+            videoRef={video}
+            onReelReady={(tl) => {
+              reel.current = tl;
+              if (!wanted.current || userPaused.current) tl.pause();
+            }}
+          />
 
           <div className="zone zone--aside" data-hero-in>
-            <div className="stage-ind">
-              <span className={`stage-ind__num ${stage === 0 ? "is-idle" : ""}`} aria-hidden="true">
-                <b>{String(n).padStart(2, "0")}</b> / {String(numberedStages.length).padStart(2, "0")}
-              </span>
-              <span className="stage-ind__bar" aria-hidden="true">
-                <i className="stage-ind__fill" ref={fill} />
-                {numberedStages.map((s) => (
-                  <i key={s.id} className="stage-ind__tick" style={{ left: `${(s.start / HERO_DURATION) * 100}%` }} />
-                ))}
-              </span>
-              <button
-                type="button"
-                className="stage-ind__toggle"
-                onClick={togglePause}
-                aria-label={paused ? "Reproducir el recorrido" : "Pausar el recorrido"}
-                aria-pressed={paused}
-              >
-                {paused ? (
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8 5.5v13M16 5.5v13" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-                  </svg>
-                )}
-              </button>
-            </div>
-            <div className="hero-panels">
-              {heroStages.map((s, i) => (
-                <div
-                  className="hero-panel"
-                  key={s.title}
-                  data-state={i === stage ? "active" : i < stage ? "past" : "next"}
-                  aria-hidden={i !== stage}
-                >
-                  <span className="hero-aside__eyebrow">{i === 0 ? "En pantalla" : s.eyebrow}</span>
-                  <p className="hero-aside__desc">
-                    {i === 0 ? "Gramercy, un concepto de e-commerce diseñado por Fary Labs." : s.description}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <HeroProgress stage={stage} paused={paused} onToggle={togglePause} fillRef={fill} />
+            <HeroStage side="aside" stage={stage} />
           </div>
         </div>
         <p className="hero-exit" aria-hidden="true">

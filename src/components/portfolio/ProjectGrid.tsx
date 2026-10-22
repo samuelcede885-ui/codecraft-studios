@@ -4,36 +4,32 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { filters, projects, type FilterId, type Project } from "@/data/projects";
-import { ProjectTile } from "./ProjectTile";
-import { PreviewDialog } from "./PreviewDialog";
-import { SHOWREEL_EVENT } from "../Showreel/Showreel";
-import { ArrowRight } from "../Icon";
+import { projects, type Project } from "@/data/projects";
+import { track } from "@/lib/analytics";
+import { ProjectCard } from "./ProjectCard";
+import { ProjectPreviewDialog } from "./ProjectPreviewDialog";
+import { FILTER_EVENT, ProjectFilters, type ActiveFilter } from "./ProjectFilters";
+import { InspirationTrigger } from "../showreel/InspirationTrigger";
 
 gsap.registerPlugin(Flip, ScrollTrigger);
 
-type Active = FilterId | "all";
-
-/** Elegir filtro desde otra sección (¿Qué quieres construir?). */
-export const FILTER_EVENT = "fary:filter";
-
-/** Solo los filtros con proyectos. */
-const available = filters.filter((f) => f.id === "all" || projects.some((p) => p.filters.includes(f.id)));
+type Active = ActiveFilter;
 
 /**
  * Catálogo de proyectos (después del destacado). Los datos viven en data/projects.ts.
  * Los filtros reordenan la rejilla sin recargar: las fichas se desplazan a su nuevo lugar (Flip),
  * las que salen se desvanecen y la altura de la rejilla se ajusta con suavidad.
  */
-export function Catalog() {
+export function ProjectGrid() {
   const [active, setActive] = useState<Active>("all");
   const [preview, setPreview] = useState<Project | null>(null);
   const grid = useRef<HTMLUListElement>(null);
   const flip = useRef<{ state: Flip.FlipState; height: number } | null>(null);
 
-  function choose(id: Active) {
+  function choose(id: Active, from: "filters" | "categories" = "filters") {
     const g = grid.current;
     if (id === active || !g) return;
+    track("project_filter_used", { filter: id, from });
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches)
       flip.current = { state: Flip.getState(g.querySelectorAll(".tile")), height: g.offsetHeight };
     setActive(id);
@@ -69,7 +65,7 @@ export function Catalog() {
 
   // Este efecto vuelve a suscribirse en cada cambio para que choose() lea el filtro actual.
   useEffect(() => {
-    const on = (e: Event) => choose((e as CustomEvent<Active>).detail);
+    const on = (e: Event) => choose((e as CustomEvent<Active>).detail, "categories");
     window.addEventListener(FILTER_EVENT, on);
     return () => window.removeEventListener(FILTER_EVENT, on);
   });
@@ -92,40 +88,18 @@ export function Catalog() {
             <p className="catalog__lead">
               Encuentra una página, aplicación o experiencia que se parezca a lo que imaginas para tu marca.
             </p>
-            <button
-              type="button"
-              className="btn btn--outline catalog__inspire"
-              data-cursor="play"
-              onClick={() => window.dispatchEvent(new Event(SHOWREEL_EVENT))}
-            >
-              Inspírame <ArrowRight className="btn__arrow" />
-            </button>
+            <InspirationTrigger className="catalog__inspire" />
           </div>
         </header>
 
-        <div className="catalog__filters" role="group" aria-label="Filtrar proyectos" data-reveal>
-          {available.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className="chip"
-              aria-pressed={active === f.id}
-              onClick={() => choose(f.id)}
-            >
-              {f.label}
-              <span className="chip__count">
-                {f.id === "all" ? projects.length : projects.filter((p) => p.filters.includes(f.id)).length}
-              </span>
-            </button>
-          ))}
-        </div>
+        <ProjectFilters active={active} onChoose={(id) => choose(id)} />
         <p className="sr-only" aria-live="polite">
           {visible.length === 1 ? "1 proyecto" : `${visible.length} proyectos`}
         </p>
 
         <ul className="catalog__grid" ref={grid}>
           {projects.map((p, i) => (
-            <ProjectTile
+            <ProjectCard
               key={p.slug}
               project={p}
               index={i + 1}
@@ -141,7 +115,7 @@ export function Catalog() {
           </p>
         )}
       </div>
-      <PreviewDialog project={preview} onClose={() => setPreview(null)} />
+      <ProjectPreviewDialog project={preview} onClose={() => setPreview(null)} />
     </section>
   );
 }

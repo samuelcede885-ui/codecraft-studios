@@ -2,6 +2,9 @@ import { random } from "remotion";
 import { fary } from "../theme/fary";
 import { iso, pts, type Point } from "../lib/iso";
 import { useActivation } from "../lib/motion";
+import { mix } from "../lib/color";
+import { useColorAt } from "../lib/focus";
+import { facadeFor, real } from "../data/materials";
 
 export type BuildingProps = {
   id: string;
@@ -20,6 +23,8 @@ export type BuildingProps = {
   idle?: number;
   /** Pantalla en la fachada frontal (se ilumina en azul al activarse). */
   screen?: boolean;
+  /** Material real cuando está en foco (ver data/materials.ts); por defecto, uno estable por id. */
+  material?: string;
 };
 
 type Face = { o: [number, number]; u: [number, number]; len: number };
@@ -29,10 +34,15 @@ type Face = { o: [number, number]; u: [number, number]; len: number };
  * Activo: se enciende la pantalla, sube el brillo, las ventanas se iluminan en orden
  * determinista y aparece un halo azul sutil en el suelo.
  */
-export function Building({ id, x, y, w, d, h, active = false, since = 0, level, idle = 0.1, screen = false }: BuildingProps) {
+export function Building({ id, x, y, w, d, h, active = false, since = 0, level, idle = 0.1, screen = false, material }: BuildingProps) {
   const activation = useActivation(active, since, 30);
   const a = level ?? activation;
   const power = idle + (1 - idle) * a;
+  // En foco, el edificio muestra su material real; fuera de foco, los grises de la marca.
+  const c = useColorAt(x + w / 2, y + d / 2);
+  const facade = facadeFor(id, material);
+  const fill = { top: mix(fary.world.faceTop, facade.top, c), left: mix(fary.world.faceLeft, facade.left, c), right: mix(fary.world.faceRight, facade.right, c) };
+  const lit = mix(fary.world.windowOn, real.window, c);
   const floor = 0.5;
 
   const P = iso;
@@ -68,14 +78,14 @@ export function Building({ id, x, y, w, d, h, active = false, since = 0, level, 
 
   const panel = quad(faces[1], w * 0.14, w * 0.86, h * 0.28, h * 0.74);
   const bars = [0.62, 0.52, 0.42].map((v, i) => quad(faces[1], w * 0.22, w * (0.48 + i * 0.12), h * v, h * (v + 0.045)));
-  const c = P(x + w / 2, y + d / 2, 0);
+  const center = P(x + w / 2, y + d / 2, 0);
 
   return (
     <g data-building={id}>
-      <ellipse cx={c.x} cy={c.y + 18} rx={(w + d) * 115} ry={(w + d) * 58} fill="url(#halo-signal)" opacity={a * 0.3} />
-      <polygon points={right} fill={fary.world.faceRight} />
-      <polygon points={left} fill={fary.world.faceLeft} />
-      <polygon points={top} fill={fary.world.faceTop} />
+      <ellipse cx={center.x} cy={center.y + 18} rx={(w + d) * 115} ry={(w + d) * 58} fill="url(#halo-signal)" opacity={a * 0.3} />
+      <polygon points={right} fill={fill.right} />
+      <polygon points={left} fill={fill.left} />
+      <polygon points={top} fill={fill.top} />
       <g fill={fary.color.blanco} opacity={a * 0.03}>
         <polygon points={right} />
         <polygon points={left} />
@@ -83,7 +93,7 @@ export function Building({ id, x, y, w, d, h, active = false, since = 0, level, 
       {windows.map((win, i) => (
         <g key={i}>
           <polygon points={win.points} fill={fary.world.windowOff} />
-          {win.lit > 0 && <polygon points={win.points} fill={fary.world.windowOn} opacity={win.lit * (win.cool ? 0.38 : 0.66)} />}
+          {win.lit > 0 && <polygon points={win.points} fill={win.cool ? fary.world.windowOn : lit} opacity={win.lit * (win.cool ? 0.38 : 0.66 + 0.2 * c)} />}
         </g>
       ))}
       {screen && (

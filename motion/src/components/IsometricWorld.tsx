@@ -23,11 +23,12 @@ export function IsometricWorld({ from = -16, to = 32, children }: { from?: numbe
         <filter id="glow-soft" x="-100%" y="-100%" width="300%" height="300%">
           <feGaussianBlur stdDeviation="26" />
         </filter>
-        {/* Halo de sistema activo (azul de señal) y de luz de calle (marfil). */}
+        {/* Halos: sistema activo (azul), luz de calle fuera de foco (marfil) y en foco (cálida). */}
         {(
           [
             ["signal", fary.color.signal, 0.55],
             ["lamp", fary.color.marfil, 0.32],
+            ["warm", "#FFC877", 0.45],
           ] as const
         ).map(([k, c, o]) => (
           <radialGradient key={k} id={`halo-${k}`}>

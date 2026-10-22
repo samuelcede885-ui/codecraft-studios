@@ -52,6 +52,9 @@ src/
   CTA) es un azul eléctrico (#2F7BFF) con brillo suave; la palabra del problema va sobre grafito.
 - Voz del manual: clara, cercana y precisa. Beneficios reales, sin jerga ni promesas absolutas.
 - Una palabra protagonista por escena.
+- Foco de color (`lib/focus.tsx`): lo que la cámara mira se ve con materiales reales
+  (`data/materials.ts`: ladrillo, vidrio, piedra, madera, árboles, asfalto, luz cálida); lo que
+  está fuera de foco queda en los grises de la marca. El foco se mueve con `useFocusPath`.
 - Texto importante dentro de la zona segura (arriba 250, derecha 180, abajo 440 px).
 - Sin cifras, clientes ni resultados inventados.
 

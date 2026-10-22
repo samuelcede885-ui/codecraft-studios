@@ -1,4 +1,7 @@
 import { fary } from "../theme/fary";
+import { mix } from "../lib/color";
+import { useColorField } from "../lib/focus";
+import { real } from "../data/materials";
 import { depth, rect } from "../lib/iso";
 import { blocks, fillers, lights, office, people, roads, systems, trees, type SystemId } from "../data/city";
 import { Building } from "./Building";
@@ -21,6 +24,7 @@ export type CityState = {
 
 /** La ciudad completa por capas, con su estado decidido por la escena. */
 export function City({ state }: { state: CityState }) {
+  const colorAt = useColorField();
   const items = [
     ...fillers.map((b) => ({ z: depth(b.x, b.y, b.w, b.d), node: <Building key={b.id} {...b} idle={state.ambient} level={0} /> })),
     ...(Object.keys(systems) as SystemId[]).map((id) => {
@@ -30,14 +34,14 @@ export function City({ state }: { state: CityState }) {
     { z: depth(office.x, office.y, office.w, office.d), node: <OfficeRoom key="office" {...office} {...state.office} /> },
     ...trees.map((t, i) => ({ z: depth(t.x, t.y), node: <Tree key={`t${i}`} {...t} /> })),
     ...lights.map((l, i) => ({ z: depth(l.x, l.y), node: <StreetLight key={`l${i}`} {...l} /> })),
-    ...people.map(([x, y], i) => ({ z: depth(x, y), node: <DigitalPerson key={`p${i}`} x={x} y={y} tone={fary.color.muted} active={state.peopleActive ?? 0} /> })),
+    ...people.map(([x, y], i) => ({ z: depth(x, y), node: <DigitalPerson key={`p${i}`} x={x} y={y} tone={fary.color.muted} shirt={i + 1} active={state.peopleActive ?? 0} /> })),
   ].sort((a, b) => a.z - b.z);
 
   return (
     <>
       <WorldLayer name="ground">
         {blocks.map((b, i) => (
-          <polygon key={i} points={rect(b.x, b.y, b.w, b.d)} fill={fary.world.block} stroke={fary.world.blockEdge} strokeWidth={3} />
+          <polygon key={i} points={rect(b.x, b.y, b.w, b.d)} fill={mix(fary.world.block, real.sidewalk, colorAt(b.x + b.w / 2, b.y + b.d / 2))} stroke={mix(fary.world.blockEdge, real.sidewalkEdge, colorAt(b.x + b.w / 2, b.y + b.d / 2))} strokeWidth={3} />
         ))}
         {roads.map((r, i) => (
           <Road key={i} {...r} />

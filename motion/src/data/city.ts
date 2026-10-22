@@ -7,16 +7,16 @@ import { arc, arcs, type Vec3 } from "../lib/iso";
  * para llenar el plano cuando la cámara se aleja.
  */
 export type SystemId = "web" | "app" | "ai" | "datos";
-export type BuildingSpec = { id: string; x: number; y: number; w: number; d: number; h: number; screen?: boolean };
+export type BuildingSpec = { id: string; x: number; y: number; w: number; d: number; h: number; screen?: boolean; material?: string };
 
 const STEP = 5; // una manzana (3.6) + acera + avenida
 const RANGE = [-3, -2, -1, 0, 1, 2, 3, 4];
 
 export const systems: Record<SystemId, BuildingSpec & { label: string }> = {
-  web: { id: "web", label: "Web", x: 0.6, y: 5.7, w: 2.4, d: 2.2, h: 3.0, screen: true },
-  app: { id: "app", label: "App", x: 5.7, y: 0.6, w: 2.4, d: 2.0, h: 3.6, screen: true },
-  ai: { id: "ai", label: "AI", x: 10.6, y: 5.6, w: 2.4, d: 2.4, h: 4.2, screen: true },
-  datos: { id: "datos", label: "Datos", x: 10.8, y: 0.8, w: 1.9, d: 1.9, h: 5.2, screen: true },
+  web: { id: "web", label: "Web", x: 0.6, y: 5.7, w: 2.4, d: 2.2, h: 3.0, screen: true, material: "ladrillo" },
+  app: { id: "app", label: "App", x: 5.7, y: 0.6, w: 2.4, d: 2.0, h: 3.6, screen: true, material: "vidrioVerde" },
+  ai: { id: "ai", label: "AI", x: 10.6, y: 5.6, w: 2.4, d: 2.4, h: 4.2, screen: true, material: "vidrioAzul" },
+  datos: { id: "datos", label: "Datos", x: 10.8, y: 0.8, w: 1.9, d: 1.9, h: 5.2, screen: true, material: "arena" },
 };
 
 /** Oficina del hook, en la manzana central. */

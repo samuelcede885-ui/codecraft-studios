@@ -2,6 +2,7 @@ import { interpolate, useCurrentFrame } from "remotion";
 import { anchors, routes } from "../../data/city";
 import { reel01 } from "../../data/reels";
 import { clamp, progress } from "../../lib/motion";
+import { FocusProvider, useFocusPath } from "../../lib/focus";
 import { City } from "../../components/City";
 import { DataFlow } from "../../components/DataFlow";
 import { FloatingLabel } from "../../components/FloatingLabel";
@@ -47,6 +48,25 @@ export function ReelWorld() {
     { frame: 960, x: 7.0, y: 7.0, z: 0.7, scale: 1.7, anchorY: 0.58 },
   ]);
 
+  // Foco de color: lo que la cámara mira se ve con colores reales; el resto, en grises.
+  const focus = useFocusPath([
+    { frame: 0, x: 7.0, y: 7.0, radius: 2.4, amount: 1 },
+    { frame: 178, x: 7.0, y: 7.0, radius: 2.6, amount: 1 },
+    { frame: 205, x: 7.0, y: 6.0, radius: 3, amount: 0 }, // Fary conecta: todo en gris
+    { frame: 280, x: 1.8, y: 6.8, radius: 3, amount: 0 },
+    { frame: 300, x: 1.8, y: 6.8, radius: 3, amount: 1 }, // web
+    { frame: 388, x: 1.8, y: 6.9, radius: 3, amount: 1 },
+    { frame: 430, x: 2.3, y: 7.9, radius: 3.6, amount: 1 }, // web y cliente
+    { frame: 508, x: 2.4, y: 7.9, radius: 3.6, amount: 1 },
+    { frame: 545, x: 6.9, y: 1.6, radius: 3, amount: 1 }, // app
+    { frame: 612, x: 6.9, y: 1.7, radius: 3, amount: 1 },
+    { frame: 650, x: 11.6, y: 6.9, radius: 3.6, amount: 1 }, // automatización
+    { frame: 718, x: 11.6, y: 6.9, radius: 3.6, amount: 1 },
+    { frame: 776, x: 7.5, y: 5.0, radius: 12, amount: 1 }, // todo conectado: la ciudad entera en color
+    { frame: 800, x: 7.5, y: 5.5, radius: 12, amount: 1 },
+    { frame: 830, x: 7.0, y: 7.0, radius: 3, amount: 1 }, // de vuelta en la oficina
+    { frame: 960, x: 7.0, y: 7.0, radius: 3, amount: 1 },
+  ]);
   const on = (at: number) => progress(frame, at, 26);
   const state = {
     ambient: interpolate(frame, [0, 200, 300, 720, 790], [0.05, 0.06, 0.1, 0.13, 0.22], clamp),
@@ -62,6 +82,7 @@ export function ReelWorld() {
   const handoff = 1 - progress(frame, W.chain, 20);
 
   return (
+    <FocusProvider focus={focus}>
     <IsometricCamera {...camera}>
       <IsometricWorld>
         <City state={state} />
@@ -83,5 +104,6 @@ export function ReelWorld() {
         </WorldLayer>
       </IsometricWorld>
     </IsometricCamera>
+    </FocusProvider>
   );
 }

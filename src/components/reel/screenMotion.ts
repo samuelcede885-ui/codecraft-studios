@@ -15,8 +15,9 @@ export function enterScreen(tl: TL, screen: HTMLElement, at: number) {
   const items = gm(screen, "item");
 
   // El zueco se asienta y el panel sube como una hoja; su contenido entra escalonado.
+  // El zueco ya es visible al entrar la página (solo se asienta), para que nunca se vea vacía.
   if (panel.length) {
-    tl.fromTo(shoe, { autoAlpha: 0, yPercent: -3 }, { autoAlpha: 1, yPercent: 0, duration: 0.6, ease: "power3.out" }, at)
+    tl.fromTo(shoe, { yPercent: -3, scale: 0.98 }, { yPercent: 0, scale: 1, duration: 0.6, ease: "power3.out" }, at)
       .fromTo(panel, { yPercent: 100 }, { yPercent: 0, duration: 0.55, ease: "power3.out" }, at + 0.1)
       .fromTo(items, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.04, ease: "power2.out" }, at + 0.35);
   }

@@ -44,7 +44,9 @@ function encode(frames, out, { from, to } = {}) {
   const scale = fade.length ? fade : ["-vf", "scale=1280:720:flags=lanczos"];
   const input = ["-framerate", String(FPS), "-i", join(frames, "%05d.jpg"), ...trim];
   ffmpeg(...input, ...scale, "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p", "-movflags", "+faststart", `${out}.mp4`);
-  ffmpeg(...input, ...scale, "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "36", "-row-mt", "1", `${out}.webm`);
+  // Los previews (fragmento corto del catálogo) admiten más compresión sin pérdida visible.
+  const crf = from === undefined ? "36" : "44";
+  ffmpeg(...input, ...scale, "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", crf, "-row-mt", "1", `${out}.webm`);
 }
 
 const still = (png, out, width = 1280) =>

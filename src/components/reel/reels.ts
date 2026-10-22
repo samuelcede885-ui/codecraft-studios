@@ -48,17 +48,31 @@ function click({ cursor, tl }: Ctx, at: number, target?: Element | null) {
   if (target) tl.to(target, { scale: 0.95, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1 }, at);
 }
 
-/** Cambio de página: la pantalla sale con una escala mínima y entra la siguiente. */
+/** Duración del cambio de página. */
+const SWAP = 0.45;
+
+/**
+ * Cambio de página, como en una navegación real: la pantalla nueva entra deslizándose y ya opaca
+ * por encima, mientras la anterior sigue visible debajo hasta quedar cubierta. Así nunca hay
+ * fotogramas lavados (dos pantallas medio transparentes) ni dos pantallas mezcladas.
+ */
 function swap({ tl, layers }: Ctx, from: number, to: number, at: number) {
-  tl.set(layers[to], { zIndex: 2 }, at)
-    .set(layers[from], { zIndex: 1 }, at)
-    .to(layers[from], { autoAlpha: 0, scale: 0.985, duration: 0.45, ease: "power2.inOut" }, at)
+  slideIn(tl, layers[to], layers[from], at);
+}
+
+function slideIn(tl: gsap.core.Timeline, incoming: HTMLElement, outgoing: HTMLElement, at: number) {
+  tl.set(incoming, { zIndex: 3 }, at)
+    .set(outgoing, { zIndex: 2 }, at)
     .fromTo(
-      layers[to],
-      { autoAlpha: 0, scale: 1.015 },
-      { autoAlpha: 1, scale: 1, duration: 0.5, ease: "power2.out", immediateRender: false },
-      at + 0.05,
-    );
+      incoming,
+      { autoAlpha: 1, xPercent: 7, scale: 1 },
+      { xPercent: 0, duration: SWAP, ease: "power3.out", immediateRender: false },
+      at,
+    )
+    // Sombra de profundidad mínima en la pantalla que queda debajo, sin desvanecerla.
+    .fromTo(outgoing, { xPercent: 0 }, { xPercent: -3, duration: SWAP, ease: "power3.out", immediateRender: false }, at)
+    .set(outgoing, { autoAlpha: 0, xPercent: 0, zIndex: 1 }, at + SWAP)
+    .set(incoming, { zIndex: 2 }, at + SWAP);
 }
 
 const START = { left: "78%", top: "74%" };
@@ -98,7 +112,7 @@ function gramercy(ctx: Ctx) {
   swap(ctx, 0, 1, t.home.end - 0.3);
 
   // 02 Producto: entra la ficha (panel, stock, cantidad, pulso de ADD TO CART).
-  enterScreen(tl, product, t.product.start);
+  enterScreen(tl, product, t.home.end - 0.3);
   move(ctx, plus, t.product.start + 0.5, 0.8);
   click(ctx, t.product.start + 1.3);
   move(ctx, addToCart, t.product.start + 2.4, 0.9);
@@ -106,7 +120,7 @@ function gramercy(ctx: Ctx) {
   swap(ctx, 1, 2, t.product.end - 0.3);
 
   // 03 Conversión: talla 41, dirección escrita y PAGAR.
-  enterScreen(tl, cart, t.cart.start);
+  enterScreen(tl, cart, t.product.end - 0.3);
   move(ctx, size41, t.cart.start + 0.05, 0.5);
   click(ctx, t.cart.start + 0.6);
   move(ctx, address, t.cart.start + 1.2, 0.7);
@@ -115,7 +129,7 @@ function gramercy(ctx: Ctx) {
   swap(ctx, 2, 3, t.cart.end - 0.3);
 
   // 04 Tecnología: los métodos entran, se resaltan en secuencia y se elige Pago Móvil.
-  enterScreen(tl, payment, t.payment.start);
+  enterScreen(tl, payment, t.cart.end - 0.3);
   move(ctx, pagoMovil, t.payment.start + 1.9, 0.8);
   click(ctx, t.payment.start + 2.8);
   const hl = gm(payment, "hl")[0];
@@ -123,16 +137,15 @@ function gramercy(ctx: Ctx) {
   swap(ctx, 3, 4, t.payment.end - 0.3);
 
   // 05 Resultados: las gráficas se dibujan y el cursor las recorre.
-  enterScreen(tl, dashboard, t.dashboard.start);
+  enterScreen(tl, dashboard, t.payment.end - 0.3);
   move(ctx, chartA, t.dashboard.start + 1.2, 1.1);
   move(ctx, chartB, t.dashboard.start + 2.8, 1.1);
 
-  // Vuelta a la portada: mismo fotograma que el inicio, para que el loop no salte.
+  // Vuelta a la portada con el mismo cambio de página: termina en el mismo fotograma que el
+  // inicio, para que el loop no salte.
   const back = t.dashboard.end - 0.8;
-  tl.set(home, { zIndex: 3, scale: 1 }, back)
-    .fromTo(home, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.7, ease: "power2.inOut", immediateRender: false }, back)
-    .set(dashboard, { autoAlpha: 0 }, t.dashboard.end - 0.05)
-    .set(home, { zIndex: 2 }, t.dashboard.end - 0.05);
+  tl.set(home, { scale: 1 }, back);
+  slideIn(tl, home, dashboard, back);
   move(ctx, START, back - 0.1, 0.8);
   tl.set({}, {}, t.dashboard.end);
 }

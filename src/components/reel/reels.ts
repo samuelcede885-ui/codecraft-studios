@@ -84,11 +84,15 @@ function gramercy(ctx: Ctx) {
   const chartA = point(root, q(dashboard, ".sc-dash__card"), 0.7, 0.7);
   const chartB = point(root, dashboard.querySelectorAll(".sc-dash__card")[1], 0.6, 0.6);
 
-  // Apertura (0–3 s): la portada ya compuesta; el cursor llega despacio.
-  move(ctx, { left: "70%", top: "64%" }, 0.6, 2);
+  // Apertura (0–3 s): hay movimiento desde el primer fotograma, para que el video "arranque"
+  // justo al terminar la intro: la portada se acerca despacio, el zueco empieza a respirar y
+  // el cursor ya se desplaza. Todo parte del mismo estado en que termina el loop.
+  tl.fromTo(home, { scale: 1 }, { scale: 1.035, duration: t.home.end - 0.3, ease: "sine.inOut", immediateRender: false }, 0);
+  tl.to(gm(home, "shoe"), { yPercent: -2.5, scale: 1.02, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+  move(ctx, { left: "62%", top: "58%" }, 0, 1.4);
+  move(ctx, { left: "70%", top: "66%" }, 1.6, 1.2);
 
-  // 01 Concepto: el zueco respira; el cursor va a ORDER NOW y entra a la ficha.
-  tl.to(gm(home, "shoe"), { yPercent: -2.5, scale: 1.02, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1 }, t.home.start + 0.2);
+  // 01 Concepto: el cursor va a ORDER NOW y entra a la ficha.
   move(ctx, order, t.home.start + 2.6, 0.9);
   click(ctx, t.home.end - 0.55, q(home, ".gm-home__order"));
   swap(ctx, 0, 1, t.home.end - 0.3);

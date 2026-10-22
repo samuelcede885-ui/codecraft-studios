@@ -154,13 +154,13 @@ export function HeroExperience() {
     track("hero_stage_view", { stage: s.id, title: s.title });
   }, [stage]);
 
-  // Entrada del hero (una vez, sin scroll): la laptop aparece en su sitio y no vuelve a moverse.
+  // Entrada del hero (una vez, sin scroll): la laptop ya está en su sitio al terminar la intro
+  // y el video arranca en ese mismo instante; solo los textos laterales entran con suavidad.
   useEffect(() => {
     const el = root.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const tl = gsap.timeline({ paused: !window.__faryIntroDone, defaults: { ease: "expo.out" } });
-    tl.from(el.querySelector(".laptop"), { autoAlpha: 0, y: 18, scale: 0.985, duration: 1.2 }, 0.1)
-      .from(el.querySelectorAll("[data-hero-in]"), { autoAlpha: 0, y: 14, duration: 0.8, stagger: 0.08 }, 0.25);
+    tl.from(el.querySelectorAll("[data-hero-in]"), { autoAlpha: 0, y: 14, duration: 0.8, stagger: 0.08 }, 0.05);
     const go = () => tl.play();
     window.addEventListener("fary:intro-done", go, { once: true });
     return () => {

@@ -1,0 +1,22 @@
+{
+  "name": "fary-labs-motion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Motion graphics de Fary Labs: reels verticales 1080 × 1920 construidos con React + Remotion.",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "render:demo": "remotion render src/index.ts Demo out/demo.mp4",
+    "still:demo": "remotion still src/index.ts Demo out/demo.png --frame=150",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.538",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.538"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}

@@ -8,15 +8,16 @@ import { SafeAreaGuides } from "../../components/SafeArea";
 import { ReelWorld } from "./ReelWorld";
 import { AgentCraft } from "./scenes/AgentCraft";
 import { AppCraft } from "./scenes/AppCraft";
-import { Conecta } from "./scenes/Conecta";
+import { Fary } from "./scenes/Fary";
 import { Hook } from "./scenes/Hook";
 import { Problema } from "./scenes/Problema";
 import { Resultado } from "./scenes/Resultado";
-import { WebCraft } from "./scenes/WebCraft";
+import { WebContacto } from "./scenes/WebContacto";
+import { WebPresenta } from "./scenes/WebPresenta";
 
 /**
- * REEL 01 — "Tu negocio no debería depender de ti" (28 s).
- * HOOK → PROBLEMA → SISTEMA → DEMO (web, app, agente) → RESULTADO → CTA.
+ * REEL 01 — "Tu negocio no debería depender de ti" (32 s).
+ * HOOK → PROBLEMA → FARY CONECTA → WEB (presenta, contacto) → APP → AUTOMATIZACIÓN → RESULTADO → CTA.
  */
 export function Reel01({ guides = false }: { guides?: boolean }) {
   const frame = useCurrentFrame();
@@ -25,18 +26,19 @@ export function Reel01({ guides = false }: { guides?: boolean }) {
   const scenes = [
     [s.hook, <Hook />],
     [s.problema, <Problema />],
-    [s.conecta, <Conecta />],
-    [s.web, <WebCraft />],
+    [s.fary, <Fary />],
+    [s.webPresenta, <WebPresenta />],
+    [s.webContacto, <WebContacto />],
     [s.app, <AppCraft />],
     [s.agent, <AgentCraft />],
     [s.resultado, <Resultado />],
   ] as const;
   return (
-    <AbsoluteFill style={{ background: fary.color.ink }}>
+    <AbsoluteFill style={{ background: fary.color.negro }}>
       <ReelWorld />
       {/* Legibilidad: el título vive sobre una zona más oscura; los bordes del mundo se apagan. */}
-      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(11,11,11,0.92) 0%, rgba(11,11,11,0.55) 20%, rgba(11,11,11,0) 34%, rgba(11,11,11,0) 72%, rgba(11,11,11,0.7) 100%)" }} />
-      <AbsoluteFill style={{ background: "radial-gradient(130% 75% at 50% 55%, rgba(11,11,11,0) 55%, rgba(11,11,11,0.85) 100%)" }} />
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(9,10,11,0.94) 0%, rgba(9,10,11,0.6) 22%, rgba(9,10,11,0) 36%, rgba(9,10,11,0) 72%, rgba(9,10,11,0.7) 100%)" }} />
+      <AbsoluteFill style={{ background: "radial-gradient(130% 75% at 50% 55%, rgba(9,10,11,0) 55%, rgba(9,10,11,0.85) 100%)" }} />
       {scenes.map(([sc, node], i) => (
         <Sequence key={i} from={sc.from} durationInFrames={sc.duration} layout="none">
           {node}

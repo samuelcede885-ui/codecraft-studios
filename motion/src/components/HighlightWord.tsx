@@ -3,19 +3,19 @@ import { useCurrentFrame } from "remotion";
 import { fary } from "../theme/fary";
 import { easeInOut, easeOut, progress } from "../lib/motion";
 
-export type HighlightTone = "accent" | "warm";
+export type HighlightTone = "signal" | "problem";
 export type HighlightTiming = { appear: number; grow: number; reveal: number };
 
 /**
  * Palabra protagonista, siempre con la misma transición:
  * 1. aparece una barra fina al pie; 2. crece de izquierda a derecha;
  * 3. sube a toda la altura y revela la palabra (oscura sobre el color).
- * Tono: verde (sistema, resultado) o cálido (el problema).
+ * Tono: marfil (señal: sistema, resultado) o grafito (el problema).
  */
 export function HighlightWord({
   children,
   from = 0,
-  tone = "accent",
+  tone = "signal",
   timing = { appear: 5, grow: 12, reveal: 10 },
   style,
 }: {
@@ -36,7 +36,7 @@ export function HighlightWord({
         style={{
           position: "absolute",
           inset: "0.1em 0 0.04em",
-          background: tone === "accent" ? fary.color.accent : fary.color.warm,
+          background: tone === "signal" ? fary.color.signal : "#3E3F44",
           opacity: appear,
           transformOrigin: "left bottom",
           transform: `scaleX(${0.05 + 0.95 * grow}) scaleY(${0.12 + 0.88 * reveal})`,
@@ -46,7 +46,7 @@ export function HighlightWord({
         style={{
           position: "relative",
           display: "inline-block",
-          color: fary.color.black,
+          color: tone === "signal" ? fary.color.negro : fary.color.marfil,
           clipPath: `inset(-0.1em ${(1 - reveal) * 100}% -0.1em 0)`,
           transform: `translateY(${(1 - reveal) * 0.16}em)`,
         }}

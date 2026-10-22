@@ -11,11 +11,12 @@ import { IsometricWorld, WorldLayer } from "../../components/IsometricWorld";
 const S = reel01.scenes;
 /** Frames clave del mundo (absolutos). */
 export const W = {
-  webOn: S.web.from + 18,
+  webOn: S.webPresenta.from + 30,
+  contactSent: S.webContacto.from + 14 + 80,
   webToApp: S.app.from + 4,
-  appOn: S.app.from + 30,
+  appOn: S.app.from + 28,
   channels: S.agent.from + 10,
-  aiOn: S.agent.from + 30,
+  aiOn: S.agent.from + 28,
   chain: S.resultado.from + 8,
   datosOn: S.resultado.from + 40,
   officeEmpty: S.resultado.from + 26,
@@ -33,20 +34,22 @@ export function ReelWorld() {
     { frame: 178, x: 7.05, y: 7.0, z: 0.7, scale: 2.1, anchorY: 0.58 },
     { frame: 226, x: 7.0, y: 5.6, z: 1.0, scale: 0.95, anchorY: 0.56 },
     { frame: 272, x: 6.8, y: 5.8, z: 1.0, scale: 0.92, anchorY: 0.56 },
-    { frame: 305, x: 1.8, y: 6.8, z: 1.5, scale: 1.4, anchorY: 0.4 },
-    { frame: 388, x: 1.9, y: 6.7, z: 1.5, scale: 1.5, anchorY: 0.4 },
-    { frame: 428, x: 6.9, y: 1.6, z: 1.8, scale: 1.35, anchorY: 0.38 },
-    { frame: 508, x: 6.9, y: 1.7, z: 1.8, scale: 1.45, anchorY: 0.38 },
-    { frame: 548, x: 11.0, y: 6.8, z: 1.6, scale: 0.95, anchorY: 0.38 },
-    { frame: 628, x: 11.1, y: 6.8, z: 1.6, scale: 1.02, anchorY: 0.38 },
-    { frame: 688, x: 7.6, y: 5.0, z: 1.0, scale: 0.62, anchorY: 0.56 },
-    { frame: 738, x: 7.0, y: 7.0, z: 0.7, scale: 1.55, anchorY: 0.58 },
-    { frame: 840, x: 7.0, y: 7.0, z: 0.7, scale: 1.7, anchorY: 0.58 },
+    { frame: 305, x: 1.8, y: 6.8, z: 1.5, scale: 1.3, anchorY: 0.44 },
+    { frame: 388, x: 1.9, y: 6.7, z: 1.5, scale: 1.4, anchorY: 0.44 },
+    { frame: 430, x: 2.2, y: 7.8, z: 1.0, scale: 1.25, anchorY: 0.46 },
+    { frame: 508, x: 2.3, y: 7.9, z: 1.0, scale: 1.3, anchorY: 0.46 },
+    { frame: 545, x: 6.9, y: 1.6, z: 1.8, scale: 1.35, anchorY: 0.4 },
+    { frame: 612, x: 6.9, y: 1.7, z: 1.8, scale: 1.45, anchorY: 0.4 },
+    { frame: 650, x: 11.0, y: 6.8, z: 1.6, scale: 0.95, anchorY: 0.4 },
+    { frame: 718, x: 11.1, y: 6.8, z: 1.6, scale: 1.02, anchorY: 0.4 },
+    { frame: 776, x: 7.6, y: 5.0, z: 1.0, scale: 0.62, anchorY: 0.56 },
+    { frame: 826, x: 7.0, y: 7.0, z: 0.7, scale: 1.55, anchorY: 0.58 },
+    { frame: 960, x: 7.0, y: 7.0, z: 0.7, scale: 1.7, anchorY: 0.58 },
   ]);
 
   const on = (at: number) => progress(frame, at, 26);
   const state = {
-    ambient: interpolate(frame, [0, 200, 300, 630, 700], [0.05, 0.06, 0.1, 0.13, 0.22], clamp),
+    ambient: interpolate(frame, [0, 200, 300, 720, 790], [0.05, 0.06, 0.1, 0.13, 0.22], clamp),
     systems: { web: on(W.webOn), app: on(W.appOn), ai: on(W.aiOn), datos: on(W.datosOn) },
     office: {
       lamp: 1 - 0.8 * progress(frame, W.officeEmpty, 24),
@@ -63,7 +66,7 @@ export function ReelWorld() {
       <IsometricWorld>
         <City state={state} />
         <WorldLayer name="data">
-          <DataFlow path={routes.clienteWeb} since={W.webOn + 30} drawFrames={24} opacity={handoff} />
+          <DataFlow path={routes.clienteWeb} since={W.contactSent} drawFrames={20} opacity={handoff} />
           <DataFlow path={routes.webApp} since={W.webToApp} drawFrames={34} opacity={handoff} />
           <DataFlow path={routes.inWeb} since={W.channels} drawFrames={30} opacity={handoff} />
           <DataFlow path={routes.inEmail} since={W.channels + 5} drawFrames={30} opacity={handoff} />
@@ -73,7 +76,7 @@ export function ReelWorld() {
         </WorldLayer>
         <WorldLayer name="labels">
           {(["email", "chat", "social"] as const).map((k, i) => (
-            <FloatingLabel key={k} at={anchors[k]} text={k} delay={W.channels + 5 * (i + 1)} visible={1 - progress(frame, S.agent.from + 100, 10)} lift={60} />
+            <FloatingLabel key={k} at={anchors[k]} text={k} delay={W.channels + 5 * (i + 1)} visible={1 - progress(frame, S.agent.from + 92, 10)} lift={60} />
           ))}
           <FloatingLabel at={anchors.cliente} text="Cliente" delay={W.chain} visible={1 - progress(frame, S.resultado.from + 70, 10)} lift={60} size={26} />
           <FloatingLabel at={anchors.datos} text="Datos" active delay={W.datosOn} visible={1 - progress(frame, S.resultado.from + 70, 10)} size={26} />

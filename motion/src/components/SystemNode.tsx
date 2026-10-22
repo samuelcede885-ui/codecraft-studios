@@ -11,10 +11,10 @@ export function SystemNode({ size = 140, active = 0, children, style }: { size?:
         borderRadius: size,
         display: "grid",
         placeItems: "center",
-        background: fary.color.surface,
-        border: `2px solid ${active > 0.01 ? `rgba(25,255,114,${0.25 + 0.75 * active})` : "rgba(255,255,255,0.12)"}`,
-        boxShadow: `0 0 ${50 * active}px rgba(25,255,114,${0.22 * active}), 0 30px 60px -30px rgba(0,0,0,0.9)`,
-        color: fary.color.white,
+        background: fary.color.carbon,
+        border: `2px solid ${active > 0.01 ? `rgba(245,245,243,${0.25 + 0.75 * active})` : "rgba(255,255,255,0.12)"}`,
+        boxShadow: `0 0 ${50 * active}px rgba(245,245,243,${0.22 * active}), 0 30px 60px -30px rgba(0,0,0,0.9)`,
+        color: fary.color.blanco,
         ...style,
       }}
     >

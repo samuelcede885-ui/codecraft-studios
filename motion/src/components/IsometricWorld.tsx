@@ -23,10 +23,16 @@ export function IsometricWorld({ from = -16, to = 32, children }: { from?: numbe
         <filter id="glow-soft" x="-100%" y="-100%" width="300%" height="300%">
           <feGaussianBlur stdDeviation="26" />
         </filter>
-        {(["accent", "warm", "white"] as const).map((k) => (
+        {/* Halo de sistema activo y de luz de calle: ambos en marfil, con distinta intensidad. */}
+        {(
+          [
+            ["signal", 0.5],
+            ["lamp", 0.32],
+          ] as const
+        ).map(([k, o]) => (
           <radialGradient key={k} id={`halo-${k}`}>
-            <stop offset="0%" stopColor={k === "white" ? fary.color.light : fary.color[k]} stopOpacity="0.55" />
-            <stop offset="100%" stopColor={k === "white" ? fary.color.light : fary.color[k]} stopOpacity="0" />
+            <stop offset="0%" stopColor={fary.color.marfil} stopOpacity={o} />
+            <stop offset="100%" stopColor={fary.color.marfil} stopOpacity="0" />
           </radialGradient>
         ))}
       </defs>

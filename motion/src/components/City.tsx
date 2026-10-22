@@ -15,7 +15,7 @@ export type CityState = {
   /** Nivel de encendido de cada sistema (0–1). */
   systems: Partial<Record<SystemId, number>>;
   office: { lamp: number; occupied: number; system: number };
-  /** Personas que usan el sistema (anillo verde). */
+  /** Personas que usan el sistema (anillo de señal). */
   peopleActive?: number;
 };
 
@@ -30,7 +30,7 @@ export function City({ state }: { state: CityState }) {
     { z: depth(office.x, office.y, office.w, office.d), node: <OfficeRoom key="office" {...office} {...state.office} /> },
     ...trees.map((t, i) => ({ z: depth(t.x, t.y), node: <Tree key={`t${i}`} {...t} /> })),
     ...lights.map((l, i) => ({ z: depth(l.x, l.y), node: <StreetLight key={`l${i}`} {...l} /> })),
-    ...people.map(([x, y], i) => ({ z: depth(x, y), node: <DigitalPerson key={`p${i}`} x={x} y={y} tone={fary.color.gray} active={state.peopleActive ?? 0} /> })),
+    ...people.map(([x, y], i) => ({ z: depth(x, y), node: <DigitalPerson key={`p${i}`} x={x} y={y} tone={fary.color.muted} active={state.peopleActive ?? 0} /> })),
   ].sort((a, b) => a.z - b.z);
 
   return (

@@ -13,6 +13,8 @@ export type KineticTitleProps = {
   highlight?: string;
   tone?: HighlightTone;
   eyebrow?: Eyebrow;
+  /** Línea de apoyo en Inter, con el beneficio en palabras sencillas. */
+  subtitle?: string;
   alignment?: "left" | "center";
   /** Posición vertical del bloque: arriba (bajo la cabecera de la app), centro o abajo. */
   position?: "top" | "center" | "bottom";
@@ -32,8 +34,9 @@ export type KineticTitleProps = {
 export function KineticTitle({
   lines,
   highlight,
-  tone = "accent",
+  tone = "signal",
   eyebrow,
+  subtitle,
   alignment = "center",
   position = "top",
   maxWidth = 936,
@@ -70,10 +73,10 @@ export function KineticTitle({
       {eyebrow && (
         <div style={{ ...enterStyle(eyeP, 16), marginBottom: 22, font: `600 24px ${fary.font.ui}`, letterSpacing: "0.32em", textTransform: "uppercase" }}>
           {typeof eyebrow === "string" ? (
-            <span style={{ color: fary.color.accent }}>{eyebrow}</span>
+            <span style={{ color: fary.color.signal }}>{eyebrow}</span>
           ) : (
             eyebrow.steps.map((s, i) => (
-              <span key={s} style={{ color: i === eyebrow.current ? fary.color.accent : "rgba(255,255,255,0.4)" }}>
+              <span key={s} style={{ color: i === eyebrow.current ? fary.color.signal : "rgba(255,255,255,0.4)" }}>
                 {i > 0 && <span style={{ color: "rgba(255,255,255,0.3)", margin: "0 0.5em" }}>·</span>}
                 {s}
               </span>
@@ -81,7 +84,7 @@ export function KineticTitle({
           )}
         </div>
       )}
-      <div style={{ maxWidth, font: `900 ${size}px/1.04 ${fary.font.display}`, letterSpacing: "-0.03em", color: fary.color.white, textShadow: "0 4px 30px rgba(0,0,0,0.6)" }}>
+      <div style={{ maxWidth, font: `900 ${size}px/1.04 ${fary.font.display}`, letterSpacing: "-0.03em", color: fary.color.blanco, textShadow: "0 4px 30px rgba(0,0,0,0.6)" }}>
         {lines.slice(0, 4).map((line, li) => (
           <div key={li}>
             {tokens(line, highlight).map((tok, wi) => {
@@ -105,6 +108,11 @@ export function KineticTitle({
           </div>
         ))}
       </div>
+      {subtitle && (
+        <div style={{ ...enterStyle(spring({ frame: frame - from - (index + 3) * stagger, fps, durationInFrames: 20, config: { damping: 200 } }), 20), marginTop: 26, maxWidth: 820, font: `500 34px/1.35 ${fary.font.ui}`, color: "rgba(245,245,243,0.78)", textShadow: "0 2px 20px rgba(0,0,0,0.8)" }}>
+          {subtitle}
+        </div>
+      )}
     </div>
   );
 }

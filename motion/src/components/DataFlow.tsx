@@ -51,18 +51,18 @@ export function DataFlow({ path, active = true, since = 0, drawFrames = 36, puls
   const dash = { strokeDasharray: total, strokeDashoffset: total * (1 - drawn) };
   return (
     <g data-flow opacity={opacity}>
-      <path d={d} fill="none" stroke={fary.color.accent} strokeWidth={width * 3} strokeOpacity={0.28} filter="url(#glow)" strokeLinecap="round" strokeLinejoin="round" {...dash} />
-      <path d={d} fill="none" stroke={fary.color.accent} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" {...dash} />
+      <path d={d} fill="none" stroke={fary.color.signal} strokeWidth={width * 3} strokeOpacity={0.28} filter="url(#glow)" strokeLinecap="round" strokeLinejoin="round" {...dash} />
+      <path d={d} fill="none" stroke={fary.color.signal} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" {...dash} />
       {marks.map(({ pt, at }, i) => (
         <g key={i} opacity={interpolate(reach - at, [-1, 20], [0, 1], clamp)} transform={`translate(${pt.x}, ${pt.y})`}>
-          <ellipse rx={17} ry={8.5} fill="none" stroke={fary.color.accent} strokeWidth={2.5} />
-          <ellipse rx={5.5} ry={2.75} fill={fary.color.accent} />
+          <ellipse rx={17} ry={8.5} fill="none" stroke={fary.color.signal} strokeWidth={2.5} />
+          <ellipse rx={5.5} ry={2.75} fill={fary.color.signal} />
         </g>
       ))}
       {packets.map((pk, i) => (
         <g key={i} opacity={pk.o}>
-          <circle cx={pk.x} cy={pk.y} r={13} fill={fary.color.accent} opacity={0.4} filter="url(#glow)" />
-          <circle cx={pk.x} cy={pk.y} r={5.5} fill={fary.color.white} />
+          <circle cx={pk.x} cy={pk.y} r={13} fill={fary.color.signal} opacity={0.4} filter="url(#glow)" />
+          <circle cx={pk.x} cy={pk.y} r={5.5} fill={fary.color.blanco} />
         </g>
       ))}
     </g>

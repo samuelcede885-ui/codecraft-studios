@@ -7,7 +7,7 @@ export const PHONE_SCREEN = { width: 390, height: 844 };
 
 /**
  * Teléfono gráfico minimalista (no hiperrealista) que recibe una interfaz React.
- * `active` enciende la pantalla: más brillo y glow verde sutil.
+ * `active` enciende la pantalla: más brillo y brillo marfil sutil.
  */
 export function PhoneMockup({ width = 400, active = true, since = 0, children }: { width?: number; active?: boolean; since?: number; children?: ReactNode }) {
   const a = useActivation(active, since, 22);
@@ -22,15 +22,15 @@ export function PhoneMockup({ width = 400, active = true, since = 0, children }:
         width,
         height,
         borderRadius: width * 0.15,
-        background: fary.color.surface,
+        background: fary.color.carbon,
         padding: bezel,
-        boxShadow: `0 0 0 2px rgba(255,255,255,0.1), 0 50px 90px -30px rgba(0,0,0,0.95), 0 0 ${70 * a}px rgba(25,255,114,${0.12 * a})`,
+        boxShadow: `0 0 0 2px rgba(255,255,255,0.1), 0 50px 90px -30px rgba(0,0,0,0.95), 0 0 ${70 * a}px rgba(245,245,243,${0.12 * a})`,
       }}
     >
-      <div style={{ position: "relative", width: screenW, height: height - bezel * 2, borderRadius: width * 0.12, overflow: "hidden", background: fary.color.light }}>
+      <div style={{ position: "relative", width: screenW, height: height - bezel * 2, borderRadius: width * 0.12, overflow: "hidden", background: fary.color.marfil }}>
         <div style={{ width: PHONE_SCREEN.width, height: PHONE_SCREEN.height, transform: `scale(${scale})`, transformOrigin: "0 0" }}>{children}</div>
         <div style={{ position: "absolute", top: 12 * scale, left: "50%", width: 104 * scale, height: 30 * scale, marginLeft: -52 * scale, borderRadius: 999, background: "#000" }} />
-        <div style={{ position: "absolute", inset: 0, background: fary.color.black, opacity: (1 - a) * 0.85 }} />
+        <div style={{ position: "absolute", inset: 0, background: fary.color.negro, opacity: (1 - a) * 0.85 }} />
       </div>
     </div>
   );

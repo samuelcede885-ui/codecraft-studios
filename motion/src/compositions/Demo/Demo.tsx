@@ -19,7 +19,7 @@ export function Demo() {
   ]);
   const ai = progress(frame, 36, 26);
   return (
-    <AbsoluteFill style={{ background: fary.color.ink }}>
+    <AbsoluteFill style={{ background: fary.color.negro }}>
       <IsometricCamera {...camera}>
         <IsometricWorld>
           <City state={{ ambient: 0.1, systems: { ai, datos: progress(frame, 100, 26) }, office: { lamp: 1, occupied: 1, system: 0 } }} />

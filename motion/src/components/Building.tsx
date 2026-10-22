@@ -18,7 +18,7 @@ export type BuildingProps = {
   level?: number;
   /** Ventanas encendidas en reposo (vida nocturna). */
   idle?: number;
-  /** Pantalla en la fachada frontal (se ilumina en verde al activarse). */
+  /** Pantalla en la fachada frontal (se ilumina en marfil al activarse). */
   screen?: boolean;
 };
 
@@ -27,7 +27,7 @@ type Face = { o: [number, number]; u: [number, number]; len: number };
 /**
  * Edificio por capas: caras, ventanas, pantalla, glow y azotea.
  * Activo: se enciende la pantalla, sube el brillo, las ventanas se iluminan en orden
- * determinista y aparece un halo verde sutil en el suelo.
+ * determinista y aparece un halo marfil sutil en el suelo.
  */
 export function Building({ id, x, y, w, d, h, active = false, since = 0, level, idle = 0.1, screen = false }: BuildingProps) {
   const activation = useActivation(active, since, 30);
@@ -72,34 +72,34 @@ export function Building({ id, x, y, w, d, h, active = false, since = 0, level, 
 
   return (
     <g data-building={id}>
-      <ellipse cx={c.x} cy={c.y + 18} rx={(w + d) * 115} ry={(w + d) * 58} fill="url(#halo-accent)" opacity={a * 0.3} />
+      <ellipse cx={c.x} cy={c.y + 18} rx={(w + d) * 115} ry={(w + d) * 58} fill="url(#halo-signal)" opacity={a * 0.3} />
       <polygon points={right} fill={fary.world.faceRight} />
       <polygon points={left} fill={fary.world.faceLeft} />
       <polygon points={top} fill={fary.world.faceTop} />
-      <g fill={fary.color.white} opacity={a * 0.03}>
+      <g fill={fary.color.blanco} opacity={a * 0.03}>
         <polygon points={right} />
         <polygon points={left} />
       </g>
       {windows.map((win, i) => (
         <g key={i}>
           <polygon points={win.points} fill={fary.world.windowOff} />
-          {win.lit > 0 && <polygon points={win.points} fill={win.cool ? fary.color.light : fary.color.warm} opacity={win.lit * (win.cool ? 0.4 : 0.72)} />}
+          {win.lit > 0 && <polygon points={win.points} fill={fary.world.windowOn} opacity={win.lit * (win.cool ? 0.38 : 0.66)} />}
         </g>
       ))}
       {screen && (
         <g>
           <polygon points={panel} fill="#0A0A0A" stroke={fary.world.edge} strokeWidth={1.5} />
-          <polygon points={panel} fill={fary.color.accent} opacity={a * 0.13} />
-          <polygon points={panel} fill={fary.color.accent} opacity={a * 0.3} filter="url(#glow)" />
+          <polygon points={panel} fill={fary.color.signal} opacity={a * 0.13} />
+          <polygon points={panel} fill={fary.color.signal} opacity={a * 0.3} filter="url(#glow)" />
           {bars.map((b, i) => (
-            <polygon key={i} points={b} fill={fary.color.accent} opacity={a * (0.9 - i * 0.2)} />
+            <polygon key={i} points={b} fill={fary.color.signal} opacity={a * (0.9 - i * 0.2)} />
           ))}
         </g>
       )}
       <g fill="none" strokeLinejoin="round">
         <polygon points={top} stroke={fary.world.edge} strokeWidth={1.5} />
         <polyline points={pts([P(x + w, y + d, 0), P(x + w, y + d, h)])} stroke={fary.world.edge} strokeWidth={1.5} />
-        <polygon points={top} stroke={fary.color.accent} strokeWidth={2} opacity={a * 0.75} />
+        <polygon points={top} stroke={fary.color.signal} strokeWidth={2} opacity={a * 0.75} />
       </g>
     </g>
   );

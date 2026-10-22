@@ -7,10 +7,10 @@ export type Channel = "chat" | "email" | "web" | "social" | "calendar" | "sheet"
 
 const name: Record<Channel, string> = { chat: "Chat", email: "Email", web: "Web", social: "Social", calendar: "Calendario", sheet: "Hoja de cálculo", notes: "Notas" };
 
-/** Notificación entrante: canal + mensaje. `tone` cálido para el caos manual, verde para el sistema. */
-export function NotificationBubble({ channel, text, delay = 0, tone = "warm", style }: { channel: Channel; text: string; delay?: number; tone?: "warm" | "accent"; style?: CSSProperties }) {
+/** Notificación entrante: canal + mensaje. `tone`: gris para el caos manual, marfil para el sistema. */
+export function NotificationBubble({ channel, text, delay = 0, tone = "problem", style }: { channel: Channel; text: string; delay?: number; tone?: "problem" | "signal"; style?: CSSProperties }) {
   const p = useEnter(delay);
-  const c = tone === "warm" ? fary.color.warm : fary.color.accent;
+  const c = tone === "problem" ? fary.color.muted : fary.color.signal;
   return (
     <div
       style={{
@@ -19,15 +19,15 @@ export function NotificationBubble({ channel, text, delay = 0, tone = "warm", st
         gap: 18,
         padding: "18px 26px 18px 18px",
         borderRadius: 26,
-        background: "rgba(243,243,243,0.96)",
-        color: fary.color.black,
+        background: "rgba(245,245,243,0.97)",
+        color: fary.color.negro,
         boxShadow: "0 24px 60px -24px rgba(0,0,0,0.9)",
         width: "fit-content",
         ...enterStyle(p),
         ...style,
       }}
     >
-      <div style={{ width: 54, height: 54, borderRadius: 16, background: fary.color.black, color: c, display: "grid", placeItems: "center" }}>
+      <div style={{ width: 54, height: 54, borderRadius: 16, background: fary.color.negro, color: c, display: "grid", placeItems: "center" }}>
         <Icon name={channel} size={30} />
       </div>
       <div>

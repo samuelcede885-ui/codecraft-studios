@@ -7,7 +7,7 @@ Reels verticales construidos con código: React + TypeScript + Remotion.
 cd motion
 npm install
 npm run dev              # Remotion Studio
-npm run render:reel01    # out/reel01.mp4 (28 s)
+npm run render:reel01    # out/reel01.mp4 (32 s)
 npm run qa               # frames de revisión del brief (§22) en out/qa/
 node scripts/qa.mjs Reel01 0,330,780 --guides   # con las guías de zona segura
 ```
@@ -18,7 +18,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 
 | Composición | Qué es |
 |---|---|
-| `Reel01` | "Tu negocio no debería depender de ti" — 8 escenas, 840 frames, sin audio |
+| `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), sin audio |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
 ## Estructura
@@ -47,8 +47,11 @@ src/
 - Animaciones solo por frame (`useCurrentFrame`, `spring`, `interpolate`): nada de `setTimeout`,
   `setInterval`, `Date.now` ni CSS en tiempo real. El mismo frame siempre da la misma imagen.
 - Entradas de UI: opacity 0 → 1, translateY 30 → 0, scale .96 → 1, stagger 3–6 frames; salidas más breves.
-- Una palabra protagonista por escena. Resaltado cálido para el problema, verde para el sistema.
-- El verde solo como señal: actividad, datos, conexiones, progreso, CTA y palabra clave.
+- Marca según el Manual v1.1: "El contraste es la identidad". Monocromía deliberada (Negro, Carbón,
+  Grafito, Marfil, Blanco), sin color de acento. La señal (datos, sistemas activos, palabra clave,
+  CTA) es el marfil con un brillo suave; la palabra del problema va sobre grafito.
+- Voz del manual: clara, cercana y precisa. Beneficios reales, sin jerga ni promesas absolutas.
+- Una palabra protagonista por escena.
 - Texto importante dentro de la zona segura (arriba 250, derecha 180, abajo 440 px).
 - Sin cifras, clientes ni resultados inventados. Sin música ni efectos sin licencia: `AudioLayer`
   y las marcas de locución (`reel01.voiceover`) quedan listas para archivos propios.

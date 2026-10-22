@@ -13,9 +13,9 @@ export function Chip({ children, delay = 0, dot = false, icon, style }: { childr
         gap: 14,
         padding: "14px 24px",
         borderRadius: 999,
-        background: "rgba(23,23,23,0.92)",
+        background: "rgba(20,21,23,0.92)",
         border: "1px solid rgba(255,255,255,0.1)",
-        color: fary.color.white,
+        color: fary.color.blanco,
         font: `600 24px ${fary.font.ui}`,
         letterSpacing: "0.16em",
         textTransform: "uppercase",
@@ -25,7 +25,7 @@ export function Chip({ children, delay = 0, dot = false, icon, style }: { childr
         ...style,
       }}
     >
-      {dot && <span style={{ width: 12, height: 12, borderRadius: 12, background: fary.color.accent }} />}
+      {dot && <span style={{ width: 12, height: 12, borderRadius: 12, background: fary.color.signal }} />}
       {icon}
       {children}
     </div>

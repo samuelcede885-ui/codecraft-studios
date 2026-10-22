@@ -7,7 +7,7 @@ import { Dashboard } from "../../../components/Dashboard";
 import { KineticTitle } from "../../../components/KineticTitle";
 import { PhoneMockup } from "../../../components/PhoneMockup";
 
-/** 0:13–0:17 — Los datos viajan de la web a la app: clientes, pedidos, reservas y métricas. */
+/** 0:17–0:20 — Los datos viajan de la web a la app: clientes, pedidos, reservas y métricas. */
 export function AppCraft() {
   const frame = useCurrentFrame();
   const d = reel01.scenes.app.duration;
@@ -15,8 +15,8 @@ export function AppCraft() {
   const out = progress(frame, d - 9, 8);
   return (
     <>
-      <div style={{ position: "absolute", left: 530, top: 735, ...enterStyle(enter, 80), opacity: enter * (1 - out) }}>
-        <PhoneMockup width={352} since={36}>
+      <div style={{ position: "absolute", left: 530, top: 760, ...enterStyle(enter, 80), opacity: enter * (1 - out) }}>
+        <PhoneMockup width={340} since={36}>
           <Dashboard modules={reel01.modules} from={40} />
         </PhoneMockup>
       </div>

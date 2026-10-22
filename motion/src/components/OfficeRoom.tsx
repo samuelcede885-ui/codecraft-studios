@@ -5,7 +5,7 @@ import { DigitalPerson } from "./DigitalPerson";
 /**
  * Oficina en corte (sin las paredes frontales) para ver el negocio "por dentro".
  * `lamp` enciende la luz cálida; `occupied` muestra a la persona trabajando;
- * `system` enciende el monitor en verde (el sistema trabaja solo).
+ * `system` enciende el monitor en marfil (el sistema trabaja solo).
  */
 export function OfficeRoom({
   x,
@@ -52,31 +52,31 @@ export function OfficeRoom({
   const clockHands = pts([hand(-30 + 47 * 0.5, 0.1), P(x, cy0, cz0), hand(47 * 6, 0.15)]);
   return (
     <g data-office>
-      <polygon points={rect(x, y, w, d)} fill={fary.world.wood} />
-      <ellipse cx={floorC.x} cy={floorC.y} rx={w * 120} ry={d * 60} fill="url(#halo-warm)" opacity={0.55 * lamp} />
+      <polygon points={rect(x, y, w, d)} fill={fary.world.floor} />
+      <ellipse cx={floorC.x} cy={floorC.y} rx={w * 120} ry={d * 60} fill="url(#halo-lamp)" opacity={0.55 * lamp} />
       <polygon points={back} fill={fary.world.wall} />
-      <polygon points={side} fill="#120F0C" />
-      <polygon points={back} fill={fary.color.warm} opacity={0.07 * lamp} />
+      <polygon points={side} fill="#0F1012" />
+      <polygon points={back} fill={fary.color.marfil} opacity={0.05 * lamp} />
       <polygon points={win} fill="#07090C" stroke="rgba(255,255,255,0.08)" strokeWidth={2} />
       {/* Reloj de pared, dibujado en el plano de la pared lateral. */}
-      <polygon points={clockFace} fill="#E9E4DA" opacity={0.25 + 0.6 * lamp} />
-      <polyline points={clockHands} fill="none" stroke="#2A241D" strokeWidth={3} strokeLinecap="round" />
+      <polygon points={clockFace} fill={fary.color.marfil} opacity={0.25 + 0.6 * lamp} />
+      <polyline points={clockHands} fill="none" stroke={fary.color.grafito} strokeWidth={3} strokeLinecap="round" />
       {/* Escritorio y monitor. */}
-      <polygon points={desk.right} fill="#221C16" />
-      <polygon points={desk.front} fill="#1A1511" />
-      <polygon points={desk.top} fill="#2B241C" />
+      <polygon points={desk.right} fill="#1E1F23" />
+      <polygon points={desk.front} fill="#18191C" />
+      <polygon points={desk.top} fill="#2A2B2F" />
       <polygon points={mon} fill="#0B0B0B" stroke="rgba(255,255,255,0.12)" strokeWidth={1.5} />
-      <polygon points={mon} fill={fary.color.light} opacity={0.22 * lamp * (1 - system)} />
-      <polygon points={mon} fill={fary.color.accent} opacity={0.55 * system} />
-      <polygon points={mon} fill={fary.color.accent} opacity={0.35 * system} filter="url(#glow)" />
+      <polygon points={mon} fill={fary.color.marfil} opacity={0.22 * lamp * (1 - system)} />
+      <polygon points={mon} fill={fary.color.signal} opacity={0.55 * system} />
+      <polygon points={mon} fill={fary.color.signal} opacity={0.35 * system} filter="url(#glow)" />
       {/* Hojas sobre la mesa: el trabajo manual. */}
-      <polygon points={rect(dx + dw * 0.08, dy + dd * 0.45, 0.32, 0.22, dh + 0.01)} fill="#EDE8DF" opacity={0.75 * lamp} />
-      <polygon points={rect(dx + dw * 0.55, dy + dd * 0.5, 0.26, 0.2, dh + 0.01)} fill="#EDE8DF" opacity={0.55 * lamp} />
-      <DigitalPerson x={dx + dw * 0.48} y={dy + dd + 0.35} seated opacity={occupied} tone="#E8E2D6" />
+      <polygon points={rect(dx + dw * 0.08, dy + dd * 0.45, 0.32, 0.22, dh + 0.01)} fill={fary.color.marfil} opacity={0.7 * lamp} />
+      <polygon points={rect(dx + dw * 0.55, dy + dd * 0.5, 0.26, 0.2, dh + 0.01)} fill={fary.color.marfil} opacity={0.5 * lamp} />
+      <DigitalPerson x={dx + dw * 0.48} y={dy + dd + 0.35} seated opacity={occupied} tone={fary.color.marfil} />
       {/* Lámpara colgante. */}
       <line x1={lampPt.x} y1={lampPt.y - 160} x2={lampPt.x} y2={lampPt.y} stroke="#2A2A2A" strokeWidth={3} />
-      <circle cx={lampPt.x} cy={lampPt.y} r={34} fill={fary.color.warm} opacity={0.4 * lamp} filter="url(#glow)" />
-      <circle cx={lampPt.x} cy={lampPt.y} r={9} fill="#FFE9C2" opacity={0.25 + 0.75 * lamp} />
+      <circle cx={lampPt.x} cy={lampPt.y} r={34} fill={fary.color.marfil} opacity={0.32 * lamp} filter="url(#glow)" />
+      <circle cx={lampPt.x} cy={lampPt.y} r={9} fill={fary.color.blanco} opacity={0.25 + 0.75 * lamp} />
       <polyline points={pts([P(x + w, y, 0), P(x + w, y, H)])} stroke={fary.world.edge} strokeWidth={2} />
       <polyline points={pts([P(x, y + d, 0), P(x, y + d, H)])} stroke={fary.world.edge} strokeWidth={2} />
     </g>

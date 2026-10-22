@@ -16,7 +16,7 @@ export function Dashboard({ modules, from = 0, stagger = 5 }: { modules: string[
     [0.35, 0.5, 0.45, 0.65, 0.8, 0.75],
   ];
   return (
-    <div style={{ width: 390, height: 844, background: fary.color.light, padding: "78px 22px 22px", font: `500 15px ${fary.font.ui}`, color: fary.color.black }}>
+    <div style={{ width: 390, height: 844, background: fary.color.marfil, padding: "78px 22px 22px", font: `500 15px ${fary.font.ui}`, color: fary.color.negro }}>
       <div style={{ ...enterStyle(spring({ frame: frame - from, fps, durationInFrames: 18, config: { damping: 200 } })) }}>
         <div style={{ font: `600 12px ${fary.font.ui}`, letterSpacing: "0.2em", color: "#7A7A7A" }}>TU SISTEMA</div>
         <div style={{ font: `900 30px/1.1 ${fary.font.display}`, marginTop: 6 }}>Todo en un lugar.</div>
@@ -28,20 +28,20 @@ export function Dashboard({ modules, from = 0, stagger = 5 }: { modules: string[
           return (
             <div key={m} style={{ background: "#FFFFFF", borderRadius: 18, padding: 14, height: 150, boxShadow: "0 6px 18px -10px rgba(0,0,0,0.25)", ...enterStyle(p, 24) }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, font: `700 12px ${fary.font.ui}`, letterSpacing: "0.12em" }}>
-                <span style={{ width: 8, height: 8, borderRadius: 8, background: fary.color.accent }} />
+                <span style={{ width: 8, height: 8, borderRadius: 8, background: fary.color.signal }} />
                 {m}
               </div>
               <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 86, marginTop: 18 }}>
                 {shapes[i % shapes.length].map((v, k) => (
-                  <span key={k} style={{ flex: 1, height: `${v * 100 * grow}%`, borderRadius: 4, background: k === 5 ? fary.color.black : "#DADADA" }} />
+                  <span key={k} style={{ flex: 1, height: `${v * 100 * grow}%`, borderRadius: 4, background: k === 5 ? fary.color.negro : "#DADADA" }} />
                 ))}
               </div>
             </div>
           );
         })}
       </div>
-      <div style={{ marginTop: 14, background: fary.color.black, color: fary.color.white, borderRadius: 18, padding: "16px 18px", display: "flex", alignItems: "center", gap: 10, ...enterStyle(spring({ frame: frame - from - 6 * stagger, fps, durationInFrames: 18, config: { damping: 200 } }), 20) }}>
-        <span style={{ width: 10, height: 10, borderRadius: 10, background: fary.color.accent }} />
+      <div style={{ marginTop: 14, background: fary.color.negro, color: fary.color.blanco, borderRadius: 18, padding: "16px 18px", display: "flex", alignItems: "center", gap: 10, ...enterStyle(spring({ frame: frame - from - 6 * stagger, fps, durationInFrames: 18, config: { damping: 200 } }), 20) }}>
+        <span style={{ width: 10, height: 10, borderRadius: 10, background: fary.color.signal }} />
         Sincronizado con la web y el agente
       </div>
     </div>

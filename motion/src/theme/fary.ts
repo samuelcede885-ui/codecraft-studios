@@ -1,45 +1,54 @@
 /**
- * Identidad de motion de Fary Labs (MASTER_BRIEF §3–4).
- * Blanco y negro son la identidad; el verde es una señal: actividad, automatización, datos,
- * conexiones, progreso, CTA y la palabra clave. El cálido es la luz de la ciudad y el problema.
+ * Identidad de motion de Fary Labs, según el Manual de Marca v1.1:
+ * "El contraste es la identidad. Monocromía deliberada."
+ * Negro (principal), Carbón (superficies), Grafito (apoyo), Marfil (fondos) y Blanco (contraste).
+ * No hay color de acento: la señal (datos, sistemas activos, palabra clave, CTA) es el marfil
+ * con un brillo suave; el problema se marca en grafito.
  */
 export const fary = {
   color: {
-    black: "#101010",
-    white: "#FFFFFF",
-    light: "#F3F3F3",
-    gray: "#8A8A8A",
-    surface: "#171717",
-    accent: "#19FF72",
-    warm: "#D7A65A",
-    ink: "#0B0B0B", // fondo del mundo, un punto por debajo de black para dar profundidad
+    negro: "#090A0B",
+    carbon: "#141517",
+    grafito: "#303134",
+    marfil: "#F5F5F3",
+    blanco: "#FFFFFF",
+    /** Texto secundario sobre negro (deriva del grafito, AA en texto grande). */
+    muted: "#8C8E92",
+    /** Señal: lo activo, lo conectado, la palabra protagonista, el CTA. */
+    signal: "#F5F5F3",
   },
-  /** Tonos del mundo isométrico: neutros, sin teñir de verde. */
+  /** Señal en rgba para brillos y transparencias. */
+  signalRgb: "245,245,243",
+  /** Tonos del mundo isométrico, construidos con la paleta (negro → grafito). */
   world: {
-    ground: "#0C0C0C",
-    groundLine: "rgba(255,255,255,0.03)",
-    block: "#101010",
-    blockEdge: "#191919",
-    road: "#131313",
-    roadEdge: "#1D1D1D",
-    roadMark: "rgba(138,138,138,0.24)",
-    faceTop: "#1F1F1F",
-    faceLeft: "#121212",
-    faceRight: "#181818",
-    edge: "rgba(255,255,255,0.06)",
-    windowOff: "rgba(255,255,255,0.03)",
-    foliage: "#141614",
-    foliageTop: "#1B1E1B",
-    wood: "#1A1612",
-    wall: "#16130F",
+    ground: "#090A0B",
+    groundLine: "rgba(245,245,243,0.028)",
+    block: "#0D0E10",
+    blockEdge: "#17181B",
+    road: "#111214",
+    roadEdge: "#1B1C1F",
+    roadMark: "rgba(140,142,146,0.22)",
+    faceTop: "#202125",
+    faceLeft: "#121316",
+    faceRight: "#18191C",
+    edge: "rgba(245,245,243,0.06)",
+    windowOff: "rgba(245,245,243,0.03)",
+    windowOn: "#E9E7E1",
+    foliage: "#141517",
+    foliageTop: "#1C1D20",
+    floor: "#17181B",
+    wall: "#131417",
   },
   video: { width: 1080, height: 1920, fps: 30 },
   /** Zona segura de Reels/TikTok: cabecera, descripción/audio y botones a la derecha. */
   safe: { top: 250, right: 180, bottom: 440, left: 72 },
+  /** Titulares Lato en pesos altos; texto e interfaces Inter. */
   font: {
     display: "Lato, Inter, sans-serif",
     ui: "Inter, sans-serif",
   },
-  /** Separación entre elementos relacionados (3–6 frames). */
   stagger: 4,
 } as const;
+
+/** rgba de la señal con la opacidad dada. */
+export const signal = (a: number) => `rgba(${fary.signalRgb},${a})`;

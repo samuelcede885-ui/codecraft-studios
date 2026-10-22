@@ -10,8 +10,8 @@ import { withBase } from "@/lib/paths";
  * miniatura, sin fullVideo el preview, sin preview no hay reproducción y las secciones sin datos
  * (reto, resultado, tecnologías, servicios, galería, antes/después, enlace público) no se muestran.
  *
- * Todos los proyectos actuales son conceptos de Fary Labs (projectType "concept"): no son trabajos
- * de clientes y se marcan siempre como tales. Un trabajo real lleva projectType "client".
+ * Los conceptos de Fary Labs (projectType "concept") no son trabajos de clientes y se marcan siempre
+ * como tales. Un trabajo real lleva projectType "client" (hoy, G-Talent).
  */
 export type Project = {
   slug: string;
@@ -97,13 +97,65 @@ const media = (slug: string, hasFull = false) => ({
 
 export const projects: Project[] = [
   {
+    slug: "g-talent",
+    name: "G-Talent",
+    category: "Landing / Formación online",
+    industry: "Educación online",
+    description: "Landing de venta para una certificación profesional en IA con Claude.",
+    headline: "Tu talento también\nse entrena.",
+    featured: true,
+    projectType: "client",
+    ...media("g-talent", true),
+    gallery: [
+      { src: "/projects/g-talent/gallery-1.webp", alt: "Portada de la certificación: Aprende Claude. Aplica. Avanza." },
+      { src: "/projects/g-talent/gallery-2.webp", alt: "Sección sobre Claude con la interfaz en una laptop" },
+      { src: "/projects/g-talent/gallery-3.webp", alt: "Lo que aprenderás: cuatro habilidades de la certificación" },
+      { src: "/projects/g-talent/gallery-4.webp", alt: "Temario por módulos con duración y número de lecciones" },
+      { src: "/projects/g-talent/gallery-5.webp", alt: "Certificado de la certificación y botón para reservar cupo" },
+    ],
+    solution:
+      "Una landing de venta para la Certificación Profesional en Agentes de IA y Automatización con Claude: intro animada con la marca, portada con la propuesta, sección sobre Claude, temario por módulos, certificado y oferta con la reserva de cupo.",
+    services: ["Web Craft", "Diseño UI/UX"],
+    technologies: ["HTML", "CSS", "JavaScript"],
+    filters: ["web"],
+    challenge: [
+      "Una certificación con varios módulos, certificado y bonos reúne mucha información. Presentada de golpe, quien llega se pierde antes de inscribirse.",
+      "La página tenía que explicar el programa con claridad, transmitir la marca G-Talent y llevar a reservar un cupo.",
+    ],
+    chapters: [
+      {
+        key: "experience",
+        title: "La marca entra primero.",
+        text: "Una intro con el logo de G-Talent abre paso a una portada directa: qué se aprende y para qué.",
+        visuals: [{ kind: "video", src: "/projects/g-talent/full", poster: "/projects/g-talent/poster.webp", label: "Recorrido por la landing de G-Talent" }],
+      },
+      {
+        key: "product",
+        title: "El programa, en orden.",
+        text: "Qué es Claude, qué habilidades se entrenan y cada módulo con su duración y sus lecciones.",
+        visuals: [
+          { kind: "image", src: "/projects/g-talent/gallery-2.webp", alt: "Sección sobre Claude con la interfaz en una laptop" },
+          { kind: "image", src: "/projects/g-talent/gallery-4.webp", alt: "Temario por módulos con duración y número de lecciones" },
+        ],
+      },
+      {
+        key: "conversion",
+        title: "Todo lleva a reservar.",
+        text: "El certificado y la oferta cierran el recorrido, con el botón de reserva siempre a la vista.",
+        visuals: [{ kind: "image", src: "/projects/g-talent/gallery-5.webp", alt: "Certificado de la certificación y botón para reservar cupo" }],
+      },
+    ],
+    result: [
+      "G-Talent cuenta con una página que presenta el programa completo en un recorrido ordenado y guía a cada visitante hacia la reserva de su cupo.",
+    ],
+  },
+  {
     slug: "gramercy",
     name: "Gramercy",
     category: "E-commerce / Fashion",
     industry: "Moda y calzado",
     description: "Una experiencia completa desde catálogo hasta pago.",
     headline: "Pisa firme.\nCompra fácil.",
-    featured: true,
     projectType: "concept",
     ...media("gramercy", true),
     gallery: [

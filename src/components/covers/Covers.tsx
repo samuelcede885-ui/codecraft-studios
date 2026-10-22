@@ -10,10 +10,11 @@ import { Screen } from "../screens/Screens";
  * scripts/record-covers.mjs las captura a public/projects/<slug>/thumb.webp.
  * Todo se mide en cqw (1cqw = 1 % del ancho), así que la portada se ve igual a cualquier tamaño.
  */
-export type CoverId = "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
-export const coverIds: CoverId[] = ["gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
+export type CoverId = "g-talent" | "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
+export const coverIds: CoverId[] = ["g-talent", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
 
-function Device({ id, className = "" }: { id: ScreenId; className?: string }) {
+/** Ventana con la pantalla HTML de un concepto o, en trabajos reales, una captura del sitio. */
+function Device({ id, shot, className = "" }: { id?: ScreenId; shot?: string; className?: string }) {
   return (
     <div className={`cv-device ${className}`}>
       <div className="cv-device__bar" aria-hidden="true">
@@ -22,7 +23,7 @@ function Device({ id, className = "" }: { id: ScreenId; className?: string }) {
         <i />
       </div>
       <div className="cv-device__screen">
-        <Screen id={id} />
+        {shot ? <img className="cv-device__shot" src={shot} alt="" /> : id && <Screen id={id} />}
       </div>
     </div>
   );
@@ -54,6 +55,15 @@ function Frame({ slug, className, children }: { slug: CoverId; className: string
 export function Cover({ slug }: { slug: CoverId }) {
   const p = getProject(slug)!;
   switch (slug) {
+    case "g-talent":
+      return (
+        <Frame slug={slug} className="cv-gt">
+          <img className="cv-gt__logo" src="/projects/g-talent-wordmark.webp" alt="" />
+          <Headline text={p.headline} className="cv-gt__msg" />
+          <Device shot="/projects/g-talent/gallery-1.webp" className="cv-gt__device" />
+          <img className="cv-gt__iso" src="/projects/g-talent-isotipo.webp" alt="" />
+        </Frame>
+      );
     case "gramercy":
       return (
         <Frame slug={slug} className="cv-gm">

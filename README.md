@@ -36,7 +36,7 @@ npm run typecheck
 | `src/components/showreel/` | Showreel "Inspírame" a pantalla completa |
 | `src/lib/analytics.ts` | Eventos de medición (`track()`): emite `fary:analytics` y usa `dataLayer` si existe; sin plataformas integradas |
 | `src/components/reel/`, `src/app/grabar/`, `scripts/record-reels.mjs` | Bobinas: navegación simulada por las pantallas HTML, grabada a video fotograma a fotograma |
-| `src/components/covers/`, `scripts/record-covers.mjs` | Portadas del catálogo (mensaje, identidad y pantalla real de cada concepto), capturadas a `thumb.webp` |
+| `src/components/covers/`, `scripts/record-covers.mjs` | Portadas del catálogo (mensaje, identidad y pantalla real de cada proyecto), capturadas a `thumb.webp` |
 | `src/components/screens/Screens.tsx` | Pantallas HTML: Gramercy, panel de métricas, asistente IA y estudio |
 | `src/components/services/`, `process/`, `FinalCTA.tsx` | Servicios (acordeón), proceso (línea de tiempo) y cierre negro con el formulario |
 | `public/projects/<slug>/` | Miniatura, póster, previews y recorridos en MP4/WebM, galería |
@@ -45,7 +45,7 @@ npm run typecheck
 ## Comportamiento
 
 - **Intro:** fondo negro, el símbolo, "Fary" y "labs"; una vez por sesión (`sessionStorage`).
-- **Hero:** al terminar la intro, la laptop reproduce el recorrido de Gramercy (sin sonido, en bucle, sin controles) y los textos de los lados cambian según el tiempo real del video. No depende del scroll; fuera de la vista se pausa y al volver continúa. Un botón discreto permite pausarlo. Si el video no carga, la laptop muestra la misma navegación en HTML.
+- **Hero:** al terminar la intro, la laptop reproduce el recorrido de Gramercy (sin sonido, en bucle, sin controles) y los textos de los lados cambian según el tiempo real del video. No depende del scroll; fuera de la vista se pausa y al volver continúa. Un botón discreto permite pausarlo. Mientras el video carga, la laptop muestra su primer fotograma.
 - **Catálogo:** con ratón, la miniatura se cambia por un preview al pasar por encima (uno solo a la vez); en táctil, solo miniatura y play. Cada proyecto abre `/proyectos/<slug>`.
 - **"Quiero una página como esta":** lleva al formulario con el proyecto como referencia.
 - **Móvil:** título, laptop e información en columna; en horizontal, texto y laptop lado a lado.
@@ -75,7 +75,7 @@ subcarpeta de Pages como en un dominio propio (en ese caso, el prefijo queda vac
 ## Pendiente
 
 - **Datos de contacto:** rellenar `email`, `whatsapp` e `instagram` en `src/config/site.ts`. El formulario envía por correo o, si solo hay WhatsApp, por WhatsApp. Mientras estén vacíos, los canales del cierre no se publican (en desarrollo se ven como "próximamente") y el formulario valida pero avisa de que el envío no está configurado. Con correo, abre el cliente de correo con la solicitud. Para un envío real conviene conectar un servicio de formularios o una API.
-- **Pantallas:** la laptop y el portafolio muestran el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". Los proyectos de "Más proyectos" también son conceptos de Fary Labs, no trabajos de clientes. Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.
+- **Pantallas:** la laptop muestra el concepto de e-commerce Gramercy (inicio, producto, carrito y pago), marcado como "concepto". El proyecto destacado es G-Talent, un trabajo real (landing de su certificación en IA con Claude, sin enlace público por ahora); su video y galería se capturaron de la propia landing. El resto del catálogo son conceptos de Fary Labs, no trabajos de clientes. Las pantallas de Pago Móvil y Binance no se usan porque contienen datos personales. La foto del producto es de Birkenstock: confirmar derechos antes de publicar la web.
 - **Presupuestos del formulario:** los rangos y las fechas son orientativos (`src/components/quote/QuoteWizard.tsx`); confirmar.
 - **Dominio:** rellenar `url` en `src/config/site.ts` para activar URL canónicas, imágenes de Open Graph y el sitemap.
 - **Medición:** los eventos (`src/lib/analytics.ts`) ya se emiten; falta conectar la herramienta que se elija escuchando `fary:analytics` o con un `dataLayer`.

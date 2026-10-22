@@ -17,8 +17,9 @@ import { ArrowRight } from "../Icon";
 type Step = { kind: "clip"; slug: string; from: number; dur: number } | { kind: "phrase"; text: string; dur: number } | { kind: "end" };
 
 const allSteps: Step[] = [
-  { kind: "clip", slug: "gramercy", from: 1, dur: 3 },
+  { kind: "clip", slug: "g-talent", from: 0.5, dur: 3 },
   { kind: "phrase", text: "Diseñamos.", dur: 1.4 },
+  { kind: "clip", slug: "gramercy", from: 1, dur: 3 },
   { kind: "clip", slug: "panel-de-metricas", from: 1.5, dur: 3 },
   { kind: "phrase", text: "Construimos.", dur: 1.4 },
   { kind: "clip", slug: "asistente-de-reservas", from: 2, dur: 3 },

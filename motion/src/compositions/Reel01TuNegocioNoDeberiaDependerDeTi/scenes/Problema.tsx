@@ -32,7 +32,7 @@ export function Problema() {
       <div style={{ position: "absolute", inset: 0, opacity: 1 - out }}>
         <svg width={1080} height={1920} style={{ position: "absolute", inset: 0 }}>
           {tools.map((t, i) => (
-            <line key={i} x1={t.x} y1={t.y} x2={PERSON.x} y2={PERSON.y - 40} stroke={fary.color.muted} strokeOpacity={0.4 * interpolate(frame, [6 + i * 4, 16 + i * 4], [0, 1], clamp)} strokeWidth={2} strokeDasharray="6 8" />
+            <line key={i} x1={t.x} y1={t.y} x2={PERSON.x} y2={PERSON.y - 40} stroke={fary.color.signal} strokeOpacity={0.5 * interpolate(frame, [6 + i * 4, 16 + i * 4], [0, 1], clamp)} strokeWidth={2} strokeDasharray="6 8" />
           ))}
         </svg>
         {tools.map((t, i) => (
@@ -54,7 +54,7 @@ function Tool({ icon, x, y, delay }: { icon: IconName; x: number; y: number; del
   const p = useEnter(delay);
   const float = Math.sin((frame + delay * 7) / 14) * 6;
   return (
-    <div style={{ position: "absolute", left: x - 42, top: y - 42 + float, width: 84, height: 84, borderRadius: 24, background: "rgba(20,21,23,0.95)", border: `1px solid ${fary.color.grafito}`, display: "grid", placeItems: "center", color: fary.color.muted, ...enterStyle(p) }}>
+    <div style={{ position: "absolute", left: x - 42, top: y - 42 + float, width: 84, height: 84, borderRadius: 24, background: "rgba(20,21,23,0.95)", border: `1px solid rgba(${fary.signalRgb},0.45)`, display: "grid", placeItems: "center", color: fary.color.signal, ...enterStyle(p) }}>
       <Icon name={icon} size={38} />
     </div>
   );

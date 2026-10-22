@@ -18,7 +18,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 
 | Composición | Qué es |
 |---|---|
-| `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), sin audio |
+| `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), con música y efectos |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
 ## Estructura
@@ -53,6 +53,22 @@ src/
 - Voz del manual: clara, cercana y precisa. Beneficios reales, sin jerga ni promesas absolutas.
 - Una palabra protagonista por escena.
 - Texto importante dentro de la zona segura (arriba 250, derecha 180, abajo 440 px).
-- Sin cifras, clientes ni resultados inventados. Sin música ni efectos sin licencia: `AudioLayer`
-  y las marcas de locución (`reel01.voiceover`) quedan listas para archivos propios.
+- Sin cifras, clientes ni resultados inventados.
+
+## Audio
+
+Música y efectos **originales**, sintetizados por código (sin muestras ni música de terceros):
+
+```bash
+python3 scripts/audio/generate_reel01.py public/audio   # regenera public/audio/
+```
+
+- `reel01-music.mp3`: 32 s sincronizados con las escenas (pad oscuro en el problema, se abre con
+  Fary, ritmo y arpegio en web/app/automatización, calma, acorde final con el logo).
+- `sfx/*.wav`: reloj, notificaciones, transiciones, conexiones, toques, escritura, confirmación,
+  checks, golpe del logo y clic del CTA. Sus frames están en `data/reels.ts` → `audio.sfx`.
+- Mezcla en torno a −16 LUFS, pico −1.4 dB.
+- Voz: no se sintetiza. Las marcas de locución están en `reel01.voiceover`; al grabarla, añadir
+  `voiceover: { src: "audio/reel01-voz.mp3" }` en `reel01.audio`.
+
 - Las referencias del kit se estudian por su lenguaje; no se copian ni se suben al repositorio.

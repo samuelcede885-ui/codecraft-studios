@@ -8,7 +8,7 @@ export type Channel = "chat" | "email" | "web" | "social" | "calendar" | "sheet"
 const name: Record<Channel, string> = { chat: "Chat", email: "Email", web: "Web", social: "Social", calendar: "Calendario", sheet: "Hoja de cálculo", notes: "Notas" };
 
 /** Notificación entrante: canal + mensaje. `tone`: gris para el caos manual, marfil para el sistema. */
-export function NotificationBubble({ channel, text, delay = 0, tone = "problem", style }: { channel: Channel; text: string; delay?: number; tone?: "problem" | "signal"; style?: CSSProperties }) {
+export function NotificationBubble({ channel, text, delay = 0, tone = "signal", style }: { channel: Channel; text: string; delay?: number; tone?: "problem" | "signal"; style?: CSSProperties }) {
   const p = useEnter(delay);
   const c = tone === "problem" ? fary.color.muted : fary.color.signal;
   return (

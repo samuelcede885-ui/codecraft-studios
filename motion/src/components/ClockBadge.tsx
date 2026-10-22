@@ -14,7 +14,7 @@ export function ClockBadge({ time, delay = 0, style }: { time: string; delay?: n
       style={style}
       icon={
         <svg width={28} height={28} viewBox="0 0 28 28">
-          <circle cx={14} cy={14} r={12} fill="none" stroke={fary.color.muted} strokeWidth={2.5} />
+          <circle cx={14} cy={14} r={12} fill="none" stroke={fary.color.signal} strokeWidth={2.5} />
           <line x1={14} y1={14} {...hand(hourDeg, 6)} stroke={fary.color.blanco} strokeWidth={2.5} strokeLinecap="round" />
           <line x1={14} y1={14} {...hand(minDeg, 9)} stroke={fary.color.blanco} strokeWidth={2} strokeLinecap="round" />
         </svg>

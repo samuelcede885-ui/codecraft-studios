@@ -6,6 +6,7 @@ export type Scene = { from: number; duration: number };
 export type SceneTitle = { lines: string[]; highlight?: string; tone?: HighlightTone; eyebrow?: Eyebrow; subtitle?: string; size?: number };
 
 const steps = ["Web", "App", "AI"];
+const sfx = (name: string, frame: number, volume: number) => ({ src: `audio/sfx/${name}.wav`, frame, volume });
 
 /**
  * REEL 01 — "Tu negocio no debería depender de ti".
@@ -28,8 +29,8 @@ export const reel01 = {
     final: { from: 840, duration: 120 },
   } satisfies Record<string, Scene>,
   titles: {
-    hook: { lines: ["Si tu negocio depende", "de que estés ahí…"], highlight: "ahí…", tone: "problem", size: 78 },
-    problema: { lines: ["Entonces no tienes", "un SISTEMA."], highlight: "SISTEMA.", tone: "problem", size: 84 },
+    hook: { lines: ["Si tu negocio depende", "de que estés ahí…"], highlight: "ahí…", size: 78 },
+    problema: { lines: ["Entonces no tienes", "un SISTEMA."], highlight: "SISTEMA.", size: 84 },
     fary: { lines: ["Lo ordenamos", "y lo CONECTAMOS."], highlight: "CONECTAMOS.", eyebrow: "Fary Labs", size: 88 },
     webPresenta: {
       lines: ["Tu web", "PRESENTA", "tu negocio."],
@@ -89,8 +90,29 @@ export const reel01 = {
     { frame: 720, text: "Y mientras descansas, tu negocio sigue." },
     { frame: 840, text: "Fary Labs. Ideas claras, productos que funcionan. Hablemos." },
   ] satisfies VoiceMarker[],
-  /** Sin audio hasta tener archivos propios o con licencia. */
-  audio: undefined as ReelAudio | undefined,
+  /**
+   * Música y efectos originales, sintetizados con scripts/audio/generate_reel01.py (sin muestras
+   * de terceros). La voz queda pendiente de grabación: ver `voiceover`.
+   */
+  audio: {
+    music: { src: "audio/reel01-music.mp3", volume: 0.95 },
+    sfx: [
+      ...[22, 52, 82, 794, 824].map((frame) => sfx("tick", frame, 0.32)),
+      ...[108, 114, 120, 126].map((frame) => sfx("ping", frame, 0.5)),
+      ...[176, 268, 506, 612, 716, 836].map((frame) => sfx("whoosh", frame, 0.4)),
+      ...[202, 210, 222, 234].map((frame) => sfx("connect", frame, 0.45)),
+      ...[296, 303, 310, 317, 324, 331].map((frame) => sfx("tick", frame, 0.26)),
+      sfx("tap", 418, 0.6),
+      sfx("typing-name", 430, 0.5),
+      sfx("typing-message", 444, 0.5),
+      sfx("tap", 478, 0.6),
+      sfx("confirm", 484, 0.5),
+      ...[486, 514, 625, 728].map((frame) => sfx("pulse", frame, 0.45)),
+      ...[663, 671, 679, 687].map((frame) => sfx("check", frame, 0.42)),
+      sfx("logo", 854, 0.75),
+      sfx("click", 914, 0.5),
+    ],
+  } satisfies ReelAudio,
 };
 
 export const demo = {

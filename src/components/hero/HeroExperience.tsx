@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HERO_DURATION, heroStages, stageAt } from "@/data/heroStages";
+import { HERO_DURATION, HERO_SPEED, heroStages, stageAt } from "@/data/heroStages";
 import { track } from "@/lib/analytics";
 import { LogoMark } from "../Logo";
 import { ArrowRight } from "../Icon";
 import { HeroLaptop } from "./HeroLaptop";
 import { HeroStage } from "./HeroStage";
-import { HeroProgress } from "./HeroProgress";
+import { HeroPlayback } from "./HeroPlayback";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,13 +23,13 @@ type Source = "video" | "reel";
  * cambian con él. El tiempo real del video (`currentTime`) es la única fuente de verdad:
  * no hay temporizadores propios, así que si el video se retrasa o se pausa, los textos esperan.
  * El scroll no controla nada: solo sirve para salir del hero. Fuera de la vista, el video se pausa.
- * Piezas: HeroStage (textos), HeroLaptop (laptop, etiquetas y video) y HeroProgress (01 / 05).
+ * Piezas: HeroStage (textos), HeroLaptop (laptop, etiquetas y video) y HeroPlayback (pausa).
+ * El recorrido se reproduce a HERO_SPEED; los textos siguen leyendo el tiempo del video.
  */
 export function HeroExperience() {
   const root = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const reel = useRef<gsap.core.Timeline | null>(null);
-  const fill = useRef<HTMLElement>(null);
   const [source, setSource] = useState<Source>("video");
   const [stage, setStage] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -43,22 +43,12 @@ export function HeroExperience() {
     return video.current?.currentTime ?? 0;
   }, []);
 
-  /** Duración real del recorrido: la del video cuando ya se conoce. */
-  const duration = useCallback(() => {
-    const d = sourceRef.current === "video" ? video.current?.duration : NaN;
-    return d && Number.isFinite(d) ? d : HERO_DURATION;
-  }, []);
-
-  /**
-   * Lee el tiempo y actualiza etapa y barra. La barra es currentTime / duration del video,
-   * escrita directo en el DOM (sin re-render en cada fotograma).
-   */
+  /** Lee el tiempo del video y actualiza la etapa. */
   const sync = useCallback(() => {
     const t = time();
     const i = stageAt(t);
     setStage((prev) => (prev === i ? prev : i));
-    if (fill.current) fill.current.style.transform = `scaleX(${Math.min(1, t / duration())})`;
-  }, [time, duration]);
+  }, [time]);
 
   const play = useCallback(() => {
     if (userPaused.current || !wanted.current) return;
@@ -66,7 +56,11 @@ export function HeroExperience() {
       reel.current?.play();
       return;
     }
-    video.current?.play().catch((err: DOMException) => {
+    const v = video.current;
+    if (!v) return;
+    v.defaultPlaybackRate = HERO_SPEED;
+    v.playbackRate = HERO_SPEED;
+    v.play().catch((err: DOMException) => {
       // Sin formato compatible o reproducción imposible: la bobina en vivo toma el relevo.
       if (err.name === "NotSupportedError") setSource("reel");
     });
@@ -226,12 +220,13 @@ export function HeroExperience() {
             videoRef={video}
             onReelReady={(tl) => {
               reel.current = tl;
+              tl.timeScale(HERO_SPEED);
               if (!wanted.current || userPaused.current) tl.pause();
             }}
           />
 
           <div className="zone zone--aside" data-hero-in>
-            <HeroProgress stage={stage} paused={paused} onToggle={togglePause} fillRef={fill} />
+            <HeroPlayback paused={paused} onToggle={togglePause} />
             <HeroStage side="aside" stage={stage} />
           </div>
         </div>

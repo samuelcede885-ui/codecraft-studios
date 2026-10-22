@@ -71,7 +71,7 @@
   background: #f3efe2;
 }
 
-/* Derecha: indicador de etapa + eyebrow y descripción. */
+/* Derecha: botón de pausa + eyebrow y descripción. */
 .zone--aside .stage-ind {
   justify-self: end;
   width: 100%;
@@ -82,46 +82,6 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 22px;
-}
-.stage-ind__num {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  transition: opacity 0.3s ease;
-}
-.stage-ind__num b {
-  color: var(--ink);
-  font-weight: 600;
-}
-.stage-ind__num.is-idle {
-  opacity: 0.45;
-}
-/* Una sola pista: el relleno avanza con video.currentTime / video.duration; las marcas
-   señalan dónde empieza cada etapa. */
-.stage-ind__bar {
-  position: relative;
-  flex: 1;
-  height: 2px;
-  overflow: hidden;
-  border-radius: 2px;
-  background: rgba(9, 10, 11, 0.14);
-}
-.stage-ind__fill {
-  position: absolute;
-  inset: 0;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-.stage-ind__tick {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  margin-left: -1.5px;
-  background: #f1f1ef;
 }
 .stage-ind__toggle {
   display: grid;

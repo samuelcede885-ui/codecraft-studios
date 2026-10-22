@@ -83,6 +83,12 @@ export const heroStages: HeroStage[] = [
   },
 ];
 
+/**
+ * Velocidad de reproducción del recorrido en el hero (2 = el doble de rápido: ~14 s por vuelta).
+ * Los tiempos de arriba siguen en segundos del video, así que la sincronía no cambia.
+ */
+export const HERO_SPEED = 2;
+
 /** Duración total del video del hero. */
 export const HERO_DURATION = heroStages[heroStages.length - 1].end;
 

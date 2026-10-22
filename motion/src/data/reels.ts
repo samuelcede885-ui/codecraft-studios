@@ -29,7 +29,7 @@ export const reel01 = {
     final: { from: 840, duration: 120 },
   } satisfies Record<string, Scene>,
   titles: {
-    hook: { lines: ["Si tu negocio depende", "de que estés ahí…"], highlight: "ahí…", size: 78 },
+    hook: { lines: ["Si tu negocio", "en Venezuela", "depende de que", "estés ahí…"], highlight: "Venezuela", size: 80 },
     problema: { lines: ["Entonces no tienes", "un SISTEMA."], highlight: "SISTEMA.", size: 84 },
     fary: { lines: ["Lo ordenamos", "y lo CONECTAMOS."], highlight: "CONECTAMOS.", eyebrow: "Fary Labs", size: 88 },
     webPresenta: {
@@ -80,7 +80,7 @@ export const reel01 = {
   },
   /** Marcas para grabar la locución (no se sintetiza voz). */
   voiceover: [
-    { frame: 0, text: "Si tu negocio depende de que estés ahí," },
+    { frame: 0, text: "Si tu negocio en Venezuela depende de que estés ahí," },
     { frame: 90, text: "entonces no tienes un sistema." },
     { frame: 180, text: "En Fary Labs lo ordenamos y lo conectamos." },
     { frame: 270, text: "Creamos una web clara para presentar tu negocio" },

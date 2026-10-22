@@ -295,7 +295,7 @@
 /* ───────────────────────── Proyecto destacado ─────────────────────────
    Pieza de campaña: nombre monumental y el recorrido a sangre, sin marco de tarjeta. */
 .featured {
-  padding: clamp(88px, 11vw, 150px) 0 clamp(72px, 9vw, 120px);
+  padding: clamp(120px, 14vw, 200px) 0 clamp(112px, 12vw, 180px);
   background: var(--tone-1);
   color: var(--ink);
 }
@@ -319,17 +319,21 @@
   color: var(--ink-2);
 }
 .featured__title {
-  margin-top: clamp(20px, 3vw, 36px);
-  margin-bottom: clamp(24px, 3.4vw, 48px);
-  font-size: clamp(4rem, 15.5vw, 15rem);
+  margin-top: clamp(28px, 3.6vw, 52px);
+  margin-bottom: clamp(48px, 6vw, 96px);
+  font-size: clamp(3.4rem, 10vw, 10rem);
   font-weight: 900;
-  line-height: 0.82;
-  letter-spacing: -0.045em;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
 }
+/* El recorrido entero (16:9, sin recortes), con aire a los lados: nunca más alto que ~72 % de la pantalla. */
 .featured__media {
   position: relative;
-  height: min(80svh, 56.25vw);
+  width: min(100% - 2 * var(--gutter), 1440px, 72svh * 16 / 9);
+  margin-inline: auto;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
+  border-radius: var(--radius);
   background: #f3efe2;
 }
 .featured__video {
@@ -338,12 +342,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 30%;
+  object-position: 50% 50%;
 }
 .featured__toggle {
   position: absolute;
-  right: max(var(--gutter), env(safe-area-inset-right, 0px));
-  bottom: 20px;
+  right: 18px;
+  bottom: 18px;
   display: grid;
   place-items: center;
   width: 40px;
@@ -370,12 +374,17 @@
 }
 .featured__info {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) auto;
-  align-items: baseline;
-  gap: 20px clamp(24px, 4vw, 64px);
-  padding-top: clamp(28px, 3.4vw, 44px);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "cat ."
+    "desc actions"
+    "note note";
+  align-items: end;
+  gap: 28px clamp(32px, 5vw, 88px);
+  padding-top: clamp(48px, 5.6vw, 88px);
 }
 .featured__cat {
+  grid-area: cat;
   font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: 0.16em;
@@ -383,6 +392,7 @@
   color: var(--muted);
 }
 .featured__desc {
+  grid-area: desc;
   margin: 0;
   max-width: 30ch;
   font-family: var(--font-display), sans-serif;
@@ -392,19 +402,22 @@
   letter-spacing: -0.01em;
 }
 .featured__actions {
+  grid-area: actions;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 .featured__note {
-  grid-column: 1 / -1;
-  margin: 0;
+  grid-area: note;
+  margin: clamp(8px, 1.4vw, 20px) 0 0;
   font-size: 0.8125rem;
   color: var(--muted);
 }
 @media (max-width: 1023px) {
   .featured__info {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cat" "desc" "actions" "note";
+    align-items: start;
   }
 }
 
@@ -1860,15 +1873,15 @@
     margin-bottom: 36px;
   }
   .featured {
-    padding: 64px 0 52px;
+    padding: 88px 0 80px;
   }
   .featured__title {
-    margin-top: 16px;
-    margin-bottom: 24px;
+    margin-top: 22px;
+    margin-bottom: 36px;
   }
   .featured__info {
-    gap: 14px;
-    padding-top: 24px;
+    gap: 18px;
+    padding-top: 36px;
   }
   .catalog__grid {
     gap: 40px;

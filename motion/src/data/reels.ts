@@ -6,7 +6,9 @@ export type Scene = { from: number; duration: number };
 export type SceneTitle = { lines: string[]; highlight?: string; tone?: HighlightTone; eyebrow?: Eyebrow; subtitle?: string; size?: number };
 
 const steps = ["Web", "App", "AI"];
-const sfx = (name: string, frame: number, volume: number) => ({ src: `audio/sfx/${name}.wav`, frame, volume });
+/** Los efectos quedan por debajo de la locución. */
+const SFX_UNDER_VOICE = 0.45;
+const sfx = (name: string, frame: number, volume: number) => ({ src: `audio/sfx/${name}.wav`, frame, volume: volume * SFX_UNDER_VOICE });
 
 /**
  * REEL 01 — "Tu negocio no debería depender de ti".
@@ -80,22 +82,23 @@ export const reel01 = {
   },
   /** Marcas para grabar la locución (no se sintetiza voz). */
   voiceover: [
-    { frame: 0, text: "Si tu negocio en Venezuela depende de que estés ahí," },
-    { frame: 90, text: "entonces no tienes un sistema." },
-    { frame: 180, text: "En Fary Labs lo ordenamos y lo conectamos." },
-    { frame: 270, text: "Creamos una web clara para presentar tu negocio" },
-    { frame: 390, text: "y facilitar el contacto, en el móvil y en el escritorio." },
-    { frame: 510, text: "Diseñamos herramientas para organizar la información," },
-    { frame: 615, text: "y automatizamos lo repetitivo para que tu equipo se dedique a lo importante." },
-    { frame: 720, text: "Y mientras descansas, tu negocio sigue." },
-    { frame: 840, text: "Fary Labs. Ideas claras, productos que funcionan. Hablemos." },
+    { frame: 9, text: "Si tu negocio depende de que estés ahí para que todo funcione… necesitas algo más que tiempo." },
+    { frame: 182, text: "Necesitas un sistema. Y ahí entra Fary Labs." },
+    { frame: 279, text: "Creamos páginas web que atraen clientes." },
+    { frame: 398, text: "Y que facilitan el contacto, desde cualquier dispositivo." },
+    { frame: 515, text: "Aplicaciones que organizan y conectan tu negocio." },
+    { frame: 617, text: "Y agentes de inteligencia artificial que automatizan tareas." },
+    { frame: 724, text: "Para que tu negocio siga avanzando… incluso cuando tú no estás." },
+    { frame: 842, text: "Fary Labs." },
+    { frame: 870, text: "Web, apps e IA." },
+    { frame: 910, text: "Construyamos el tuyo." },
   ] satisfies VoiceMarker[],
   /**
-   * Música y efectos originales, sintetizados con scripts/audio/generate_reel01.py (sin muestras
-   * de terceros). La voz queda pendiente de grabación: ver `voiceover`.
+   * Locución (voz neuronal Kokoro "em_alex", ver scripts/audio/README) y efectos originales
+   * sintetizados con scripts/audio/generate_reel01.py, por debajo de la voz. Sin música.
    */
   audio: {
-    music: { src: "audio/reel01-music.mp3", volume: 0.95 },
+    voiceover: { src: "audio/reel01-voz.wav", volume: 1 },
     sfx: [
       ...[22, 52, 82, 794, 824].map((frame) => sfx("tick", frame, 0.32)),
       ...[108, 114, 120, 126].map((frame) => sfx("ping", frame, 0.5)),

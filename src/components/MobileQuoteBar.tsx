@@ -7,13 +7,14 @@ const KEY = "fary-quote-bar-closed";
 
 /**
  * Barra inferior en móvil: "¿Te gustó alguno? Cotizar →". Aparece después de haber visto
- * unas dos fichas del catálogo, se esconde mientras el formulario o el cierre están a la vista
+ * unas dos fichas del catálogo, se esconde mientras el hero, el formulario o el cierre están a la vista
  * y se puede cerrar (no vuelve en la sesión). Mientras se muestra, la página reserva su
  * altura abajo para no tapar contenido.
  */
 export function MobileQuoteBar() {
   const [seen, setSeen] = useState(false);
   const [atContact, setAtContact] = useState(false);
+  const [atHero, setAtHero] = useState(true);
   const [closed, setClosed] = useState(true);
 
   useEffect(() => {
@@ -41,14 +42,18 @@ export function MobileQuoteBar() {
     const contact = new IntersectionObserver(([e]) => setAtContact(e.isIntersecting), { threshold: 0 });
     const target = document.getElementById("contacto");
     if (target) contact.observe(target);
+    const hero = new IntersectionObserver(([e]) => setAtHero(e.isIntersecting), { threshold: 0.15 });
+    const top = document.getElementById("inicio");
+    if (top) hero.observe(top);
 
     return () => {
       tiles.disconnect();
       contact.disconnect();
+      hero.disconnect();
     };
   }, []);
 
-  const visible = seen && !closed && !atContact;
+  const visible = seen && !closed && !atContact && !atHero;
 
   useEffect(() => {
     document.documentElement.classList.toggle("has-quote-bar", visible);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { services } from "@/data/services";
 import { Screen } from "./screens/Screens";
@@ -37,6 +37,11 @@ function ServiceGlyph({ id }: { id: string }) {
 /** Tres servicios en formato editorial; cada uno se expande para ver qué incluye y una vista previa. */
 export function Services() {
   const [open, setOpen] = useState<string | null>(services[0].id);
+
+  // En móvil empiezan todos cerrados: la sección ocupa menos y cada uno se abre al tocarlo.
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) setOpen(null);
+  }, []);
 
   return (
     <section id="servicios" className="section services" aria-labelledby="servicios-title">

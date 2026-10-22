@@ -96,9 +96,14 @@ export function HeroShowcase() {
   }, [sync]);
 
   // Arranca al terminar la intro de marca; se pausa fuera de la vista o con la pestaña oculta.
+  // Con movimiento reducido empieza en pausa: el botón lo pone en marcha.
   useEffect(() => {
     const el = root.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      userPaused.current = true;
+      setPaused(true);
+    }
     let visible = true;
     let introDone = !!window.__faryIntroDone;
     const update = () => {

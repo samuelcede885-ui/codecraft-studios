@@ -39,7 +39,7 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
   const href = `/proyectos/${slug}`;
   const frame = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const [armed, setArmed] = useState(false); // el <video> se crea al acercarse (con ratón) o al primer hover
+  const [armed, setArmed] = useState(false); // el <video> se crea al primer hover
   const [showing, setShowing] = useState(false);
   const hovering = useRef(false);
   const time = useRef<HTMLTimeElement>(null);
@@ -69,7 +69,8 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
   }
 
   function start() {
-    if (!canHover()) return;
+    // Con movimiento reducido no hay previews automáticos: el botón play sigue disponible.
+    if (!canHover() || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     hovering.current = true;
     if (!armed) {
       setArmed(true);
@@ -94,25 +95,14 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hidden]);
 
-  // Con ratón, el video se prepara al acercarse para que el preview arranque sin espera.
-  // Fuera de la vista, ningún preview sigue en marcha.
+  // El <video> se crea solo al primer hover (los previews pesan ~100 KB y arrancan enseguida):
+  // al cargar o recorrer la página no se descarga ninguno. Fuera de la vista, ninguno sigue en marcha.
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
-    const near = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && canHover()) {
-          setArmed(true);
-          near.disconnect();
-        }
-      },
-      { rootMargin: "300px 0px" },
-    );
     const io = new IntersectionObserver(([e]) => !e.isIntersecting && stop(), { threshold: 0 });
-    near.observe(el);
     io.observe(el);
     return () => {
-      near.disconnect();
       io.disconnect();
       cancelAnimationFrame(raf.current);
     };
@@ -139,7 +129,7 @@ export function ProjectTile({ project, index, hidden, shifted, onPlay }: Props) 
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               poster={assetUrl(project.thumbnail)}
               disablePictureInPicture
               disableRemotePlayback

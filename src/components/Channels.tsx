@@ -2,7 +2,11 @@ import { site } from "@/config/site";
 
 const { email, whatsapp, instagram } = site.contact;
 
-/** Canales del cierre. Sin dato configurado se muestran como "próximamente", nunca con un enlace inventado. */
+/**
+ * Canales del cierre. Solo se publican los que tienen dato real en site.contact; sin dato,
+ * en desarrollo se ven como "próximamente" (para recordar que faltan) y en producción no aparecen.
+ */
+const dev = process.env.NODE_ENV === "development";
 const channels = [
   { label: "Instagram", href: instagram ? `https://instagram.com/${instagram}` : "" },
   { label: "WhatsApp", href: whatsapp ? `https://wa.me/${whatsapp}` : "" },
@@ -14,7 +18,7 @@ export function Channels() {
     <div className="container final__foot">
       <ul className="final__channels">
         {channels.map((c) =>
-          c.href ? (
+          !c.href && !dev ? null : c.href ? (
             <li key={c.label}>
               <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
                 {c.label}

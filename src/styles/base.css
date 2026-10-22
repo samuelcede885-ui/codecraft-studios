@@ -332,3 +332,29 @@ a {
     transition: opacity 0.2s ease;
   }
 }
+
+/* ───────────────────────── Movimiento reducido ─────────────────────────
+   Todo el contenido queda visible sin depender de animaciones: transiciones y animaciones
+   pasan a ser instantáneas y se quitan los desplazamientos decorativos al pasar el ratón. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  .btn:hover,
+  .btn:hover .btn__arrow,
+  .link-arrow:hover .btn__arrow,
+  .tile__media:hover .tile__thumb,
+  .tile__media:hover .tile__video,
+  .tile__media:hover .tile__play,
+  .build__row:hover .build__title,
+  .service__head:hover .service__glyph,
+  .service.is-open .service__glyph {
+    transform: none !important;
+  }
+}

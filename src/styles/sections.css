@@ -1839,3 +1839,123 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ───────────────────────── Móvil: menos recorrido, mismo aire ─────────────────────────
+   Espacios verticales más cortos, textos de ficha acotados, un solo CTA donde antes había
+   varios seguidos y galerías en carrusel. */
+.tile__desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width: 767px) {
+  .section {
+    padding: 72px 0;
+  }
+  .section-head {
+    margin-bottom: 36px;
+  }
+  .featured {
+    padding: 64px 0 52px;
+  }
+  .featured__title {
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  .featured__info {
+    gap: 14px;
+    padding-top: 24px;
+  }
+  .catalog__grid {
+    gap: 40px;
+  }
+  .catalog__filters {
+    margin-bottom: 28px;
+  }
+  .tile__meta {
+    padding-top: 14px;
+  }
+  .tile__name {
+    margin-top: 6px;
+  }
+  .build__head {
+    margin-bottom: 24px;
+  }
+  .build__row {
+    padding: 20px 0;
+  }
+  .build__title {
+    font-size: 1.6rem;
+  }
+  .service__head {
+    padding: 22px 0;
+  }
+  /* Un solo "Comenzar proyecto" al final de servicios, no uno por servicio. */
+  .service__cta {
+    display: none;
+  }
+  .service__detail,
+  .service__preview {
+    padding-bottom: 24px;
+  }
+  .process__steps {
+    gap: 26px;
+  }
+  .process__step h3 {
+    margin: 6px 0;
+    font-size: 1.45rem;
+  }
+  .final {
+    padding-top: 96px;
+  }
+  .final__intro {
+    gap: 22px;
+  }
+  /* El formulario está justo debajo: basta con "Ver proyectos". */
+  .final__actions .btn {
+    display: none;
+  }
+  .final__body {
+    margin-top: 56px;
+    padding-top: 36px;
+  }
+  /* Case study */
+  .pj-hero {
+    padding-bottom: 48px;
+  }
+  .pj-challenge {
+    padding: 56px 0;
+  }
+  .pj-chapter {
+    padding-top: 56px;
+  }
+  .pj-chapter:has(+ .pj-result) {
+    padding-bottom: 56px;
+  }
+  .pj-chapter__head {
+    margin-bottom: 24px;
+  }
+  .pj-result {
+    padding: 64px 0;
+  }
+  /* Dos imágenes seguidas: carrusel horizontal con imán, en vez de apilarlas. */
+  .pj-visuals.is-pair {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 86%;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .pj-visuals.is-pair::-webkit-scrollbar {
+    display: none;
+  }
+  .pj-visuals.is-pair > * {
+    scroll-snap-align: start;
+  }
+}

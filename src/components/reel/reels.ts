@@ -66,7 +66,9 @@ function slideIn(tl: gsap.core.Timeline, incoming: HTMLElement, outgoing: HTMLEl
     .fromTo(
       incoming,
       { autoAlpha: 1, xPercent: 7, scale: 1 },
-      { xPercent: 0, duration: SWAP, ease: "power3.out", immediateRender: false },
+      // autoAlpha también en el destino: al saltar en la línea de tiempo (fotos fijas, loop) la
+      // pantalla queda visible en cualquier punto posterior.
+      { autoAlpha: 1, xPercent: 0, scale: 1, duration: SWAP, ease: "power3.out", immediateRender: false },
       at,
     )
     // Sombra de profundidad mínima en la pantalla que queda debajo, sin desvanecerla.

@@ -6,7 +6,7 @@
  *
  * Requiere Playwright y ffmpeg (con libx264, libvpx-vp9 y libwebp). Si Playwright no está
  * en el proyecto, indicar su módulo con PLAYWRIGHT_MODULE=/ruta/a/playwright/index.mjs.
- * Escribe en public/projects/<slug>/: preview.mp4/.webm, full.mp4/.webm (gramercy),
+ * Escribe en public/projects/<slug>/: preview.mp4/.webm, full.mp4/.webm y hero.mp4/.webm (gramercy),
  * gallery-*.webp y, si hay recorrido completo, poster.webp (su primer fotograma).
  * Las miniaturas (thumb.webp) son las portadas diseñadas: scripts/record-covers.mjs.
  */
@@ -78,7 +78,15 @@ for (const id of process.argv.slice(2).length ? process.argv.slice(2) : Object.k
   }
   console.log(`${id}: ${total} fotogramas (${duration.toFixed(2)} s)`);
 
-  if (plan.full) encode(frames, join(dir, "full"));
+  if (plan.full) {
+    encode(frames, join(dir, "full"));
+    // Versión ligera para la laptop del hero: 960 px y 15 fps. Como el hero la reproduce a
+    // HERO_SPEED = 2, en pantalla se ve a 30 fps; pesa ~3 veces menos y arranca antes.
+    const light = ["-vf", "fps=15,scale=960:-2:flags=lanczos", "-an", "-g", "150"];
+    const src = ["-framerate", String(FPS), "-i", join(frames, "%05d.jpg")];
+    ffmpeg(...src, ...light, "-c:v", "libx264", "-preset", "slow", "-crf", "30", "-pix_fmt", "yuv420p", "-movflags", "+faststart", join(dir, "hero.mp4"));
+    ffmpeg(...src, ...light, "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "42", "-row-mt", "1", join(dir, "hero.webm"));
+  }
   encode(frames, join(dir, "preview"), plan.preview);
 
   // Imágenes fijas sin cursor: póster (primer fotograma) y galería.

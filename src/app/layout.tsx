@@ -7,9 +7,10 @@ import { AnalyticsClicks } from "@/components/analytics/AnalyticsClicks";
 // Tipografías de marca: Lato en pesos altos para titulares e Inter para texto e interfaces.
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const lato = Lato({ subsets: ["latin"], weight: ["700", "900"], variable: "--font-display", display: "swap" });
-// Tipografías de la tienda Gramercy que se ve dentro de la laptop.
-const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-display", display: "swap" });
-const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap" });
+// Tipografías de la tienda Gramercy (pantallas HTML de servicios y portadas). La laptop del hero
+// muestra un video, así que no se precargan: no compiten con el video al entrar.
+const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-display", display: "swap", preload: false });
+const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap", preload: false });
 
 // Antes del primer pintado: guarda el instante de inicio de la intro y la omite si ya se vio
 // en esta sesión o si se pide menos movimiento.

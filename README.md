@@ -29,7 +29,7 @@ npm run typecheck
 | `src/config/site.ts` | Navegación y datos de contacto (Instagram, WhatsApp, correo) |
 | `src/components/Intro.tsx` | Intro de marca (≤ 2,7 s, una vez por sesión, botón "Saltar intro") |
 | `src/components/Header.tsx`, `MobileMenu.tsx` | Header fijo que se compacta con blur y menú móvil a pantalla completa |
-| `src/components/hero/` | Hero automático (HeroExperience, HeroLaptop, HeroStage, HeroPlayback): la laptop reproduce el video a velocidad `HERO_SPEED` y los textos siguen su `currentTime` |
+| `src/components/hero/` | Hero automático (HeroExperience, HeroLaptop, HeroStage, HeroPlayback): la laptop reproduce una versión ligera del video (`hero.webm`, ~300 KB) a velocidad `HERO_SPEED`, arrancada por un script en línea al terminar la intro, y los textos siguen su `currentTime` |
 | `src/components/portfolio/` | Destacado, catálogo con filtros, fichas con preview (hover / lightbox) y "¿Qué quieres construir?" |
 | `src/app/proyectos/[slug]/`, `src/components/projects/` | Case study de cada proyecto (hero, reto, capítulos, resultado, antes/después) |
 | `src/components/quote/` | Cotización en 4 pasos con proyecto de referencia (`?proyecto=<slug>#cotizacion`) |

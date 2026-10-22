@@ -1,29 +1,18 @@
 import type { Ref } from "react";
-import type gsap from "gsap";
 import { heroStages } from "@/data/heroStages";
 import { assetUrl } from "@/lib/assets";
-import { Reel } from "../reel/Reel";
 import { LaptopFrame } from "./LaptopFrame";
 import { stageState } from "./HeroStage";
 
-export const HERO_VIDEO = "/projects/gramercy/full";
+/** Versión ligera del recorrido (960 px, 15 fps): a HERO_SPEED = 2 se ve a 30 fps y pesa ~300 KB. */
+export const HERO_VIDEO = "/projects/gramercy/hero";
 export const HERO_POSTER = "/projects/gramercy/poster.webp";
 
 /**
  * Laptop fija del hero: etiqueta editorial de la etapa encima y, en la pantalla, el video del
- * recorrido o, si falla, la bobina HTML en vivo (`source === "reel"`).
+ * recorrido. Mientras carga se ve su póster (el primer fotograma), sin saltos.
  */
-export function HeroLaptop({
-  stage,
-  source,
-  videoRef,
-  onReelReady,
-}: {
-  stage: number;
-  source: "video" | "reel";
-  videoRef: Ref<HTMLVideoElement>;
-  onReelReady: (tl: gsap.core.Timeline) => void;
-}) {
+export function HeroLaptop({ stage, videoRef }: { stage: number; videoRef: Ref<HTMLVideoElement> }) {
   return (
     <div className="zone zone--device">
       <div className="hero-tags" aria-hidden="true">
@@ -36,26 +25,22 @@ export function HeroLaptop({
         )}
       </div>
       <LaptopFrame>
-        {source === "video" ? (
-          <video
-            ref={videoRef}
-            className="hero-video"
-            muted
-            playsInline
-            loop
-            preload="auto"
-            poster={assetUrl(HERO_POSTER)}
-            disablePictureInPicture
-            disableRemotePlayback
-            aria-hidden="true"
-            tabIndex={-1}
-          >
-            <source src={assetUrl(`${HERO_VIDEO}.webm`)} type="video/webm" />
-            <source src={assetUrl(`${HERO_VIDEO}.mp4`)} type="video/mp4" />
-          </video>
-        ) : (
-          <Reel id="gramercy" onReady={onReelReady} />
-        )}
+        <video
+          ref={videoRef}
+          className="hero-video"
+          muted
+          playsInline
+          loop
+          preload="auto"
+          poster={assetUrl(HERO_POSTER)}
+          disablePictureInPicture
+          disableRemotePlayback
+          aria-hidden="true"
+          tabIndex={-1}
+        >
+          <source src={assetUrl(`${HERO_VIDEO}.webm`)} type="video/webm" />
+          <source src={assetUrl(`${HERO_VIDEO}.mp4`)} type="video/mp4" />
+        </video>
       </LaptopFrame>
     </div>
   );

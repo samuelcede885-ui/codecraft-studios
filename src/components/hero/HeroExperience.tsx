@@ -3,20 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HERO_DURATION, HERO_SPEED, heroStages, stageAt } from "@/data/heroStages";
+import { HERO_SPEED, heroStages, stageAt } from "@/data/heroStages";
 import { track } from "@/lib/analytics";
 import { LogoMark } from "../Logo";
 import { ArrowRight } from "../Icon";
 import { HeroLaptop } from "./HeroLaptop";
 import { HeroStage } from "./HeroStage";
 import { HeroPlayback } from "./HeroPlayback";
+import { heroStarterScript } from "./heroStarter";
 
 gsap.registerPlugin(ScrollTrigger);
-
-/** Si el video no está listo en este tiempo, la laptop pasa a la bobina HTML en vivo. */
-const VIDEO_TIMEOUT = 6000;
-
-type Source = "video" | "reel";
 
 /**
  * Hero automático: la laptop reproduce un recorrido por Gramercy y los textos de los lados
@@ -29,19 +25,12 @@ type Source = "video" | "reel";
 export function HeroExperience() {
   const root = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const reel = useRef<gsap.core.Timeline | null>(null);
-  const [source, setSource] = useState<Source>("video");
   const [stage, setStage] = useState(0);
   const [paused, setPaused] = useState(false);
-  const sourceRef = useRef<Source>("video");
   const wanted = useRef(false); // el hero debería estar reproduciendo (visible e intro terminada)
   const userPaused = useRef(false);
-  sourceRef.current = source;
 
-  const time = useCallback(() => {
-    if (sourceRef.current === "reel") return reel.current ? reel.current.time() % HERO_DURATION : 0;
-    return video.current?.currentTime ?? 0;
-  }, []);
+  const time = useCallback(() => video.current?.currentTime ?? 0, []);
 
   /** Lee el tiempo del video y actualiza la etapa. */
   const sync = useCallback(() => {
@@ -50,25 +39,19 @@ export function HeroExperience() {
     setStage((prev) => (prev === i ? prev : i));
   }, [time]);
 
+  // Si aún no hay datos suficientes, play() queda en espera y el video arranca solo en cuanto
+  // puede; mientras tanto se ve el póster, que es su primer fotograma. Nunca se cambia por otra cosa.
   const play = useCallback(() => {
     if (userPaused.current || !wanted.current) return;
-    if (sourceRef.current === "reel") {
-      reel.current?.play();
-      return;
-    }
     const v = video.current;
     if (!v) return;
     v.defaultPlaybackRate = HERO_SPEED;
     v.playbackRate = HERO_SPEED;
-    v.play().catch((err: DOMException) => {
-      // Sin formato compatible o reproducción imposible: la bobina en vivo toma el relevo.
-      if (err.name === "NotSupportedError") setSource("reel");
-    });
+    v.play().catch(() => undefined);
   }, []);
 
   const pause = useCallback(() => {
     video.current?.pause();
-    reel.current?.pause();
   }, []);
 
   // Bucle de sincronización: un requestAnimationFrame mientras algo se reproduce.
@@ -99,7 +82,9 @@ export function HeroExperience() {
       setPaused(true);
     }
     let visible = true;
-    let introDone = !!window.__faryIntroDone;
+    // Si el script en línea ya arrancó el video al terminar la intro, se sigue sin pausas.
+    let introDone = !!window.__faryIntroDone || !!window.__faryHeroStarted;
+    window.__faryHeroReact = true;
     const update = () => {
       wanted.current = visible && introDone && document.visibilityState === "visible";
       if (wanted.current) play();
@@ -124,27 +109,6 @@ export function HeroExperience() {
     };
   }, [play, pause]);
 
-  // Respaldo: si el video falla o no está listo a tiempo, la bobina HTML ocupa su lugar.
-  useEffect(() => {
-    const v = video.current;
-    if (!v || source !== "video") return;
-    const fail = () => setSource("reel");
-    const last = v.querySelector("source:last-of-type");
-    last?.addEventListener("error", fail);
-    v.addEventListener("error", fail);
-    const timer = window.setTimeout(() => {
-      if (v.readyState < 3) fail();
-    }, VIDEO_TIMEOUT);
-    const ok = () => window.clearTimeout(timer);
-    v.addEventListener("canplay", ok, { once: true });
-    return () => {
-      window.clearTimeout(timer);
-      last?.removeEventListener("error", fail);
-      v.removeEventListener("error", fail);
-      v.removeEventListener("canplay", ok);
-    };
-  }, [source]);
-
   // Medición: cada etapa numerada que se llega a ver (una vez por etapa y visita).
   const seenStages = useRef(new Set<number>());
   useEffect(() => {
@@ -158,7 +122,8 @@ export function HeroExperience() {
   // y el video arranca en ese mismo instante; solo los textos laterales entran con suavidad.
   useEffect(() => {
     const el = root.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Si la página cargó tarde y el hero ya está en marcha, no se repite la entrada.
+    if (!el || window.__faryHeroStarted || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const tl = gsap.timeline({ paused: !window.__faryIntroDone, defaults: { ease: "expo.out" } });
     tl.from(el.querySelectorAll("[data-hero-in]"), { autoAlpha: 0, y: 14, duration: 0.8, stagger: 0.08 }, 0.05);
     const go = () => tl.play();
@@ -214,16 +179,7 @@ export function HeroExperience() {
             </a>
           </div>
 
-          <HeroLaptop
-            stage={stage}
-            source={source}
-            videoRef={video}
-            onReelReady={(tl) => {
-              reel.current = tl;
-              tl.timeScale(HERO_SPEED);
-              if (!wanted.current || userPaused.current) tl.pause();
-            }}
-          />
+          <HeroLaptop stage={stage} videoRef={video} />
 
           <div className="zone zone--aside" data-hero-in>
             <HeroPlayback paused={paused} onToggle={togglePause} />
@@ -238,6 +194,8 @@ export function HeroExperience() {
           Scroll
         </div>
       </div>
+      {/* Arranque sin esperar al JavaScript de la página (ver heroStarter.ts). */}
+      <script dangerouslySetInnerHTML={{ __html: heroStarterScript() }} />
     </section>
   );
 }

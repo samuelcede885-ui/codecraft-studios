@@ -47,7 +47,7 @@ export function HeroExperience() {
     if (!v) return;
     v.defaultPlaybackRate = HERO_SPEED;
     v.playbackRate = HERO_SPEED;
-    v.play().catch(() => undefined);
+    v.play().catch(() => retryOnGesture(v));
   }, []);
 
   const pause = useCallback(() => {
@@ -80,6 +80,7 @@ export function HeroExperience() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       userPaused.current = true;
       setPaused(true);
+      if (video.current) video.current.dataset.userPaused = "1";
     }
     let visible = true;
     // Si el script en línea ya arrancó el video al terminar la intro, se sigue sin pausas.
@@ -163,6 +164,11 @@ export function HeroExperience() {
   function togglePause() {
     userPaused.current = !userPaused.current;
     setPaused(userPaused.current);
+    // El reintento por gesto (retryOnGesture) no debe reanudar un video que la persona pausó.
+    if (video.current) {
+      if (userPaused.current) video.current.dataset.userPaused = "1";
+      else delete video.current.dataset.userPaused;
+    }
     if (userPaused.current) pause();
     else play();
   }
@@ -198,4 +204,17 @@ export function HeroExperience() {
       <script dangerouslySetInnerHTML={{ __html: heroStarterScript() }} />
     </section>
   );
+}
+
+/**
+ * Si el navegador bloquea el arranque automático (p. ej. iPhone en modo de bajo consumo), el video
+ * arranca en el primer toque, desplazamiento o tecla de la persona. Una sola vez.
+ */
+function retryOnGesture(v: HTMLVideoElement) {
+  const events = ["touchstart", "pointerdown", "keydown", "wheel", "scroll"] as const;
+  const go = () => {
+    events.forEach((e) => window.removeEventListener(e, go));
+    if (v.paused && !v.dataset.userPaused) v.play().catch(() => undefined);
+  };
+  events.forEach((e) => window.addEventListener(e, go, { passive: true, once: true }));
 }

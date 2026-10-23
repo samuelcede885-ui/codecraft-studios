@@ -38,8 +38,10 @@ export function HeroLaptop({ stage, videoRef }: { stage: number; videoRef: Ref<H
           aria-hidden="true"
           tabIndex={-1}
         >
-          <source src={assetUrl(`${HERO_VIDEO}.webm`)} type="video/webm" />
+          {/* MP4 (H.264) primero: en iPhone se decodifica por hardware y arranca sin tirones;
+              la versión WebM queda de respaldo. */}
           <source src={assetUrl(`${HERO_VIDEO}.mp4`)} type="video/mp4" />
+          <source src={assetUrl(`${HERO_VIDEO}.webm`)} type="video/webm" />
         </video>
       </LaptopFrame>
     </div>

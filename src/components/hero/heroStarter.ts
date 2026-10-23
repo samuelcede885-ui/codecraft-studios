@@ -14,7 +14,8 @@ declare global {
  * (o de inmediato si no hay intro) sin esperar al JavaScript de la página, que en conexiones lentas
  * llega segundos después. Hasta que HeroExperience toma el relevo, mantiene los textos sincronizados
  * leyendo `currentTime` del video (la misma regla de siempre: nunca temporizadores propios).
- * Con movimiento reducido no hace nada: el hero empieza en pausa.
+ * Si el navegador bloquea el arranque (p. ej. iPhone en modo de bajo consumo), lo reintenta en el
+ * primer toque, desplazamiento o tecla. Con movimiento reducido no hace nada: el hero empieza en pausa.
  */
 export function heroStarterScript() {
   const stages = JSON.stringify(heroStages.map((s) => [s.start, s.end]));
@@ -30,7 +31,8 @@ for(var i=0;i<lead.length;i++)lead[i].setAttribute("data-state",st(i,k));
 for(i=0;i<aside.length;i++)aside[i].setAttribute("data-state",st(i,k));
 for(i=0;i<tags.length;i++)tags[i].setAttribute("data-state",st(i+1,k));
 requestAnimationFrame(sync)}
-function go(){window.__faryHeroStarted=true;v.defaultPlaybackRate=sp;v.playbackRate=sp;var p=v.play();if(p&&p.catch)p.catch(function(){});sync()}
+var E=["touchstart","pointerdown","keydown","wheel","scroll"];function retry(){E.forEach(function(e){removeEventListener(e,retry)});if(v.paused&&!v.dataset.userPaused){var q=v.play();if(q&&q.catch)q.catch(function(){})}}
+function go(){window.__faryHeroStarted=true;v.defaultPlaybackRate=sp;v.playbackRate=sp;var p=v.play();if(p&&p.catch)p.catch(function(){E.forEach(function(e){addEventListener(e,retry,{passive:true,once:true})})});sync()}
 var seen=d.documentElement.classList.contains("intro-seen");
 var wait=seen?0:Math.max(0,2200-(performance.now()-(window.__faryIntroT0||0)));
 setTimeout(go,wait)})();`;

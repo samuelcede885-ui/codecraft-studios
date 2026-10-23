@@ -8,6 +8,7 @@ cd motion
 npm install
 npm run dev              # Remotion Studio
 npm run render:reel01    # out/reel01.mp4 (32 s)
+npm run render:webtour   # out/web-tour.mp4 (~105 s); antes, grabar con scripts/record-web-tour.mjs
 npm run qa               # frames de revisión del brief (§22) en out/qa/
 node scripts/qa.mjs Reel01 0,330,780 --guides   # con las guías de zona segura
 ```
@@ -19,6 +20,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 | Composición | Qué es |
 |---|---|
 | `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), con música y efectos |
+| `WebTour` | Recorrido por la web de escritorio dentro de un monitor, con el título de cada sección; sin audio. La grabación (`public/tour/`, no versionada) sale de `scripts/record-web-tour.mjs` |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
 ## Estructura
@@ -38,7 +40,7 @@ src/
                            StatusCard, SystemNode, PhoneMockup, BrowserMockup, Dashboard, Cursor,
                            CTAEndCard, FaryLogo, Icon, SafeArea, AudioLayer)
   screens/                 interfaces para los mockups (WebsiteFlow…)
-  compositions/            Reel01…/ (ReelWorld + scenes/), Demo/
+  compositions/            Reel01…/ (ReelWorld + scenes/), WebTour/, Demo/
 ```
 
 ## Reglas

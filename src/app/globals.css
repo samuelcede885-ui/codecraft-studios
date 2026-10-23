@@ -11,6 +11,7 @@
 @import "../styles/screens.css";
 @import "../styles/covers.css";
 @import "../styles/sections.css";
+@import "../styles/plans.css";
 @import "../styles/form.css";
 
 /* Movimiento reducido: sin bucles ni transiciones largas; la historia se resuelve sin animación. */

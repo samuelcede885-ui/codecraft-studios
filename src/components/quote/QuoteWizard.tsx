@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { site } from "@/config/site";
 import { getProject, type Project } from "@/data/projects";
-import { QUOTE_EVENT, quoteReferenceFromUrl } from "@/lib/quote";
+import { PLAN_EVENT, QUOTE_EVENT, quoteReferenceFromUrl } from "@/lib/quote";
+import { usd, type Plan } from "@/data/plans";
 import { track } from "@/lib/analytics";
 import { ArrowRight } from "../Icon";
 import { QuoteStep } from "./QuoteStep";
@@ -29,8 +30,8 @@ const steps: { title: string; fields: Field[] }[] = [
 const projectTypes = ["Web", "E-commerce", "App", "Agente IA", "Otro"];
 /** Tipo sugerido según el proyecto de referencia (la persona puede cambiarlo). */
 const typeFromFilter: Record<string, string> = { ecommerce: "E-commerce", web: "Web", apps: "App", ia: "Agente IA" };
-/** Rangos orientativos para el cliente: Fary Labs debe confirmarlos. */
-const budgets = ["Por definir", "Menos de 1.000 USD", "1.000 – 3.000 USD", "3.000 – 8.000 USD", "Más de 8.000 USD"];
+/** Rangos orientativos, alineados con los planes (data/plans.ts). */
+const budgets = ["Por definir", "Menos de 200 USD", "200 – 500 USD", "500 – 1.000 USD", "Más de 1.000 USD"];
 const timings = ["Sin fecha definida", "Lo antes posible", "En 1 mes", "En 2 – 3 meses", "Más adelante"];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -47,6 +48,7 @@ export function QuoteWizard() {
   const [step, setStep] = useState(0);
   const [ref, setRef] = useState("");
   const [type, setType] = useState("");
+  const [plan, setPlan] = useState<Plan | null>(null);
   const [picking, setPicking] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -67,7 +69,18 @@ export function QuoteWizard() {
     applyReference(getProject(quoteReferenceFromUrl()));
     const onPick = (e: Event) => applyReference(getProject((e as CustomEvent<string>).detail));
     window.addEventListener(QUOTE_EVENT, onPick);
-    return () => window.removeEventListener(QUOTE_EVENT, onPick);
+    // Plan elegido en "Planes": se muestra en el paso 2 y fija el tipo de proyecto.
+    const onPlan = (e: Event) => {
+      const p = (e as CustomEvent<Plan>).detail;
+      setPlan(p);
+      setType(p.quoteType);
+      setErrors((x) => ({ ...x, type: undefined }));
+    };
+    window.addEventListener(PLAN_EVENT, onPlan);
+    return () => {
+      window.removeEventListener(QUOTE_EVENT, onPick);
+      window.removeEventListener(PLAN_EVENT, onPlan);
+    };
   }, []);
 
   // Al cambiar de paso, el foco va al título del paso (no al cargar la página).
@@ -111,6 +124,7 @@ export function QuoteWizard() {
       `Email: ${d.get("email")}`,
       `WhatsApp: ${d.get("whatsapp") || "-"}`,
       `Quiere construir: ${d.get("type")}`,
+      `Plan: ${plan ? `${plan.name} (desde ${usd(plan.price)})` : "-"}`,
       `Referencia: ${project ? `${project.name} (${project.category}) [${project.slug}]` : "Ninguna"}`,
       `Qué le gustó: ${d.getAll("liked").join(", ") || "-"}`,
       `Presupuesto: ${d.get("budget")}`,
@@ -132,7 +146,7 @@ export function QuoteWizard() {
     }
     track("quote_step_completed", { step: steps.length, name: steps[steps.length - 1].title, project: ref || undefined });
     const channel = email ? "email" : whatsapp ? "whatsapp" : "pending";
-    track("quote_submitted", { project: ref || undefined, type, channel });
+    track("quote_submitted", { project: ref || undefined, type, plan: plan?.id, channel });
     // Sin destino configurado no se simula un envío.
     if (!email && !whatsapp) return setStatus("pending");
     const body = summary(new FormData(e.currentTarget));
@@ -257,6 +271,14 @@ export function QuoteWizard() {
           ))}
         </div>
         {err("type")}
+        {plan && (
+          <p className="wizard__plan">
+            Plan elegido: <b>{plan.name}</b> · desde {usd(plan.price)}
+            <button type="button" onClick={() => setPlan(null)}>
+              Quitar
+            </button>
+          </p>
+        )}
       </QuoteStep>
 
       <QuoteStep index={2} title={steps[2].title} active={step === 2} headingRef={heading}>

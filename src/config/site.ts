@@ -21,6 +21,7 @@ export const site = {
     { label: "Inicio", mobileLabel: "Inicio", href: "#inicio" },
     { label: "Portafolio", mobileLabel: "Proyectos", href: "#portafolio" },
     { label: "Servicios", mobileLabel: "Servicios", href: "#servicios" },
+    { label: "Planes", mobileLabel: "Planes", href: "#planes" },
     { label: "Proceso", mobileLabel: "Proceso", href: "#proceso" },
     { label: "Contacto", mobileLabel: "Contacto", href: "#contacto" },
   ],

@@ -7,6 +7,7 @@ import { FeaturedProject } from "@/components/portfolio/FeaturedProject";
 import { ProjectCategories } from "@/components/portfolio/ProjectCategories";
 import { ProjectGrid } from "@/components/portfolio/ProjectGrid";
 import { ServicesAccordion } from "@/components/services/ServicesAccordion";
+import { PricingPlans } from "@/components/plans/PricingPlans";
 import { ProcessTimeline } from "@/components/process/ProcessTimeline";
 import { FinalCTA } from "@/components/FinalCTA";
 import { ScrollEffects } from "@/components/ScrollEffects";
@@ -39,6 +40,7 @@ export default function Home() {
         <ProjectGrid />
         <ProjectCategories />
         <ServicesAccordion />
+        <PricingPlans />
         <ProcessTimeline />
         <FinalCTA />
       </main>

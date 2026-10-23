@@ -4,6 +4,7 @@
  * - Desde una ficha de proyecto: el enlace /?proyecto=<slug>#cotizacion lo lleva la URL.
  */
 import { track } from "./analytics";
+import type { Plan } from "@/data/plans";
 
 export const QUOTE_EVENT = "fary:quote";
 
@@ -14,6 +15,14 @@ export function selectQuoteReference(slug: string, from = "catalog") {
   try {
     history.replaceState(null, "", `?proyecto=${encodeURIComponent(slug)}#cotizacion`);
   } catch {}
+}
+
+export const PLAN_EVENT = "fary:plan";
+
+/** Plan elegido en la sección de planes: el formulario lo muestra y lo incluye en el mensaje. */
+export function selectQuotePlan(plan: Plan) {
+  track("plan_selected", { plan: plan.id, price: plan.price });
+  window.dispatchEvent(new CustomEvent<Plan>(PLAN_EVENT, { detail: plan }));
 }
 
 export function quoteReferenceFromUrl() {

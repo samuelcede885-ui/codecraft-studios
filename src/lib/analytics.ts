@@ -16,7 +16,8 @@ export type AnalyticsEvent =
   | "quote_started"
   | "quote_step_completed"
   | "quote_submitted"
-  | "whatsapp_clicked";
+  | "whatsapp_clicked"
+  | "plan_selected";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 

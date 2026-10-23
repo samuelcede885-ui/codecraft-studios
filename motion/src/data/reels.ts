@@ -82,19 +82,13 @@ export const reel01 = {
   },
   /** Marcas para grabar la locución (no se sintetiza voz). */
   voiceover: [
-    { frame: 9, text: "Si tu negocio depende de que estés ahí para que todo funcione… necesitas algo más que tiempo." },
-    { frame: 182, text: "Necesitas un sistema. Y ahí entra Fary Labs." },
-    { frame: 279, text: "Creamos páginas web que atraen clientes." },
-    { frame: 398, text: "Y que facilitan el contacto, desde cualquier dispositivo." },
-    { frame: 515, text: "Aplicaciones que organizan y conectan tu negocio." },
-    { frame: 617, text: "Y agentes de inteligencia artificial que automatizan tareas." },
-    { frame: 724, text: "Para que tu negocio siga avanzando… incluso cuando tú no estás." },
-    { frame: 842, text: "Fary Labs." },
-    { frame: 870, text: "Web, apps e IA." },
-    { frame: 910, text: "Construyamos el tuyo." },
+    { frame: 12, text: "Si tu negocio depende de que estés ahí para que todo funcione, necesitas algo más que tiempo. Necesitas un sistema. Y ahí entra Fary Labs." },
+    { frame: 288, text: "Creamos páginas web que atraen clientes, y que facilitan el contacto desde cualquier dispositivo." },
+    { frame: 516, text: "Aplicaciones que organizan y conectan tu negocio. Y agentes de inteligencia artificial que automatizan tareas, para que tu negocio siga avanzando, incluso cuando tú no estás." },
+    { frame: 852, text: "Fary Labs. Web, apps e IA. Construyamos el tuyo." },
   ] satisfies VoiceMarker[],
   /**
-   * Locución (voz neuronal Kokoro "em_alex", ver scripts/audio/README) y efectos originales
+   * Locución (voz neuronal Kokoro: 80 % em_alex + 20 % am_onyx, un semitono más grave; ver scripts/audio/README) y efectos originales
    * sintetizados con scripts/audio/generate_reel01.py, por debajo de la voz. Sin música.
    */
   audio: {

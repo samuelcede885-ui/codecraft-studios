@@ -11,7 +11,7 @@ import { withBase } from "@/lib/paths";
  * (reto, resultado, tecnologías, servicios, galería, antes/después, enlace público) no se muestran.
  *
  * Los conceptos de Fary Labs (projectType "concept") no son trabajos de clientes y se marcan siempre
- * como tales. Un trabajo real lleva projectType "client" (hoy, G-Talent y la web del GABA).
+ * como tales. Un trabajo real lleva projectType "client" (hoy, G-Talent, la web del GABA y Fariseos League).
  */
 export type Project = {
   slug: string;
@@ -204,6 +204,56 @@ export const projects: Project[] = [
     ],
     result: [
       "Las estudiantes cuentan con una web publicada que explica el GABA paso a paso y que cualquiera puede abrir desde el navegador, sin instalar nada.",
+    ],
+  },
+  {
+    slug: "fariseos-league",
+    name: "Fariseos League",
+    category: "App web / Liga deportiva",
+    industry: "Deporte amateur",
+    description: "La app de la liga: jugadores, estadísticas, equipos y partidos, desde el móvil.",
+    headline: "Tu liga,\nen el bolsillo.",
+    projectType: "client",
+    publicUrl: "https://fariseosleague.com",
+    ...media("fariseos-league", true),
+    gallery: [
+      { src: "/projects/fariseos-league/gallery-1.webp", alt: "Directorio de jugadores, ficha de un jugador y estadísticas avanzadas" },
+      { src: "/projects/fariseos-league/gallery-2.webp", alt: "Clasificación de equipos, formación en el campo y resultados de partidos" },
+      { src: "/projects/fariseos-league/gallery-3.webp", alt: "Menú de la liga, valor de mercado con logros y progresión del jugador" },
+    ],
+    solution:
+      "Una app web para la liga: directorio de jugadores con buscador y filtros, fichas con estadísticas, valor de mercado y logros, y fichas de equipo con formación, plantilla, partidos y racha. Incluye clasificación, calendario, reglas y mercado.",
+    services: ["App Craft", "Diseño UI/UX"],
+    filters: ["apps"],
+    challenge: [
+      "En una liga entre amigos, los resultados, las estadísticas y las fichas suelen quedarse repartidos en chats y hojas de cálculo.",
+      "El reto era darle a la liga una app propia, fácil de consultar desde el móvil, con la información de cada jugador y de cada equipo.",
+    ],
+    chapters: [
+      {
+        key: "experience",
+        title: "La liga, en una app.",
+        text: "Jugadores, partidos, clasificación y equipos a un toque, con la estética de una liga profesional.",
+        visuals: [{ kind: "video", src: "/projects/fariseos-league/full", poster: "/projects/fariseos-league/poster.webp", label: "Recorrido por la app de Fariseos League" }],
+      },
+      {
+        key: "product",
+        title: "Cada jugador, con su ficha.",
+        text: "Buscador y filtros por posición y equipo, carta del jugador, estadísticas por partido, valor de mercado y logros.",
+        visuals: [
+          { kind: "image", src: "/projects/fariseos-league/gallery-1.webp", alt: "Directorio de jugadores, ficha de un jugador y estadísticas avanzadas" },
+          { kind: "image", src: "/projects/fariseos-league/gallery-3.webp", alt: "Menú de la liga, valor de mercado con logros y progresión del jugador" },
+        ],
+      },
+      {
+        key: "system",
+        title: "Los equipos, al día.",
+        text: "Clasificación, formación en el campo, plantilla, partidos jugados y racha de cada equipo.",
+        visuals: [{ kind: "image", src: "/projects/fariseos-league/gallery-2.webp", alt: "Clasificación de equipos, formación en el campo y resultados de partidos" }],
+      },
+    ],
+    result: [
+      "La liga tiene una app pública donde jugadores y equipos consultan fichas, estadísticas, clasificación y partidos desde el móvil.",
     ],
   },
   {

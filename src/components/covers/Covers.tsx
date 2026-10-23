@@ -10,8 +10,8 @@ import { Screen } from "../screens/Screens";
  * scripts/record-covers.mjs las captura a public/projects/<slug>/thumb.webp.
  * Todo se mide en cqw (1cqw = 1 % del ancho), así que la portada se ve igual a cualquier tamaño.
  */
-export type CoverId = "g-talent" | "gaba" | "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
-export const coverIds: CoverId[] = ["g-talent", "gaba", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
+export type CoverId = "g-talent" | "gaba" | "fariseos-league" | "gramercy" | "panel-de-metricas" | "asistente-de-reservas" | "norte-estudio";
+export const coverIds: CoverId[] = ["g-talent", "gaba", "fariseos-league", "gramercy", "panel-de-metricas", "asistente-de-reservas", "norte-estudio"];
 
 /** Ventana con la pantalla HTML de un concepto o, en trabajos reales, una captura del sitio. */
 function Device({ id, shot, className = "" }: { id?: ScreenId; shot?: string; className?: string }) {
@@ -70,6 +70,18 @@ export function Cover({ slug }: { slug: CoverId }) {
           <Headline text={p.headline} className="cv-gaba__msg" />
           <Device shot="/projects/gaba/gallery-1.webp" className="cv-gaba__device" />
           <span className="cv-gaba__star" aria-hidden="true" />
+        </Frame>
+      );
+    case "fariseos-league":
+      return (
+        <Frame slug={slug} className="cv-fl">
+          <Headline text={p.headline} className="cv-fl__msg" />
+          <div className="cv-phone cv-fl__phone cv-fl__phone--back">
+            <img src="/projects/fariseos-league/screen-2.webp" alt="" />
+          </div>
+          <div className="cv-phone cv-fl__phone cv-fl__phone--front">
+            <img src="/projects/fariseos-league/screen-1.webp" alt="" />
+          </div>
         </Frame>
       );
     case "gramercy":

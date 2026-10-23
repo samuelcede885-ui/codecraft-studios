@@ -169,6 +169,56 @@
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
+/* Fariseos League: el azul noche de la app y sus pantallas en teléfonos. */
+.cv-fl {
+  background:
+    radial-gradient(55% 75% at 75% 50%, #22305a 0%, rgba(34, 48, 90, 0) 70%),
+    #0b0e1a;
+  color: #fff;
+}
+.cv-fl__msg {
+  position: absolute;
+  left: 5cqw;
+  top: 13cqw;
+  z-index: 5;
+  font-size: 6.4cqw;
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.cv-fl__msg span:last-child {
+  color: #3ecf8e;
+}
+.cv-phone {
+  position: absolute;
+  overflow: hidden;
+  border: 0.6cqw solid #080a10;
+  border-radius: 2.6cqw;
+  background: #080a10;
+  box-shadow:
+    0 0 0 0.1cqw rgba(255, 255, 255, 0.14),
+    0 3cqw 6cqw -1.5cqw rgba(0, 0, 0, 0.75);
+}
+.cv-phone img {
+  display: block;
+  width: 100%;
+  border-radius: 2cqw;
+}
+.cv-fl__phone {
+  width: 21cqw;
+}
+.cv-fl__phone--front {
+  left: 52cqw;
+  top: 9cqw;
+  z-index: 3;
+}
+.cv-fl__phone--back {
+  left: 71cqw;
+  top: 15cqw;
+  transform: rotate(4deg);
+  opacity: 0.92;
+}
+
 /* Gramercy: crema y verde salvia de la tienda, display condensada, el zueco rompe el marco. */
 .cv-gm {
   background:

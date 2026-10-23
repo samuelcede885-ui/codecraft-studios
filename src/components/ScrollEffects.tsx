@@ -80,5 +80,9 @@ export function ScrollEffects() {
 
 /** Quita el ancla de la dirección sin moverse ni tocar el estado del router. */
 function clearHash() {
-  if (window.location.hash) history.replaceState(history.state, "", window.location.pathname + window.location.search);
+  try {
+    if (window.location.hash) history.replaceState(history.state, "", window.location.pathname + window.location.search);
+  } catch {
+    // Algunos visores embebidos no permiten cambiar la dirección; no es necesario.
+  }
 }

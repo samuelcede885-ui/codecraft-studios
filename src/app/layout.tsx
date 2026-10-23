@@ -13,8 +13,10 @@ const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-gm-di
 const oswald = Oswald({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-gm-ui", display: "swap", preload: false });
 
 // Antes del primer pintado: guarda el instante de inicio de la intro y la omite si ya se vio
-// en esta sesión o si se pide menos movimiento.
-const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}`;
+// en esta sesión o si se pide menos movimiento. Al recargar o volver a abrir la página se empieza
+// siempre arriba (en el hero): el navegador no restaura el scroll ni salta a un ancla que quedó en
+// la dirección (#planes…). Un enlace que trae ancla a propósito (/#cotizacion) sí se respeta.
+const introScript = `window.__faryIntroT0=performance.now();try{if(sessionStorage.getItem("fary-intro-seen")||matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro-seen")}catch(e){}try{history.scrollRestoration="manual";var n=performance.getEntriesByType("navigation")[0];if(location.hash&&n&&n.type!=="navigate")history.replaceState(history.state,"",location.pathname+location.search)}catch(e){}`;
 
 const title = "Fary Labs — Transformamos ideas en productos digitales";
 

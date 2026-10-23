@@ -59,10 +59,26 @@ export function ScrollEffects() {
       ScrollTrigger.refresh();
       const target = window.location.hash && document.querySelector(window.location.hash);
       if (target) target.scrollIntoView();
+      clearHash();
     });
 
-    return () => mm.revert();
+    // Los enlaces del menú (#planes, #portafolio…) desplazan sin dejar el ancla en la dirección:
+    // así, al recargar o volver a entrar, la página empieza en el hero y no en esa sección.
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as Element | null)?.closest?.('a[href^="#"]')) setTimeout(clearHash, 0);
+    };
+    document.addEventListener("click", onClick);
+
+    return () => {
+      document.removeEventListener("click", onClick);
+      mm.revert();
+    };
   });
 
   return null;
+}
+
+/** Quita el ancla de la dirección sin moverse ni tocar el estado del router. */
+function clearHash() {
+  if (window.location.hash) history.replaceState(history.state, "", window.location.pathname + window.location.search);
 }

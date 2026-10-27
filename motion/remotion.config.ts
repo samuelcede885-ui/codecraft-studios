@@ -10,3 +10,5 @@ Config.setOverwriteOutput(true);
 // Si el entorno no puede descargar Chrome Headless Shell, indicar uno local:
 // REMOTION_BROWSER=/ruta/al/navegador npx remotion render …
 if (process.env.REMOTION_BROWSER) Config.setBrowserExecutable(process.env.REMOTION_BROWSER);
+// Escenas 3D (Reel02, Three.js): sin GPU, renderizar con REMOTION_GL=swangle (WebGL por software).
+if (process.env.REMOTION_GL) Config.setChromiumOpenGlRenderer(process.env.REMOTION_GL as "swangle");

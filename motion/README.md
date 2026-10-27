@@ -8,6 +8,7 @@ cd motion
 npm install
 npm run dev              # Remotion Studio
 npm run render:reel01    # out/reel01.mp4 (32 s)
+npm run render:reel02    # out/reel02.mp4 (63,5 s, 3D con Three.js; ver "Reel 02" abajo)
 npm run render:webtour   # out/web-tour.mp4 (~105 s); antes, grabar con scripts/record-web-tour.mjs
 npm run qa               # frames de revisión del brief (§22) en out/qa/
 node scripts/qa.mjs Reel01 0,330,780 --guides   # con las guías de zona segura
@@ -20,6 +21,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 | Composición | Qué es |
 |---|---|
 | `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), con música y efectos |
+| `Reel02` | "Conectando el comercio venezolano" — ciudad 3D (Three.js), 8 escenas, 1905 frames (63,5 s), voz temporal, música y efectos |
 | `WebTour` | Recorrido por la web de escritorio dentro de un monitor, con el título de cada sección; sin audio. La grabación (`public/tour/`, no versionada) sale de `scripts/record-web-tour.mjs` |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
@@ -40,8 +42,67 @@ src/
                            StatusCard, SystemNode, PhoneMockup, BrowserMockup, Dashboard, Cursor,
                            CTAEndCard, FaryLogo, Icon, SafeArea, AudioLayer)
   screens/                 interfaces para los mockups (WebsiteFlow…)
-  compositions/            Reel01…/ (ReelWorld + scenes/), WebTour/, Demo/
+  compositions/            Reel01…/ (ReelWorld + scenes/), Reel02/, WebTour/, Demo/
 ```
+
+## Reel 02 — "Conectando el comercio venezolano"
+
+Visión en desarrollo de Fary Labs (no una plataforma ya operativa): de vender respondiendo mensajes
+a mano a un ecosistema de tiendas digitales, gestión centralizada, automatización e IA.
+Ciudad 3D real (Three.js / React Three Fiber dentro de `@remotion/three`), una sola cámara continua
+y las interfaces en DOM ancladas a la ciudad (se proyectan puntos 3D con la misma cámara).
+
+```
+src/compositions/Reel02/
+  timeline.ts        escenas (frames), locución (segundo de entrada de cada frase) y titulares
+  drivers.ts         curvas de la historia por frame (encendido, congelado, línea azul, modo red…)
+  camera.ts          claves de cámara (Catmull-Rom + easing) y `project()` para anclar interfaces
+  Scene3D.tsx        lienzo 3D: cámara, luces, sombras suaves, reflejos, niebla, bloom y viñeta
+  city/layout.ts     modelo de la ciudad con semilla fija: manzanas, edificios, comercios, faroles,
+                     árboles, autos, rutas por las calles, arcos y pines por tipo de comercio
+  city/materials.ts  paleta del reel y fachadas con ventanas procedurales (shader)
+  city/City.tsx      suelo, edificios instanciados, comercios, faroles con halo, árboles, tráfico
+  city/HeroShop.tsx  comercio protagonista: interior, comerciante, letrero y planos de gestión
+  city/Connections.tsx  rutas luminosas que se dibujan, pulsos, arcos y nodos en las puertas
+  ui/                titulares, mensajes, tienda (teléfono + web), panel, automatización + IA,
+                     comunidad y cierre; `kit.tsx` con tokens, iconos y curvas
+  audio.ts           pistas de public/audio/reel02/
+```
+
+| Escena | Segundos | Qué pasa |
+|---|---|---|
+| 1 Ciudad | 0–7,2 | Sobrevuelo nocturno; los comercios se encienden; llegan mensajes; la cámara pasa bajo el toldo |
+| 2 Problema | 7,2–14,6 | Interior: el comerciante, mensajes que se acumulan y pedidos pendientes; todo se congela |
+| 3 Visión | 14,6–20,4 | Línea azul desde la puerta que recorre la ciudad y conecta comercios ("Conectado") |
+| 4 Compra | 20,4–29,8 | Teléfono y web nacen del letrero: descubre → catálogo → producto → carrito → pago → confirmación |
+| 5 Gestión | 29,8–36,2 | El pedido entra al edificio; pedidos, inventario, ventas, reportes y tienda web se actualizan |
+| 6 Automatización | 36,2–44,4 | Flujo cliente → tienda → pedido → panel → notificación; asistente IA con datos del comercio |
+| 7 Comunidad | 44,4–54 | Gran plano: la red crece; tipos de comercio y lo que pasa entre ellos (sin cifras) |
+| 8 Cierre | 54–63,5 | La ciudad se hunde en negro, quedan las líneas; firma, lema, llamada a la acción e isotipo |
+
+Exportar (sin GPU, WebGL por software; ~3 s por frame con 4 núcleos):
+
+```bash
+export REMOTION_BROWSER=/ruta/al/chrome-headless-shell   # si no puede descargarse
+export REMOTION_GL=swangle                               # sin GPU (con GPU: angle o omitir)
+npm run render:reel02
+REMOTION_GL=swangle node scripts/qa.mjs Reel02 150,300,700,1000,1450,1700   # frames de revisión
+```
+
+Audio (`public/audio/reel02/`):
+
+```bash
+# Voz TEMPORAL (Kokoro, local). Para la definitiva: grabar el mismo guion y reemplazar reel02-voz.mp3
+# respetando los segundos de entrada de timeline.ts → voice.
+pip install kokoro-onnx soundfile
+python3 scripts/audio/generate_reel02_voice.py <carpeta con kokoro-v1.0.onnx y voices-v1.0.bin> public/audio/reel02
+# Música y efectos originales (síntesis propia); la música se agacha bajo la voz.
+python3 scripts/audio/generate_reel02.py public/audio/reel02
+```
+
+Paleta de esta pieza (pedida para el reel, cercana a la marca): fondo #080A0F, superficies #171C26,
+azul eléctrico #2563EB y cian #38DDF5 como luz secundaria. Titulares Lato, interfaz Inter.
+Comercio, productos, precios y datos del panel son de ejemplo y se rotulan como interfaz conceptual.
 
 ## Reglas
 

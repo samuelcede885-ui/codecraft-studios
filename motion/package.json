@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "remotion studio src/index.ts",
     "render:reel01": "remotion render src/index.ts Reel01 out/reel01.mp4",
+    "render:reel02": "remotion render src/index.ts Reel02 out/reel02.mp4 --concurrency=4 --timeout=180000 --audio-codec=aac --audio-bitrate=320k",
     "render:webtour": "remotion render src/index.ts WebTour out/web-tour.mp4",
     "render:demo": "remotion render src/index.ts Demo out/demo.mp4",
     "qa": "node scripts/qa.mjs Reel01",
@@ -13,15 +14,21 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@react-three/fiber": "9.1.2",
+    "@react-three/postprocessing": "3.0.4",
     "@remotion/cli": "4.0.538",
+    "@remotion/three": "4.0.538",
+    "postprocessing": "6.37.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "remotion": "4.0.538"
+    "remotion": "4.0.538",
+    "three": "0.170.0"
   },
   "devDependencies": {
     "@remotion/bundler": "^4.0.538",
     "@remotion/renderer": "^4.0.538",
     "@types/react": "19.1.8",
+    "@types/three": "0.170.0",
     "typescript": "5.8.3"
   }
 }

@@ -13,9 +13,11 @@ const out = path.resolve("out/qa");
 mkdirSync(out, { recursive: true });
 const serveUrl = await bundle({ entryPoint: path.resolve("src/index.ts") });
 const browserExecutable = process.env.REMOTION_BROWSER || null;
-const composition = await selectComposition({ serveUrl, id, inputProps: { guides }, browserExecutable });
+// Escenas 3D (Three.js): en servidores sin GPU, REMOTION_GL=swangle.
+const chromiumOptions = process.env.REMOTION_GL ? { gl: process.env.REMOTION_GL } : {};
+const composition = await selectComposition({ serveUrl, id, inputProps: { guides }, browserExecutable, chromiumOptions });
 for (const frame of list.split(",").map(Number)) {
   const output = path.join(out, `${id}-${String(frame).padStart(4, "0")}.png`);
-  await renderStill({ serveUrl, composition, frame, output, inputProps: { guides }, browserExecutable });
+  await renderStill({ serveUrl, composition, frame, output, inputProps: { guides }, browserExecutable, chromiumOptions });
   console.log(output);
 }

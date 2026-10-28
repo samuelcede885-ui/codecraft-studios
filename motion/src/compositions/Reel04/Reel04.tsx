@@ -3,7 +3,9 @@ import { palette } from "../Reel02/city/materials";
 import { Scene3D } from "./Scene3D";
 import { EndCard } from "./ui/EndCard";
 import { ArepaMessages, BizLabels, Dashboard, FlowLabels, ShopFlow, VisionTag } from "./ui/Story";
-import { Subtitles, Titles, TopVeil } from "./ui/Text";
+import { TopVeil } from "./ui/Text";
+import { Captions } from "./ui/Captions";
+import { SceneLabels } from "./ui/Labels";
 
 /**
  * REEL 04 — "Una Venezuela conectada". Animación explicativa en 3D (Three.js en Remotion):
@@ -29,8 +31,8 @@ export function Reel04() {
       <Dashboard frame={frame} />
       <VisionTag frame={frame} />
       <EndCard frame={frame} />
-      <Titles frame={frame} />
-      <Subtitles frame={frame} />
+      <SceneLabels frame={frame} />
+      <Captions frame={frame} />
       <Audio src={staticFile(audio.music.src)} volume={audio.music.volume} />
       <Audio src={staticFile(audio.voice.src)} volume={audio.voice.volume} />
       <Audio src={staticFile(audio.effects.src)} volume={audio.effects.volume} />

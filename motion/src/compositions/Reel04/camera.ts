@@ -9,11 +9,12 @@ import { s } from "./timeline";
 export const PHONE = { x: 0, y: 1.3, z: 8.6 };
 
 const keys: CameraKey[] = [
-  // 1 · Un solo toque (muy cerca del vidrio)
-  { f: 0, pos: [0.24, 1.46, 9.42], at: [0.06, 1.42, 8.6], fov: 38 },
-  { f: s(1.3), pos: [0.17, 1.55, 9.22], at: [0.1, 1.52, 8.6], fov: 36 },
-  { f: s(2.5), pos: [2.3, 1.95, 9.5], at: [0, 1.3, 7.8], fov: 42 },
-  { f: s(3.55), pos: [0.05, 1.35, 7.6], at: [0, 1.05, 2.0], fov: 46 },
+  // 1 · Corte de la pantalla en primerísimo plano (estilo explicativo): el dedo toca, el campo se
+  //     concentra y la cámara sigue el pulso de datos hacia la derecha; luego gira hacia la bodega.
+  { f: 0, pos: [-0.02, 1.5, 10.75], at: [-0.04, 1.36, 9.0], fov: 34 },
+  { f: s(1.4), pos: [-0.06, 1.46, 10.5], at: [-0.08, 1.33, 9.0], fov: 34 },
+  { f: s(2.6), pos: [0.9, 1.44, 10.55], at: [0.85, 1.3, 9.0], fov: 34 },
+  { f: s(3.45), pos: [1.5, 1.6, 7.9], at: [0.4, 0.95, 2.0], fov: 42 },
   // 2 · La bodega en el vacío; el pedido viaja a su puerta
   { f: s(4.6), pos: [1.5, 1.75, 5.6], at: [0.65, 0.9, 0.3], fov: 40 },
   { f: s(9.6), pos: [-0.4, 1.6, 5.0], at: [0.7, 0.9, 0.3], fov: 40 },

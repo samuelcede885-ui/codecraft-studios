@@ -188,6 +188,12 @@ guion de voz. Audio: `generate_reel03_voice.py` (voz temporal, Kokoro) y `genera
 Animación explicativa (cada movimiento explica algo) sobre la visión de Fary Labs para el comercio
 venezolano: es una visión en desarrollo, no una red de comercios que ya funcione, y así se rotula.
 
+Estilo tomado del video de referencia (divulgación en primerísimo plano): fondo azul noche con
+estrellas y partículas, corte macro de la pantalla con el campo de los sensores bajo el dedo,
+rótulos técnicos con línea guía (`Callout`) y subtítulos palabra a palabra arriba (la palabra
+actual en blanco, las anteriores en gris, las clave en una caja de selección azul con ícono).
+Los tiempos por palabra salen de la voz real: `scripts/audio/word_timings.py` → `words.json`.
+
 ```
 src/compositions/Reel04/
   timeline.ts          escenas, locución, subtítulos (*palabra* = azul) y titulares
@@ -195,7 +201,9 @@ src/compositions/Reel04/
                        negocio, libreta, pulso, flujo, red, convergencia, fundido; lista de negocios
   camera.ts            cámara continua (sin cortes): del vidrio del teléfono a la ciudad y al cierre
   Scene3D.tsx          ciudad del Reel 02 que crece + negocios + objetos explicativos + DOF/bloom
-  city/PhoneRig.tsx    teléfono, dedo, onda en el vidrio y despiece en capas con datos en la placa
+  city/ScreenSection.tsx corte macro de la pantalla: vidrio, sensores y su campo, píxeles RGB,
+                       dedo que toca (la carga) y pulso de datos; Starfield.tsx: cielo y polvo
+  city/PhoneRig.tsx    (versión anterior del inicio: teléfono de frente que se abre en capas)
   city/Businesses.tsx  barbería, arepera, bodega, tienda de ropa, cafetería y tecnología: cada una
                        se construye pieza a pieza y tiene actividad (cocinero, maniquíes, vapor,
                        pantallas, poste de barbería que gira); `Person` reutilizable
@@ -203,7 +211,8 @@ src/compositions/Reel04/
   city/Explainers.tsx  esfera del pedido, libreta que se abre y suelta sus datos, pulso azul que
                        los ordena, y el flujo Cliente → Tienda digital → Pedido → Inventario → Panel
   city/Network4.tsx    rutas entre negocios y comercios, pulsos y arcos que convergen al centro
-  ui/                  Text (titulares, subtítulos), Story (compra, etiquetas, mensajes, flujo,
+  ui/                  Captions (subtítulos palabra a palabra + `Callout`), Labels (rótulos por
+                       escena), Text (velo superior; titulares de la versión anterior), Story (compra, etiquetas, mensajes, flujo,
                        panel con IA integrable, "visión en desarrollo"), EndCard; Cover.tsx (portada)
 subtitles/Fary_Labs_Venezuela_Conectada.srt
 ```

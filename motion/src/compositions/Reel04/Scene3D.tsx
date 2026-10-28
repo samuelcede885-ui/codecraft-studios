@@ -3,11 +3,11 @@ import { ThreeCanvas } from "@remotion/three";
 import { useThree } from "@react-three/fiber";
 import { Bloom, DepthOfField, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { useCurrentFrame } from "remotion";
-import { Color, Vector3, type PerspectiveCamera } from "three";
+import { Color, FogExp2, Vector3, type PerspectiveCamera } from "three";
 import { drivers as reel02Drivers } from "../Reel02/drivers";
 import { Ground, Lamps, Traffic, Trees } from "../Reel02/city/City";
-import { makeCityUniforms, palette } from "../Reel02/city/materials";
-import { Environment, Fog } from "../Reel02/Scene3D";
+import { makeCityUniforms } from "../Reel02/city/materials";
+import { Environment } from "../Reel02/Scene3D";
 import { cameraAt } from "./camera";
 import { BIZ, drivers } from "./drivers";
 import { scenes } from "./timeline";
@@ -15,7 +15,8 @@ import { Businesses } from "./city/Businesses";
 import { Flow, Notebook, OrderOrb, Pulse } from "./city/Explainers";
 import { GrowingCity } from "./city/GrowingCity";
 import { Network4 } from "./city/Network4";
-import { PhoneRig } from "./city/PhoneRig";
+import { ScreenSection } from "./city/ScreenSection";
+import { Starfield } from "./city/Starfield";
 
 function CameraRig({ frame }: { frame: number }) {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
@@ -31,6 +32,16 @@ function CameraRig({ frame }: { frame: number }) {
 
 /** Sin edificios genéricos frente a la cámara ni donde están los negocios temáticos. */
 const exclude = (b: { x: number; z: number }) => (Math.abs(b.x) < 2.2 && b.z > 2 && b.z < 16) || BIZ.some((z) => Math.abs(b.x - z.x) < 1.9 && Math.abs(b.z - z.z) < 1.9);
+
+/** Azul noche del estilo explicativo (fondo y niebla). */
+const NIGHT = "#0A0E19";
+
+function Fog({ density }: { density: number }) {
+  const scene = useThree((s) => s.scene);
+  if (!scene.fog) scene.fog = new FogExp2(NIGHT, density);
+  (scene.fog as FogExp2).density = density;
+  return null;
+}
 
 export function Scene3D() {
   const frame = useCurrentFrame();
@@ -48,9 +59,10 @@ export function Scene3D() {
   const focus = useMemo(() => new Vector3(), []);
   focus.set(...c.at);
   const close = frame < scenes.ciudad.from + 30 || (frame > scenes.procesos.from && frame < scenes.venezuela.from);
+  const macro = frame < scenes.compra.from;
   return (
     <ThreeCanvas width={1080} height={1920} shadows gl={{ antialias: true }} camera={{ fov: 38, near: 0.02, far: 400 }}>
-      <color attach="background" args={[new Color(palette.fondo)]} />
+      <color attach="background" args={[new Color(NIGHT)]} />
       <CameraRig frame={frame} />
       <Environment />
       <Fog density={fog} />
@@ -73,22 +85,28 @@ export function Scene3D() {
       />
       {/* Luz de contorno para el teléfono y los objetos explicativos */}
       <pointLight position={[1.5, 3, 11]} color="#9CC2FF" intensity={2.2 * (1 - d.voidFog * 0) * (frame < scenes.compra.from + 20 ? 1 : 0.3)} distance={8} decay={1.4} />
-      <Ground d={cd} />
-      <GrowingCity u={u} radius={d.growRadius} exclude={exclude} />
+      {/* En el corte de la pantalla solo existe el vacío azul noche: la ciudad aparece al girar. */}
+      <group visible={frame >= scenes.toque.to - 30}>
+        <Ground d={cd} />
+        <GrowingCity u={u} radius={d.growRadius} exclude={exclude} />
+      </group>
       <group visible={d.city > 0.02}>
         <Lamps d={cd} />
         <Trees />
         <Traffic d={cd} />
       </group>
-      <Businesses u={u} d={d} frame={frame} />
-      <PhoneRig d={d} frame={frame} />
+      <group visible={frame >= scenes.toque.to - 30}>
+        <Businesses u={u} d={d} frame={frame} />
+      </group>
+      <ScreenSection frame={frame} />
+      <Starfield frame={frame} opacity={d.linesFade} />
       <OrderOrb d={d} />
       <Notebook d={d} frame={frame} />
       <Pulse d={d} />
       <Flow d={d} frame={frame} />
       <Network4 d={d} frame={frame} />
       <EffectComposer multisampling={0}>
-        <DepthOfField target={focus} focalLength={0.05} bokehScale={close ? 2.6 : 0} height={960} />
+        <DepthOfField target={focus} focalLength={macro ? 0.02 : 0.05} bokehScale={macro ? 4 : close ? 2.6 : 0} height={960} />
         <Bloom mipmapBlur luminanceThreshold={0.85} luminanceSmoothing={0.2} intensity={1.2} radius={0.72} />
         <Vignette offset={0.3} darkness={0.65} />
       </EffectComposer>

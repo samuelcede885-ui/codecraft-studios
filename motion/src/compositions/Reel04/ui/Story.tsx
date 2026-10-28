@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { interpolate } from "remotion";
 import { project } from "../camera";
-import { BIZ, type BizId, drivers } from "../drivers";
+import { BIZ, drivers } from "../drivers";
 import { s, scenes } from "../timeline";
 import { SHELL } from "../city/Businesses";
 import { STATIONS } from "../city/Explainers";
 import { clamp, easeInOut, Icon, pop, prog, ProductArt, ui, type IconName } from "../../Reel02/ui/kit";
+import { Callout } from "./Captions";
 
 /**
  * Interfaces del reel 04. Todo es una demostración conceptual: comercios, productos y datos
@@ -162,7 +163,6 @@ function Send({ frame }: { frame: number }) {
 }
 
 // ── Escena 3: cada negocio se identifica al terminar de construirse ──────────
-const BIZ_ICON: Record<BizId, IconName> = { barberia: "user", arepera: "food", bodega: "store", ropa: "shirt", cafe: "food", tecno: "laptop" };
 
 export function BizLabels({ frame }: { frame: number }) {
   const { ciudad } = scenes;
@@ -175,18 +175,9 @@ export function BizLabels({ frame }: { frame: number }) {
         // Aparece cuando el negocio termina de construirse.
         const k = Math.min(1, Math.max(0, (d.build(b.id) - 0.9) * 10));
         if (k <= 0) return null;
-        const p = project(frame, [b.x, SHELL.h + SHELL.upper + 0.5, b.z]);
-        if (p.behind || p.y < 480 || p.y > 1260 || p.x < 120 || p.x > 860) return null;
-        return (
-          <div key={b.id} style={{ position: "absolute", left: p.x, top: p.y, transform: `translate(-50%, -100%) scale(${0.7 + 0.3 * k})`, opacity: k }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px 8px 8px", borderRadius: 16, background: "rgba(245,245,243,0.96)", color: ui.tinta, font: `700 21px ${ui.font}`, whiteSpace: "nowrap", boxShadow: "0 12px 30px rgba(0,0,0,0.5)" }}>
-              <span style={{ width: 34, height: 34, borderRadius: 10, background: ui.azul, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Icon name={BIZ_ICON[b.id]} size={19} color="#fff" />
-              </span>
-              {b.label}
-            </div>
-          </div>
-        );
+        const p = project(frame, [b.x, SHELL.h + SHELL.upper + 0.3, b.z]);
+        if (p.behind || p.y < 520 || p.y > 1260 || p.x < 120 || p.x > 860) return null;
+        return <Callout key={b.id} frame={frame} at={[b.x, SHELL.h + SHELL.upper + 0.3, b.z]} text={b.label.toUpperCase()} a={k} dx={0} dy={-90} />;
       })}
     </div>
   );
@@ -237,20 +228,9 @@ export function FlowLabels({ frame }: { frame: number }) {
         const lit = Math.min(1, Math.max(0, (d.flow - i + 0.3) * 3));
         const a = pop(frame, s(26.2) + i * 4);
         if (q.behind) return null;
-        // Etiqueta al lado con más espacio, siempre dentro de la zona segura (72–900 px, debajo del titular).
-        const w = 70 + stationLabels[i].t.length * 15;
         const right = q.x < 540;
-        const x = right ? Math.min(900 - w, q.x + 50) : Math.max(72, q.x - 50 - w);
-        const y = Math.min(1230, Math.max(600, q.y));
-        return (
-          <div key={i} style={{ position: "absolute", left: x, top: y, transform: `translateY(-50%) scale(${0.8 + 0.2 * a})`, transformOrigin: right ? "0 50%" : "100% 50%", opacity: a }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "9px 16px", borderRadius: 14, whiteSpace: "nowrap", font: `800 22px ${ui.display}`, letterSpacing: "0.06em", color: "#fff", background: lit > 0.5 ? ui.azul : "rgba(18,22,31,0.9)", border: `1.5px solid rgba(56,221,245,${0.2 + 0.6 * lit})`, boxShadow: `0 0 ${30 * lit}px rgba(37,99,235,${0.7 * lit})` }}>
-              <Icon name={stationLabels[i].icon} size={20} color="#fff" />
-              {stationLabels[i].t}
-              {i === 3 && d.flow > 3.15 && <span style={{ marginLeft: 6, color: ui.cian }}>−1</span>}
-            </div>
-          </div>
-        );
+        const label = stationLabels[i].t + (i === 3 && d.flow > 3.15 ? "  −1" : "");
+        return <Callout key={i} frame={frame} at={[p.x, i === 4 ? 1.65 : 0.6, p.z]} text={label} a={a} dx={right ? 170 : -170} dy={-40} lit={lit} />;
       })}
     </div>
   );

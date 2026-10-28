@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { AdditiveBlending, BoxGeometry, Color, ConeGeometry, CylinderGeometry, DynamicDrawUsage, IcosahedronGeometry, InstancedMesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, SphereGeometry } from "three";
-import { BLOCK, N, PITCH, ROAD_LENGTH, cars, city, lamps, trees, type Face } from "./layout";
+import { BLOCK, N, PITCH, ROAD_LENGTH, cars, city, lamps, trees, type Building, type Face } from "./layout";
 import { facadeMaterial, palette, type CityUniforms } from "./materials";
 import type { Drivers } from "../drivers";
 
@@ -60,14 +60,16 @@ export function Ground({ d }: { d: Drivers }) {
 }
 
 /** Edificios de la ciudad (instanciados) con ventanas procedurales, cornisas y equipos en azotea. */
-export function Buildings({ u }: { u: CityUniforms }) {
+/** `exclude` (opcional) quita edificios de la vista, p. ej. un corredor frente a la cámara. */
+export function Buildings({ u, exclude }: { u: CityUniforms; exclude?: (b: Building) => boolean }) {
   const concreteRef = useRef<InstancedMesh>(null);
   const glassRef = useRef<InstancedMesh>(null);
   const capsRef = useRef<InstancedMesh>(null);
   const unitsRef = useRef<InstancedMesh>(null);
-  const concrete = useMemo(() => city.buildings.filter((b) => !b.glass), []);
-  const glass = useMemo(() => city.buildings.filter((b) => b.glass), []);
-  const units = useMemo(() => city.buildings.filter((b) => !b.glass && b.seed > 0.35), []);
+  const all = useMemo(() => (exclude ? city.buildings.filter((b) => !exclude(b)) : city.buildings), [exclude]);
+  const concrete = useMemo(() => all.filter((b) => !b.glass), [all]);
+  const glass = useMemo(() => all.filter((b) => b.glass), [all]);
+  const units = useMemo(() => all.filter((b) => !b.glass && b.seed > 0.35), [all]);
   const concreteMat = useMemo(() => facadeMaterial(u, { color: palette.grafito, roughness: 0.82, metalness: 0.08 }), [u]);
   const glassMat = useMemo(() => facadeMaterial(u, { color: "#0E1320", roughness: 0.16, metalness: 0.85, cell: [0.22, 0.32] }), [u]);
   const box = useMemo(() => new BoxGeometry(1, 1, 1), []);
@@ -84,7 +86,7 @@ export function Buildings({ u }: { u: CityUniforms }) {
       dummy.updateMatrix();
       glassRef.current!.setMatrixAt(i, dummy.matrix);
     });
-    city.buildings.forEach((b, i) => {
+    all.forEach((b, i) => {
       dummy.position.set(b.x, b.h + 0.025, b.z);
       dummy.scale.set(b.w + 0.05, 0.05, b.d + 0.05);
       dummy.updateMatrix();
@@ -98,12 +100,12 @@ export function Buildings({ u }: { u: CityUniforms }) {
       unitsRef.current!.setMatrixAt(i, dummy.matrix);
     });
     [concreteRef, glassRef, capsRef, unitsRef].forEach((r) => (r.current!.instanceMatrix.needsUpdate = true));
-  }, [concrete, glass, units]);
+  }, [all, concrete, glass, units]);
   return (
     <group>
       <instancedMesh ref={concreteRef} args={[box, concreteMat, concrete.length]} castShadow receiveShadow />
       <instancedMesh ref={glassRef} args={[box, glassMat, glass.length]} castShadow receiveShadow />
-      <instancedMesh ref={capsRef} args={[box, undefined, city.buildings.length]} castShadow>
+      <instancedMesh ref={capsRef} args={[box, undefined, all.length]} castShadow>
         <meshStandardMaterial color={palette.grafitoClaro} roughness={0.7} metalness={0.2} />
       </instancedMesh>
       <instancedMesh ref={unitsRef} args={[box, undefined, units.length]} castShadow>
@@ -119,11 +121,12 @@ const faceNormal: Record<Face, [number, number]> = { "+x": [1, 0], "-x": [-1, 0]
  * Comercios en planta baja: escaparate iluminado, letrero y toldo. Se encienden con el radio
  * de iluminación y se modernizan (azul / cian) cuando la red los alcanza.
  */
-export function Shops({ d, modern }: { d: Drivers; modern: (i: number) => number }) {
+export function Shops({ d, modern, exclude }: { d: Drivers; modern: (i: number) => number; exclude?: (b: Building) => boolean }) {
   const windowsRef = useRef<InstancedMesh>(null);
   const signsRef = useRef<InstancedMesh>(null);
   const awningsRef = useRef<InstancedMesh>(null);
-  const shops = city.shops;
+  // `index` = posición en city.shops (la que recibe `modern`), aunque se excluyan algunos.
+  const shops = useMemo(() => city.shops.map((b, index) => ({ ...b, index })).filter((b) => !exclude || !exclude(b)), [exclude]);
   const box = useMemo(() => new BoxGeometry(1, 1, 1), []);
   const glowMat = useMemo(() => new MeshBasicMaterial({ toneMapped: false }), []);
   const signMat = useMemo(() => new MeshBasicMaterial({ toneMapped: false }), []);
@@ -163,7 +166,7 @@ export function Shops({ d, modern }: { d: Drivers; modern: (i: number) => number
     const c = new Color();
     shops.forEach((b, i) => {
       const lit = Math.min(1, Math.max(0, (d.litRadius - b.dist) / 3));
-      const m = modern(i);
+      const m = modern(b.index);
       const base = b.seed > 0.5 ? warm : cool;
       c.copy(base).lerp(b.seed > 0.7 ? cyan : blue, m).multiplyScalar((0.25 + 1.6 * lit) * d.fade * (1 - 0.5 * d.dim));
       windowsRef.current!.setColorAt(i, c);

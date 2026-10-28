@@ -11,7 +11,7 @@ type Built = { route: Route; curve: CurvePath<Vector3>; geo: TubeGeometry; segme
 
 const RADIAL = 6;
 
-function buildRoute(route: Route): Built {
+export function buildRoute(route: Route): Built {
   const curve = new CurvePath<Vector3>();
   for (let i = 0; i < route.points.length - 1; i++) curve.add(new LineCurve3(new Vector3(...route.points[i]), new Vector3(...route.points[i + 1])));
   const segments = Math.max(8, Math.round(curve.getLength() * 10));
@@ -23,7 +23,7 @@ function buildRoute(route: Route): Built {
  * Una ruta luminosa que se dibuja a lo largo de la calle (drawRange de la malla del tubo),
  * con un pulso de luz en la punta mientras avanza.
  */
-function RouteTube({ built, progress, intensity }: { built: Built; progress: number; intensity: number }) {
+export function RouteTube({ built, progress, intensity }: { built: Built; progress: number; intensity: number }) {
   const mat = useMemo(() => new MeshBasicMaterial({ toneMapped: false, fog: false, transparent: true }), []);
   const glow = useMemo(() => new MeshBasicMaterial({ toneMapped: false, fog: false, transparent: true, blending: AdditiveBlending, depthWrite: false }), []);
   mat.color.copy(color(built.route.tone, 2.4 * intensity));

@@ -9,6 +9,7 @@ npm install
 npm run dev              # Remotion Studio
 npm run render:reel01    # out/reel01.mp4 (32 s)
 npm run render:reel02    # out/reel02.mp4 (63,5 s, 3D con Three.js; ver "Reel 02" abajo)
+npm run render:reel03    # out/Fary_Labs_Dos_Negocios.mp4 (45 s, 3D; ver "Reel 03" abajo)
 npm run render:webtour   # out/web-tour.mp4 (~105 s); antes, grabar con scripts/record-web-tour.mjs
 npm run qa               # frames de revisión del brief (§22) en out/qa/
 node scripts/qa.mjs Reel01 0,330,780 --guides   # con las guías de zona segura
@@ -22,6 +23,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 |---|---|
 | `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), con música y efectos |
 | `Reel02` | "Conectando el comercio venezolano" — ciudad 3D (Three.js), 8 escenas, 1905 frames (63,5 s), voz temporal, música y efectos |
+| `Reel03` | "Dos negocios, dos formas de trabajar" — dos tiendas idénticas (SIN / CON Fary Labs) en la ciudad 3D del Reel 02, 6 escenas, 1350 frames (45 s), subtítulos |
 | `WebTour` | Recorrido por la web de escritorio dentro de un monitor, con el título de cada sección; sin audio. La grabación (`public/tour/`, no versionada) sale de `scripts/record-web-tour.mjs` |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
@@ -138,3 +140,42 @@ python3 scripts/audio/generate_reel01.py public/audio   # regenera public/audio/
   `voiceover: { src: "audio/reel01-voz.mp3" }` en `reel01.audio`.
 
 - Las referencias del kit se estudian por su lenguaje; no se copian ni se suben al repositorio.
+
+
+## Reel 03 — "Dos negocios, dos formas de trabajar"
+
+Ejemplo ilustrativo con negocios ficticios: dos tiendas con la misma arquitectura, los mismos
+productos y la misma calle. La izquierda (SIN Fary Labs, luz cálida) lo hace todo a mano; la
+derecha (CON Fary Labs, luz azul) vende desde su tienda web y gestiona todo en una app.
+Reutiliza la ciudad, los materiales y el kit de interfaz del Reel 02.
+
+```
+src/lib/camera3d.ts                 cámara por claves + `project()` (compartible entre reels 3D)
+src/compositions/Reel03/
+  timeline.ts        escenas, locución (segundo de entrada) y subtítulos (máx. dos líneas)
+  drivers.ts         curvas por frame (línea divisoria, actividad manual, corte, red, fundido)
+  camera.ts          recorrido continuo: aérea → pantalla dividida → tienda digital → corte →
+                     plano general → elevación final
+  Scene3D.tsx        ciudad del Reel 02 + corredor despejado frente a las tiendas + DOF + bloom
+  city/TwinShops.tsx las dos tiendas (misma geometría; cambian luz, herramientas y gestos) y la
+                     línea de luz que las divide; los pisos superiores se levantan en el corte
+  city/Network.tsx   rutas y arcos que salen de la tienda digital en el cierre
+  ui/                Overlays (etiquetas SIN/CON, subtítulos, mensajes grandes, aviso de ejemplo),
+                     Manual (mensajes, hojas de cálculo, libreta, notas), Digital (teléfono del
+                     cliente, tienda web, cadena Cliente → Panel, app administrativa + IA integrable),
+                     EndCard (firma, "Digitaliza tu negocio.", pregunta final, isotipo)
+subtitles/Fary_Labs_Dos_Negocios.srt   subtítulos para subir aparte a TikTok / Reels si se prefiere
+```
+
+| Escena | Segundos | Voz |
+|---|---|---|
+| 1 Presentación | 0–6,2 | "Dos negocios. Mismos productos. Mismas oportunidades." |
+| 2 El problema | 6,2–15,2 | "Pero hay una diferencia. Uno responde cada mensaje…" (pantalla dividida) |
+| 3 La transformación | 15,2–24,3 | "El otro tiene Fary Labs. Sus clientes pueden comprar… Sus pedidos llegan a un solo lugar." |
+| 4 La administración | 24,3–29,2 | "Y puede gestionar inventario, ventas y gastos desde una aplicación." (corte arquitectónico) |
+| 5 La diferencia | 29,2–36,9 | "¿La diferencia? Uno depende… El otro tiene herramientas para crecer." |
+| 6 Cierre | 36,9–45 | "Fary Labs. Digitaliza tu negocio. ¿Cuál de los dos quieres tener?" |
+
+La escena 3 (compra y flujo del pedido) va antes que la administración para seguir el orden del
+guion de voz. Audio: `generate_reel03_voice.py` (voz temporal, Kokoro) y `generate_reel03.py`
+(música y efectos originales), igual que en el Reel 02. Exportar: `REMOTION_GL=swangle npm run render:reel03`.

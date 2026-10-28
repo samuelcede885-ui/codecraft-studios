@@ -29,7 +29,7 @@ function CameraRig({ frame }: { frame: number }) {
 }
 
 /** Reflejos controlados: entorno neutro muy tenue para vidrio, autos y calzada. */
-function Environment() {
+export function Environment() {
   const gl = useThree((s) => s.gl);
   const scene = useThree((s) => s.scene);
   useLayoutEffect(() => {
@@ -43,7 +43,7 @@ function Environment() {
   return null;
 }
 
-function Fog({ density }: { density: number }) {
+export function Fog({ density }: { density: number }) {
   const scene = useThree((s) => s.scene);
   if (!scene.fog) scene.fog = new FogExp2(palette.fondo, density);
   (scene.fog as FogExp2).density = density;

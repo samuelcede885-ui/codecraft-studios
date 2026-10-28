@@ -43,8 +43,10 @@ function Fog({ density }: { density: number }) {
   return null;
 }
 
-export function Scene3D() {
-  const frame = useCurrentFrame();
+/** `at` fija el frame (portada); si no, sigue el tiempo de la composición. */
+export function Scene3D({ at }: { at?: number } = {}) {
+  const current = useCurrentFrame();
+  const frame = at ?? current;
   const d = drivers(frame);
   const u = useMemo(makeCityUniforms, []);
   u.uLitRadius.value = d.growRadius + 40 * d.connected;

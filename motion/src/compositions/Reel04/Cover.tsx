@@ -1,4 +1,4 @@
-import { AbsoluteFill, Freeze } from "remotion";
+import { AbsoluteFill } from "remotion";
 import { FaryLogo } from "../../components/FaryLogo";
 import { palette } from "../Reel02/city/materials";
 import { ui } from "../Reel02/ui/kit";
@@ -9,9 +9,7 @@ import { s } from "./timeline";
 export function Reel04Cover() {
   return (
     <AbsoluteFill style={{ background: palette.fondo }}>
-      <Freeze frame={s(38.6)}>
-        <Scene3D />
-      </Freeze>
+      <Scene3D at={s(38.6)} />
       <AbsoluteFill style={{ background: "linear-gradient(180deg, rgba(8,10,15,0.9) 0%, rgba(8,10,15,0.35) 36%, rgba(8,10,15,0) 55%, rgba(8,10,15,0.75) 100%)" }} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 300, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
         <FaryLogo width={300} />

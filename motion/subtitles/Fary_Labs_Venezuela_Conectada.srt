@@ -1,0 +1,51 @@
+1
+00:00:00,300 --> 00:00:03,550
+¿Y si comprar en Venezuela fuera así de fácil?
+
+2
+00:00:04,000 --> 00:00:06,400
+Un toque para descubrir una tienda.
+
+3
+00:00:06,600 --> 00:00:08,850
+Otro para elegir un producto.
+
+4
+00:00:09,000 --> 00:00:11,750
+Y un pedido que llega directo al negocio.
+
+5
+00:00:12,000 --> 00:00:14,500
+Ahora imagina esa experiencia en muchos comercios:
+
+6
+00:00:14,500 --> 00:00:17,750
+restaurantes, tiendas y servicios.
+
+7
+00:00:18,100 --> 00:00:22,850
+Hoy, muchos todavía dependen de mensajes, libretas y procesos separados.
+
+8
+00:00:23,200 --> 00:00:26,400
+En Fary Labs queremos cambiar eso con tiendas digitales,
+
+9
+00:00:26,400 --> 00:00:29,600
+aplicaciones para administrar ventas e inventario,
+
+10
+00:00:29,600 --> 00:00:32,700
+y automatizaciones que conecten cada paso.
+
+11
+00:00:33,600 --> 00:00:36,900
+No es una realidad que ya exista en todas partes.
+
+12
+00:00:37,100 --> 00:00:41,200
+Es una visión que estamos construyendo para el comercio venezolano.
+
+13
+00:00:42,200 --> 00:00:45,600
+¿Tienes un negocio? Comenta CONECTAR y hablemos.

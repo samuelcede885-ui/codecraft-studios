@@ -8,6 +8,8 @@
     "render:reel01": "remotion render src/index.ts Reel01 out/reel01.mp4",
     "render:reel02": "remotion render src/index.ts Reel02 out/reel02.mp4 --concurrency=4 --timeout=180000 --audio-codec=aac --audio-bitrate=320k",
     "render:reel03": "remotion render src/index.ts Reel03 out/Fary_Labs_Dos_Negocios.mp4 --concurrency=4 --timeout=180000 --audio-codec=aac --audio-bitrate=320k",
+    "render:reel04": "remotion render src/index.ts Reel04 out/Fary_Labs_Venezuela_Conectada.mp4 --concurrency=4 --timeout=180000 --audio-codec=aac --audio-bitrate=320k",
+    "still:reel04-cover": "remotion still src/index.ts Reel04Cover out/Fary_Labs_Venezuela_Conectada_portada.png",
     "render:webtour": "remotion render src/index.ts WebTour out/web-tour.mp4",
     "render:demo": "remotion render src/index.ts Demo out/demo.mp4",
     "qa": "node scripts/qa.mjs Reel01",

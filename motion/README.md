@@ -10,6 +10,8 @@ npm run dev              # Remotion Studio
 npm run render:reel01    # out/reel01.mp4 (32 s)
 npm run render:reel02    # out/reel02.mp4 (63,5 s, 3D con Three.js; ver "Reel 02" abajo)
 npm run render:reel03    # out/Fary_Labs_Dos_Negocios.mp4 (45 s, 3D; ver "Reel 03" abajo)
+npm run render:reel04    # out/Fary_Labs_Venezuela_Conectada.mp4 (47,2 s, 3D; ver "Reel 04" abajo)
+npm run still:reel04-cover  # portada vertical (PNG)
 npm run render:webtour   # out/web-tour.mp4 (~105 s); antes, grabar con scripts/record-web-tour.mjs
 npm run qa               # frames de revisión del brief (§22) en out/qa/
 node scripts/qa.mjs Reel01 0,330,780 --guides   # con las guías de zona segura
@@ -24,6 +26,7 @@ Si el entorno no puede descargar Chrome Headless Shell: `REMOTION_BROWSER=/ruta/
 | `Reel01` | "Tu negocio no debería depender de ti" — 9 escenas, 960 frames (32 s), con música y efectos |
 | `Reel02` | "Conectando el comercio venezolano" — ciudad 3D (Three.js), 8 escenas, 1905 frames (63,5 s), voz temporal, música y efectos |
 | `Reel03` | "Dos negocios, dos formas de trabajar" — dos tiendas idénticas (SIN / CON Fary Labs) en la ciudad 3D del Reel 02, 6 escenas, 1350 frames (45 s), subtítulos |
+| `Reel04` | "Una Venezuela conectada" — animación explicativa 3D: teléfono que se abre en capas, pedido, ciudad que se construye, procesos separados, conexión y red; 1416 frames (47,2 s). `Reel04Cover`: portada |
 | `WebTour` | Recorrido por la web de escritorio dentro de un monitor, con el título de cada sección; sin audio. La grabación (`public/tour/`, no versionada) sale de `scripts/record-web-tour.mjs` |
 | `Demo` | Base de 6 s: el agente IA se enciende y envía datos |
 
@@ -179,3 +182,32 @@ subtitles/Fary_Labs_Dos_Negocios.srt   subtítulos para subir aparte a TikTok / 
 La escena 3 (compra y flujo del pedido) va antes que la administración para seguir el orden del
 guion de voz. Audio: `generate_reel03_voice.py` (voz temporal, Kokoro) y `generate_reel03.py`
 (música y efectos originales), igual que en el Reel 02. Exportar: `REMOTION_GL=swangle npm run render:reel03`.
+
+## Reel 04 — "Una Venezuela conectada"
+
+Animación explicativa (cada movimiento explica algo) sobre la visión de Fary Labs para el comercio
+venezolano: es una visión en desarrollo, no una red de comercios que ya funcione, y así se rotula.
+
+```
+src/compositions/Reel04/
+  timeline.ts          escenas, locución, subtítulos (*palabra* = azul) y titulares
+  drivers.ts           curvas por frame: toque, capas, pedido, crecimiento, construcción de cada
+                       negocio, libreta, pulso, flujo, red, convergencia, fundido; lista de negocios
+  camera.ts            cámara continua (sin cortes): del vidrio del teléfono a la ciudad y al cierre
+  Scene3D.tsx          ciudad del Reel 02 que crece + negocios + objetos explicativos + DOF/bloom
+  city/PhoneRig.tsx    teléfono, dedo, onda en el vidrio y despiece en capas con datos en la placa
+  city/Businesses.tsx  barbería, arepera, bodega, tienda de ropa, cafetería y tecnología: cada una
+                       se construye pieza a pieza y tiene actividad (cocinero, maniquíes, vapor,
+                       pantallas, poste de barbería que gira); `Person` reutilizable
+  city/GrowingCity.tsx edificios que suben desde el suelo en una onda desde el centro
+  city/Explainers.tsx  esfera del pedido, libreta que se abre y suelta sus datos, pulso azul que
+                       los ordena, y el flujo Cliente → Tienda digital → Pedido → Inventario → Panel
+  city/Network4.tsx    rutas entre negocios y comercios, pulsos y arcos que convergen al centro
+  ui/                  Text (titulares, subtítulos), Story (compra, etiquetas, mensajes, flujo,
+                       panel con IA integrable, "visión en desarrollo"), EndCard; Cover.tsx (portada)
+subtitles/Fary_Labs_Venezuela_Conectada.srt
+```
+
+Audio: `generate_reel04_voice.py` (voz temporal, Kokoro) y `generate_reel04.py` (música y efectos
+de síntesis propia: sin muestras ni licencias de terceros). Exportar:
+`REMOTION_GL=swangle npm run render:reel04` y `REMOTION_GL=swangle npm run still:reel04-cover`.

@@ -1,17 +1,18 @@
 import type { ScreenId } from "./screens";
 
 /**
- * Etapas del hero, en segundos del video que se reproduce dentro de la laptop
- * (public/projects/gramercy/full.mp4). Es la única fuente de los tiempos: la bobina
- * que graba el video (src/components/reel) y los textos sincronizados leen de aquí.
- * Si se cambia un tiempo, hay que volver a grabar el video (scripts/record-reels.mjs).
+ * Etapas del hero, en segundos del video que se reproduce dentro de la laptop: el recorrido por
+ * Bunzo Burgers, concepto de restaurante (public/projects/bunzo/hero.*, scripts/record-hero-bunzo.mjs).
+ * Es la única fuente de los tiempos: los textos sincronizados leen de aquí, y la bobina de Gramercy
+ * (src/components/reel, portafolio) reutiliza los mismos tiempos con sus pantallas (`screen`).
+ * Si se cambia un tiempo, hay que volver a grabar ambos videos.
  */
 export type HeroStage = {
   /** "" en la etapa de apertura (sin número). */
   id: string;
   start: number;
   end: number;
-  /** Pantalla de Gramercy que muestra el video en esta etapa. */
+  /** Pantalla de Gramercy en su bobina del portafolio (mismos tiempos). */
   screen: ScreenId;
   eyebrow: string;
   /** Etiqueta editorial discreta sobre la laptop ("" en la apertura). */
@@ -66,20 +67,20 @@ export const heroStages: HeroStage[] = [
     start: 17.6,
     end: 22.4,
     screen: "payment",
-    eyebrow: "Tecnología",
-    tag: "Systems",
-    title: "Tecnología que hace que todo funcione.",
-    description: "Pagos, integraciones y automatización trabajando juntos.",
+    eyebrow: "Experiencia",
+    tag: "Motion",
+    title: "Experiencias que se sienten vivas.",
+    description: "Animación, ritmo y detalle al servicio de tu producto.",
   },
   {
     id: "05",
     start: 22.4,
     end: 28.2,
     screen: "dashboard",
-    eyebrow: "Resultados",
-    tag: "Growth",
-    title: "Datos que impulsan decisiones.",
-    description: "Soluciones diseñadas para medir, aprender y crecer.",
+    eyebrow: "Marca",
+    tag: "Brand",
+    title: "Marcas que se quedan en la memoria.",
+    description: "Identidad, contenido y llamadas a la acción claras para tu negocio.",
   },
 ];
 

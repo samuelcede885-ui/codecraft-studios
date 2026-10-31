@@ -15,7 +15,7 @@ import { heroStarterScript } from "./heroStarter";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Hero automático: la laptop reproduce un recorrido por Gramercy y los textos de los lados
+ * Hero automático: la laptop reproduce un recorrido por Bunzo Burgers (concepto) y los textos de los lados
  * cambian con él. El tiempo real del video (`currentTime`) es la única fuente de verdad:
  * no hay temporizadores propios, así que si el video se retrasa o se pausa, los textos esperan.
  * El scroll no controla nada: solo sirve para salir del hero. Fuera de la vista, el video se pausa.

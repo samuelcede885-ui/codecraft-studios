@@ -28,7 +28,7 @@ const organization = {
 
 export default function Home() {
   // Póster del video del hero: solo en la portada, que es donde se usa.
-  preload(withBase("/projects/gramercy/poster.webp"), { as: "image", fetchPriority: "high" });
+  preload(withBase("/projects/bunzo/poster.webp"), { as: "image", fetchPriority: "high" });
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} />

@@ -4,9 +4,12 @@ import { assetUrl } from "@/lib/assets";
 import { LaptopFrame } from "./LaptopFrame";
 import { stageState } from "./HeroStage";
 
-/** Versión ligera del recorrido (960 px, 15 fps): a HERO_SPEED = 2 se ve a 30 fps y pesa ~300 KB. */
-export const HERO_VIDEO = "/projects/gramercy/hero";
-export const HERO_POSTER = "/projects/gramercy/poster.webp";
+/**
+ * Versión ligera del recorrido por Bunzo Burgers (960 px, 15 fps; a HERO_SPEED = 2 se ve a 30 fps).
+ * Se graba con scripts/record-hero-bunzo.mjs.
+ */
+export const HERO_VIDEO = "/projects/bunzo/hero";
+export const HERO_POSTER = "/projects/bunzo/poster.webp";
 
 /**
  * Laptop fija del hero: etiqueta editorial de la etapa encima y, en la pantalla, el video del

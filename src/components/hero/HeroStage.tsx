@@ -32,7 +32,7 @@ export function HeroStage({ side, stage }: { side: "lead" | "aside"; stage: numb
             <>
               <span className="hero-aside__eyebrow">{i === 0 ? "En pantalla" : s.eyebrow}</span>
               <p className="hero-aside__desc">
-                {i === 0 ? "Gramercy, un concepto de e-commerce diseñado por Fary Labs." : s.description}
+                {i === 0 ? "Bunzo Burgers, un concepto de restaurante diseñado por Fary Labs." : s.description}
               </p>
             </>
           )}

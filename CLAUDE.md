@@ -15,7 +15,7 @@ La visión principal del proyecto está en `docs/fary-labs-brief.md`. Léela ant
 - Next.js 15 + TypeScript + Tailwind 4 + GSAP/ScrollTrigger. `npm run dev`, `npm run build`, `npm run typecheck`.
 - Datos en `src/data/` (projects, services, process, heroStages); contacto y dominio en `src/config/site.ts`; medición en `src/lib/analytics.ts` (`track()`, sin plataformas integradas).
 - Componentes por área en `src/components/`:
-  - `hero/` — HeroExperience (sincronía con el video), HeroLaptop, HeroStage, HeroPlayback (pausa) y heroStarter (script en línea que arranca el video al terminar la intro sin esperar a React). La laptop usa `bunzo/hero.webm|mp4` (960 px, 15 fps; a `HERO_SPEED` = 2 se ve a 30 fps). Tiempos y velocidad en `src/data/heroStages.ts`; si cambian, regrabar Bunzo con `scripts/record-hero-bunzo.mjs` y la bobina de Gramercy con `scripts/record-reels.mjs`.
+  - `hero/` — HeroExperience (sincronía con el video), HeroLaptop, HeroStage, HeroPlayback (pausa) y heroStarter (script en línea que arranca el video al terminar la intro sin esperar a React). La laptop usa `bunzo/hero.webm|mp4` (960 px, 20 fps; a `HERO_SPEED` = 1,5 se ve a 30 fps). Tiempos y velocidad en `src/data/heroStages.ts`; si cambian, regrabar Bunzo con `scripts/record-hero-bunzo.mjs` y la bobina de Gramercy con `scripts/record-reels.mjs`.
   - `portfolio/` — FeaturedProject, ProjectGrid, ProjectCard, ProjectPreviewVideo, ProjectPreviewDialog, ProjectFilters, ProjectCategories ("¿Qué quieres construir?").
   - `projects/` — CaseStudy, CaseStudyHero, CaseStudySection, ProjectGallery, ProjectVideo, BeforeAfterComparison (solo con imágenes reales).
   - `showreel/` — InspirationTrigger, InspirationShowreel. `quote/` — QuoteWizard, QuoteStep, ProjectReference.

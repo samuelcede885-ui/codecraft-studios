@@ -5,10 +5,10 @@
  *   17,6–22,4 destacados · 22,4–28,2 shakes, catering, sucursales y cierre.
  *
  *   # la demo servida en local (repo samuelcede885-ui/bunzo-demo) o su URL publicada
- *   BUNZO_URL=http://localhost:4100/ xvfb-run -a -s "-screen 0 1600x900x24" node scripts/record-hero-bunzo.mjs
+ *   BUNZO_URL=http://localhost:4100/ xvfb-run -a -s "-screen 0 1440x810x24" node scripts/record-hero-bunzo.mjs
  *
  * Chromium con ventana (kiosco) en un display virtual, capturado con ffmpeg (x11grab). Escribe en
- * public/projects/bunzo/: hero.mp4/.webm (960 px, 15 fps, para la laptop), full.mp4/.webm
+ * public/projects/bunzo/: hero.mp4/.webm (960 px, 20 fps, para la laptop), full.mp4/.webm
  * (1280 px, 30 fps) y poster.webp (primer fotograma). Requiere Playwright y ffmpeg.
  */
 import { spawn, execFileSync } from "node:child_process";
@@ -20,8 +20,9 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright")
 const URL = process.env.BUNZO_URL ?? "https://samuelcede885-ui.github.io/bunzo-demo/";
 const OUT = join(process.cwd(), "public/projects/bunzo");
 const TMP = mkdtempSync(join(tmpdir(), "bunzo-"));
-const W = 1600;
-const H = 900;
+// Tamaño de una laptop (16:9, como la pantalla del hero): el texto se ve a escala real.
+const W = 1440;
+const H = 810;
 const DUR = 28.2;
 mkdirSync(OUT, { recursive: true });
 
@@ -43,19 +44,19 @@ const at = await p.evaluate(() => {
   return { ing: top("#ingredientes"), menu: top("#menu"), feat: top("#destacados"), extras: top("#extras"), catering: top("#catering"), locales: top("#locales"), pedir: top("#pedir") };
 });
 
-// Recorrido por claves (segundo → scroll Y), interpolado con suavidad dentro de la página.
+// Recorrido por claves (segundo → scroll Y). Como navega una persona: se detiene en cada sección
+// hasta que terminan sus animaciones de entrada, y al final va al cierre como al tocar "Pedir".
+const half = at.feat + Math.round((at.extras - at.feat) * 0.48);
 const keys = [
   [0, 0],
-  [3.4, 0],
-  [7.4, at.ing - 40],
-  [12.4, at.menu - 120],
-  [13.0, at.menu + 40],
-  [17.4, at.menu + 40],
-  [17.9, at.feat],
-  [22.2, at.extras - 200],
-  [24.2, at.catering - 60],
-  [25.8, at.locales + 40],
-  [27.2, at.pedir],
+  [4.2, 0],
+  [7.6, at.ing - 40],
+  [11.9, at.menu - 110],
+  [12.6, at.menu + 30],
+  [17.4, at.menu + 30],
+  [18.2, at.feat],
+  [22.2, half],
+  [23.6, at.pedir],
   [28.2, at.pedir],
 ];
 
@@ -88,10 +89,10 @@ const clickTab = async (index, sec) => {
     await p.mouse.up();
   }
 };
-// Pestañas del menú: 0 hamburguesas · 1 papas y acompañantes · 2 shakes.
-await clickTab(1, 13.6);
-await clickTab(2, 15.0);
-await clickTab(0, 16.3);
+// Pestañas del menú: 0 hamburguesas · 1 papas y acompañantes (la de shakes anima su tarjeta
+// estrechándola y se ve mal en pausa: no se usa).
+await clickTab(1, 13.8);
+await clickTab(0, 15.9);
 await p.waitForTimeout(Math.max(0, t0 + DUR * 1000 + 300 - Date.now()));
 ff.stdin.write("q");
 await new Promise((r) => ff.on("exit", r));
@@ -103,7 +104,8 @@ const trim = ["-ss", "1.2", "-t", String(DUR)];
 const ffmpeg = (...a) => execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", ...a], { stdio: "inherit" });
 ffmpeg(...trim, "-i", cap, "-vf", "scale=1280:720:flags=lanczos", "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p", "-movflags", "+faststart", join(OUT, "full.mp4"));
 ffmpeg(...trim, "-i", cap, "-vf", "scale=1280:720:flags=lanczos", "-an", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "36", "-row-mt", "1", "-cpu-used", "4", join(OUT, "full.webm"));
-const light = ["-vf", "scale=960:540:flags=lanczos,fps=15", "-an"];
+// 20 fps: a HERO_SPEED = 1,5 se ve a 30 fps.
+const light = ["-vf", "scale=960:540:flags=lanczos,fps=20", "-an"];
 ffmpeg(...trim, "-i", cap, ...light, "-c:v", "libx264", "-preset", "slow", "-crf", "34", "-pix_fmt", "yuv420p", "-movflags", "+faststart", join(OUT, "hero.mp4"));
 ffmpeg(...trim, "-i", cap, ...light, "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "46", "-row-mt", "1", "-cpu-used", "4", join(OUT, "hero.webm"));
 ffmpeg("-ss", "1.25", "-i", cap, "-frames:v", "1", "-vf", "scale=1280:720:flags=lanczos", "-c:v", "libwebp", "-quality", "82", join(OUT, "poster.webp"));

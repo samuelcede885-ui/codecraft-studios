@@ -5,7 +5,7 @@ import { LaptopFrame } from "./LaptopFrame";
 import { stageState } from "./HeroStage";
 
 /**
- * Versión ligera del recorrido por Bunzo Burgers (960 px, 15 fps; a HERO_SPEED = 2 se ve a 30 fps).
+ * Versión ligera del recorrido por Bunzo Burgers (960 px, 20 fps; a HERO_SPEED = 1,5 se ve a 30 fps).
  * Se graba con scripts/record-hero-bunzo.mjs.
  */
 export const HERO_VIDEO = "/projects/bunzo/hero";

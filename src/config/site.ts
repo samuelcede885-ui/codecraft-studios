@@ -1,7 +1,5 @@
-// Datos reales de contacto pendientes de confirmar por Fary Labs.
-// Mientras estén vacíos, la web no enlaza a destinos inventados:
-// el formulario valida y avisa de que el envío aún no está configurado,
-// y los canales del cierre se muestran como "próximamente".
+// Contacto confirmado por Fary Labs (correo y WhatsApp). Un canal vacío no se publica:
+// la web no enlaza a destinos inventados.
 export const site = {
   name: "Fary Labs",
   /** Dominio público (p. ej. "https://farylabs.com"). Vacío: no se generan URLs absolutas
@@ -11,8 +9,8 @@ export const site = {
     "Estudio de desarrollo digital y consultoría tecnológica. Sitios web, software a medida y automatización para negocios que quieren avanzar.",
   tagline: "Transformamos ideas en productos digitales.",
   contact: {
-    email: "", // p. ej. "hola@farylabs.com"
-    whatsapp: "", // número en formato internacional sin "+", p. ej. "584121234567"
+    email: "farylabs.ve@gmail.com",
+    whatsapp: "584220311117", // formato internacional sin "+" (+58 422-0311117)
     instagram: "", // usuario sin "@", p. ej. "farylabs"
   },
   /** Cursor contextual en escritorio (círculo con VER / PLAY sobre proyectos). false lo desactiva. */

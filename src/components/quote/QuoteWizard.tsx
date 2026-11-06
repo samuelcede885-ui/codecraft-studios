@@ -145,17 +145,19 @@ export function QuoteWizard() {
       return setStatus("error");
     }
     track("quote_step_completed", { step: steps.length, name: steps[steps.length - 1].title, project: ref || undefined });
-    const channel = email ? "email" : whatsapp ? "whatsapp" : "pending";
+    // WhatsApp primero: es el canal que más usan los clientes en Venezuela y no depende de
+    // tener una aplicación de correo configurada en el teléfono.
+    const channel = whatsapp ? "whatsapp" : email ? "email" : "pending";
     track("quote_submitted", { project: ref || undefined, type, plan: plan?.id, channel });
     // Sin destino configurado no se simula un envío.
     if (!email && !whatsapp) return setStatus("pending");
     const body = summary(new FormData(e.currentTarget));
-    if (email) {
-      const subject = `Proyecto${project ? ` — referencia ${project.name}` : ""}`;
-      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    } else {
+    if (whatsapp) {
       track("whatsapp_clicked", { from: "quote" });
       window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(body)}`, "_blank", "noopener");
+    } else {
+      const subject = `Proyecto${project ? ` — referencia ${project.name}` : ""}`;
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
     setStatus("sent");
   }
@@ -324,7 +326,7 @@ export function QuoteWizard() {
           {status === "error" && "Revisa los campos marcados."}
           {status === "pending" &&
             "Gracias. El envío aún no está configurado: pronto publicaremos nuestros canales de contacto."}
-          {status === "sent" && "Listo. Abrimos tu aplicación con la solicitud preparada para enviar."}
+          {status === "sent" && `Listo. Abrimos ${whatsapp ? "WhatsApp" : "tu correo"} con tu solicitud preparada para enviar.`}
         </p>
       </div>
       {project && (

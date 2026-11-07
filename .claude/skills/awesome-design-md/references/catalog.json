@@ -1,0 +1,94 @@
+{
+ "AI & LLM": [
+  ["claude", "#cc785c", "Warm cream, coral accents and humanist editorial typography"],
+  ["x.ai", "#ffffff", "Monochromatic frontier AI, minimal black canvas"],
+  ["cohere", "#17171c", "Editorial enterprise AI and deep mineral surfaces"],
+  ["mistral.ai", "#fa520f", "Sunset gradients and bold AI storytelling"],
+  ["minimax", "#0a0a0a", "Clean monochrome and saturated product gradients"],
+  ["together.ai", "#000000", "Dark infrastructure and vivid accent gradients"],
+  ["replicate", "#ea2804", "Indie ML developer warmth and orange"],
+  ["runwayml", "#000000", "Cinematic, video-led dark editorial"],
+  ["elevenlabs", "#292524", "Quiet editorial voice-AI identity"],
+  ["ollama", "#000000", "Readme-like minimal interface"],
+  ["composio", "#0007cd", "Deep-blue technical agent UI"],
+  ["voltagent", "#00d992", "Near-black developer UI with neon green"],
+  ["lovable", "#f7f4ed", "Soft creamy AI-builder minimalism"]
+ ],
+ "Developer tools & platforms": [
+  ["cursor", "#f54e00", "Warm editorial code-editor identity"],
+  ["vercel", "#171717", "Crisp monochrome and mesh gradients"],
+  ["linear.app", "#5e6ad2", "Near-black software-craft luxury and lavender blue"],
+  ["framer", "#ffffff", "Black canvas and precise experimental typography"],
+  ["webflow", "#080808", "High-contrast visual web-design platform"],
+  ["figma", "#000000", "Playful pastel blocks and bold editorial layout"],
+  ["warp", "#f7f5f0", "Warm-toned agentic terminal"],
+  ["raycast", "#ffffff", "Polished, product-screenshot-led dark UI"],
+  ["opencode.ai", "#201d1d", "Monospace terminal-native interface"],
+  ["expo", "#000000", "Restrained React Native tooling"],
+  ["sentry", "#150f23", "Dark violet software monitoring with vivid accents"],
+  ["posthog", "#f7a501", "Playful product analytics and illustrated mascots"],
+  ["hashicorp", "#000000", "Enterprise developer tooling, product accents"],
+  ["sanity", "#0b0b0b", "Nocturnal content infrastructure"],
+  ["mintlify", "#0a0a0a", "Atmospheric gradients and clean documentation"],
+  ["supabase", "#3ecf8e", "Clean developer tools and emerald accents"],
+  ["mongodb", "#00ed64", "Deep-teal tech and bright green"],
+  ["clickhouse", "#faff69", "Almost-black performance platform, electric yellow"],
+  ["ibm", "#0f62fe", "Carbon system, square geometry, IBM blue"],
+  ["resend", "#fcfdff", "Dark editorial developer email UI"],
+  ["clay", "#0a0a0a", "Claymation-inspired colorful GTM tooling"]
+ ],
+ "Productivity & collaboration": [
+  ["notion", "#5645d4", "Illustrated knowledge workspace"],
+  ["miro", "#1c1c1e", "Playful collaborative visual workspace"],
+  ["airtable", "#181d26", "Clean data-workflow editorial"],
+  ["cal", "#111111", "Calendar-first minimal productivity"],
+  ["slack", "#4a154b", "Deep aubergine and friendly collaboration"],
+  ["intercom", "#111111", "Cream editorial customer-service SaaS"],
+  ["zapier", "#ff4f00", "Warm automation UI with orange"],
+  ["superhuman", "#1b1938", "Indigo editorial email productivity"]
+ ],
+ "Finance & crypto": [
+  ["stripe", "#533afd", "Deep navy ink, electric indigo and mesh gradients"],
+  ["coinbase", "#0052ff", "Institutional white-and-blue fintech"],
+  ["binance", "#fcd535", "Near-black trading UI and yellow"],
+  ["kraken", "#7132f5", "Purple-trust financial dashboard"],
+  ["revolut", "#494fdf", "Dark finance with saturated product surfaces"],
+  ["wise", "#9fe870", "Strong dark headings and lime green"],
+  ["mastercard", "#eb001b", "Warm editorial financial identity"]
+ ],
+ "Commerce, consumer & mobility": [
+  ["airbnb", "#ff385c", "Warm, photography-led marketplace"],
+  ["shopify", "#000000", "Cinematic high-contrast commerce"],
+  ["nike", "#111111", "Full-bleed sports photography and oversized uppercase"],
+  ["pinterest", "#e60023", "Masonry imagery and crimson CTA"],
+  ["starbucks", "#006241", "Cream and deep-green retail"],
+  ["uber", "#000000", "Urban transport in black and white"],
+  ["meta", "#0064e0", "Product merchandising with tech-blue accents"]
+ ],
+ "Media & entertainment": [
+  ["apple", "#0066cc", "Premium whitespace, gallery photography"],
+  ["spotify", "#1ed760", "Immersive dark media and bright green"],
+  ["theverge", "#3cffd0", "Experimental neon tech editorial"],
+  ["wired", "#000000", "Black-and-white tech magazine"],
+  ["playstation", "#0070d1", "Console-launch storytelling with blue accents"]
+ ],
+ "Automotive": [
+  ["tesla", "#3e6ae1", "Minimal product-led automotive"],
+  ["ferrari", "#da291c", "Luxury red-black cinematic editorial"],
+  ["bmw", "#1c69d4", "Measured automotive precision"],
+  ["bmw-m", "#ffffff", "Dramatic monochrome motorsport"],
+  ["lamborghini", "#ffc000", "Black-and-gold high drama"],
+  ["bugatti", "#ffffff", "Restrained, cinematic luxury"],
+  ["renault", "#ffed00", "Stark geometric yellow-and-black automotive"]
+ ],
+ "Enterprise, hardware & aerospace": [
+  ["hp", "#024ad8", "White paper-like hardware commerce"],
+  ["nvidia", "#76b900", "Engineering black-white and bright green"],
+  ["vodafone", "#e60000", "Monumental photography and signal red"],
+  ["spacex", "#000000", "Cinematic space imagery and black"]
+ ],
+ "Retro web": [
+  ["dell-1996", "#e91d2a", "Late-90s enterprise catalog"],
+  ["nintendo-2001", "#e60012", "Y2K console chrome and beveled panels"]
+ ]
+}

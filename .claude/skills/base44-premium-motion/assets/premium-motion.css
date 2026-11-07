@@ -1,0 +1,39 @@
+:root {
+  --pm-fast: 130ms;
+  --pm-normal: 240ms;
+  --pm-slow: 380ms;
+  --pm-stagger: 55ms;
+  --pm-ease-out: cubic-bezier(.22, 1, .36, 1);
+  --pm-ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --pm-ease-in: cubic-bezier(.4, 0, 1, 1);
+  --pm-translate: 12px;
+  --pm-scale: .985;
+}
+@keyframes pm-enter {
+  from { opacity: 0; transform: translate3d(0, var(--pm-translate), 0) scale(var(--pm-scale)); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes pm-enter-left {
+  from { opacity: 0; transform: translate3d(-12px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes pm-exit {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(0, -5px, 0) scale(.995); }
+}
+.pm-enter { animation: pm-enter var(--pm-slow) var(--pm-ease-out) both; }
+.pm-enter-left { animation: pm-enter-left var(--pm-normal) var(--pm-ease-out) both; }
+.pm-exit { animation: pm-exit var(--pm-fast) var(--pm-ease-in) both; pointer-events: none; }
+.pm-stagger > * { animation: pm-enter var(--pm-slow) var(--pm-ease-out) both; animation-delay: calc(min(var(--pm-index, 0), 8) * var(--pm-stagger)); }
+.pm-interactive { transition: transform var(--pm-fast) var(--pm-ease-standard), opacity var(--pm-fast) var(--pm-ease-standard); }
+@media (hover: hover) and (pointer: fine) {
+  .pm-interactive:hover { transform: translate3d(0,-2px,0); }
+}
+.pm-interactive:active { transform: scale(.985); }
+.pm-interactive:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+/* Respect transitions managed by existing design system. Do not overwrite dialog semantics. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --pm-fast: 0ms; --pm-normal: 0ms; --pm-slow: 0ms; --pm-stagger: 0ms; --pm-translate: 0px; --pm-scale: 1; }
+  .pm-enter, .pm-enter-left, .pm-exit, .pm-stagger > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .pm-interactive, .pm-interactive:hover, .pm-interactive:active { transition: none !important; transform: none !important; }
+}

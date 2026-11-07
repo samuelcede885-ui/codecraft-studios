@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es-VE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Punkie’s Burger — Smash burgers de barrio en Chacao, Caracas</title>
+    <meta name="description" content="Smash burgers de barrio en Chacao, Caracas. Pan brioche, doble smash, queso y pepinillos. Mira el menú, arma tu pedido y encuéntranos en la Av. Mohedano." />
+    <meta name="theme-color" content="#1a0c09" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:locale" content="es_VE" />
+    <meta property="og:site_name" content="Punkie’s Burger" />
+    <meta property="og:title" content="Punkie’s Burger — Aplastada. Dorada. Tuya." />
+    <meta property="og:description" content="Smash burgers de barrio en Chacao, Caracas. Menú y pedidos en línea." />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Smash burger de Punkie’s con el logo manuscrito en rojo sobre crema." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- PENDIENTE: con el dominio definitivo, agregar <link rel="canonical"> y usar URLs absolutas en og:image -->
+
+    <link rel="preload" as="image" type="image/webp" href="/img/clasica-cerca-1170.webp" imagesrcset="/img/clasica-cerca-480.webp 480w, /img/clasica-cerca-800.webp 800w, /img/clasica-cerca-1170.webp 1170w" imagesizes="(min-width: 1024px) 32vw, 76vw" fetchpriority="high" />
+
+    <script>
+      document.documentElement.classList.add('js');
+      if (/[?&]revision\b/.test(location.search)) document.documentElement.classList.add('revision');
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Punkie's Burger",
+        "servesCuisine": ["Hamburguesas", "Smash burgers"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Av. Mohedano, calle José Félix Ribas",
+          "addressLocality": "Chacao",
+          "addressRegion": "Miranda",
+          "addressCountry": "VE"
+        },
+        "openingHoursSpecification": [
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday"], "opens": "12:00", "closes": "21:00" },
+          { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Thursday", "Friday", "Saturday", "Sunday"], "opens": "12:00", "closes": "23:00" }
+        ],
+        "sameAs": ["https://www.instagram.com/punkiesburger/"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="padding:24px;font-family:system-ui;color:#f3efc3;background:#1a0c09">
+        Punkie’s Burger · Smash burgers en Av. Mohedano, calle José Félix Ribas, Chacao, Caracas. Instagram: @punkiesburger. Activa JavaScript para ver el menú y hacer tu pedido.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+{
+  "bolsa-delivery": {
+    "width": 1170,
+    "height": 1300,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRoAAAABXRUJQVlA4IHQAAACQAwCdASoQABIAPu1iqU2ppaOiMAgBMB2JQAAG8lOe5CToJ/gAAPhjj/2ISSJZQ9DK3YjuX5jAjbuRR1qyMd8ybqHfEwNPmHs2krdsSh6eXgHxI2lU1zuxFBj8PLhxLlft74bzHkX+C0rj7YNtg0/OyogAAA=="
+  },
+  "cajon-de-luz": {
+    "width": 1170,
+    "height": 1275,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAAAQAwCdASoQABEAPu1iqU2ppaOiMAgBMB2JQBfJAxduUNgA/vK0uSKHta7C6fYIfWj0/srOSQFgInQeCefQtL1dEX5JGWc0VtaLFoAA"
+  },
+  "choose-your-fighter": {
+    "width": 1170,
+    "height": 1425,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRq4AAABXRUJQVlA4IKIAAAAwBACdASoQABQAPu1iqU2ppaOiMAgBMB2JZACdMoJYAAqlgoEGwp9FVOAA/oRnIh0kl+UCDHD3DyesuZIx5etMbzAbKiT3oI9zOtds1fU3ufpHBFV0bhguHgXn/Br84eWBaN6iNJuaKeoN44YGB/rBNXMkTqdYtsF0UEgxyM+n36ZhuPbhR6qPoywzWoU8jzhvLnZw3ond3iRoiBCNEHgaAAA="
+  },
+  "clasica-cerca": {
+    "width": 1170,
+    "height": 1300,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAABwBACdASoQABIAPu1iqU2ppaOiMAgBMB2JZgCdMoRwACV61g3EsEFilYDSwAD3L83UDrD9F89M0/kDnG+ra7boTzE/alnR1dGboNP16/G3BdGJ6l5uEWtMz3VADdjwNUxZVaNCP+I1YH+9VGCdBZB9pquAbl5wcCjgmAGCevAAAA=="
+  },
+  "clasica-combo": {
+    "width": 990,
+    "height": 1560,
+    "widths": [
+      480,
+      800,
+      990
+    ],
+    "lqip": "data:image/webp;base64,UklGRqIAAABXRUJQVlA4IJYAAABwBACdASoQABkAPu1iqk2ppaQiMAgBMB2JbACdL1yFpblf3USs3DpI2jVnYAD+bGQZC2akYTlE5uXVXivMwkCLhjMDfCjkzlA4HtomSS5s28T2MpIZIQreY9Frd1vfnCKN/zZ/tj8jUfbgtKMVNQKp7Pj83RIb/h7XtCnv2cryMyqr784xiOc43Jtc9phA6jMH7rcgAAA="
+  },
+  "cocina-guante": {
+    "width": 810,
+    "height": 490,
+    "widths": [
+      480,
+      800,
+      810
+    ],
+    "lqip": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAAAwAgCdASoQAAoAA4BaJagCdAEQEsc64PzkgAD+0qxWGmd9hyXpUuI5z3wLwO6jqaE+urmAWKsHqBJpxQLiSLfQfYK0jbA7WTnEAoyMWv/Pd/EAAAA="
+  },
+  "dos-smash": {
+    "width": 1170,
+    "height": 1300,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAAAwBACdASoQABIAPu1iqU2ppaOiMAgBMB2JbACdMoAlrBJPlRSpwG6GJUAA/uZluM3Ghqu13Le18K44egt44yzhuHKEGQC8h6CLh8alsj75q4f2KOR/2vZY1lkFLl5H3/W/6XlX3Oo2GfWXHLhq/B20CfZ8JxV3CIIJuRqimy6LcNdvHn/WE7SiAAA="
+  },
+  "envuelta-bandeja": {
+    "width": 1170,
+    "height": 1300,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRp4AAABXRUJQVlA4IJIAAABQBACdASoQABIAPu1iqU2ppaOiMAgBMB2JZgCdMoMljEGhEYolIhFz2LQ4AP6DWA0+2RYVcc1u6urZ4sW89DGyoBo2ibs6DziljmgqDFPzi/JXgg1Hh7rCgUvu+mtnoeuxS9/T5z6Xh4Z7Vc5LxDCSd/fQOvHbc1uliZPOSb79pZHGh66eJFDXc7eloL01dpAAAA=="
+  },
+  "especial-septiembre": {
+    "width": 1170,
+    "height": 1425,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRoQAAABXRUJQVlA4IHgAAACQBACdASoQABQAPu1iqU2ppaOiMAgBMB2JZACdMoRwACmaHzFT8nHW++rCOgAAzjRybaVPubAkXE3iQh9hSz3KsKIJN3sp91v3b5K5oYdPB9jarvfI240LS2O/frVL5HHgm1dMJXn2okwNK5+GTaxKV0K3TpUYAAA="
+  },
+  "fachada": {
+    "width": 1170,
+    "height": 1425,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAADQAwCdASoQABQAPu1iqU2ppaOiMAgBMB2JQBOgAzlYT3/6h1KYGwAA2a1DW8jP3WZSNQPfVIDBqKY5cRv057FMcRCAf7vrnHWO/5rc6PXaR2+/rsn6EP/dVOT9LrCsWTxGg8jA2u1v6ihtIeL9/F+Vh9ES354QIB6Rn3Npzbm1LQEbThAIzXIAAAA="
+  },
+  "pan-brioche": {
+    "width": 940,
+    "height": 578,
+    "widths": [
+      480,
+      800,
+      940
+    ],
+    "lqip": "data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAAAwAgCdASoQAAoAA4BaJbACdLoAAwKfSzYogAD+tXmkMsMZp6M2/euFklm4OLbqMhw9JI3jUmEHb/peMv3dhT7CrtLXNpLdAAA="
+  },
+  "panes-salsas": {
+    "width": 540,
+    "height": 485,
+    "widths": [
+      480,
+      540
+    ],
+    "lqip": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAAAQAgCdASoQAA4AA4BaJbACdAD6Kx23ALVQAP73hR+BytY14oaqhUCqy3snjWVG+v3QWkQA3XIUx8nI/EAitjZDwZzgMXhYmGSiI7i+Iatq3q7ScvzHk1vgsvK6tZlblwfyh5ac4RFy2DUmnd9Z6fAA"
+  },
+  "papas-logo-rojo": {
+    "width": 530,
+    "height": 1005,
+    "widths": [
+      480,
+      530
+    ],
+    "lqip": "data:image/webp;base64,UklGRsIAAABXRUJQVlA4ILYAAAAwBQCdASoQAB4APu1iqU2ppaOiMAgBMB2JaACdMoR3AdEw9GG4GZsYWja2DJqFvaZrIAD9AMkieyAGGVzFpGldh0cmO1L9bEAKfQJiiF+8nTfWf8RYOL9F7LSs5wRoGKBOMtWpBwbEo78yT5zkelf8szSlVKieYVtt8eyr3kFUyqM15k92RiRv63wMat4nlydRzCSwKO7M0fCTxnT31Aw9gIwCvraqcWWmwyjn/H6Au4o6lyogAA=="
+  },
+  "papas-sazonadas": {
+    "width": 730,
+    "height": 970,
+    "widths": [
+      480,
+      730
+    ],
+    "lqip": "data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAABwBACdASoQABUAPu1iqU2ppaOiMAgBMB2JbACdIHADCX2+7eBM+QLskyzjgAD+8rGaE9/kOBNq906MNHV7HtvMeOCtsewc+BQvYmi5MlLy1GoUE47pt5SjJkBLz2fE02x7gMe9TIx+l7REnPdteszxqgrAcpOT/ZgwRa5sbtfi/AAA"
+  },
+  "papas-vaso": {
+    "width": 740,
+    "height": 970,
+    "widths": [
+      480,
+      740
+    ],
+    "lqip": "data:image/webp;base64,UklGRngAAABXRUJQVlA4IGwAAADwAwCdASoQABUAPu1iqU2ppaQiMAgBMB2JQBYdhD0qUUkccpSwupyAAP7yniXF/EM4yL7EjXlpESm3iFJv4uzNwpavaP5Xkmu2PGlGdtDwBEB8T4ptQXngrfB/gSxjd9dF2VHo4TQnxXBZAAA="
+  },
+  "plancha-guantes": {
+    "width": 1170,
+    "height": 1300,
+    "widths": [
+      480,
+      800,
+      1170
+    ],
+    "lqip": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAABQBACdASoQABIAPu1iqU2ppaOiMAgBMB2JZACdMoADEJXre4Wwn2wEK2+AAP5yAyekVH3GTQ8PE5cXmPmpY6TY4sb2MND+FrOROOecEC6AubDWwZ76XO3vOMTNBACq4B5kqO7/W/DmDpjfd1Jh7HN4GeJb/IIozlJJjBLMqDdM09tl94WUtUL14S5urFoy2BrU0BJORkTTcm3geGYxiTWYEtAAAA=="
+  },
+  "punkieversario": {
+    "width": 968,
+    "height": 644,
+    "widths": [
+      480,
+      800,
+      968
+    ],
+    "lqip": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADQAQCdASoQAAsAA4BaJbACdAC3S3YvwAD+5mWfeFzQcXnNSSWPdb/5VcIyZ88gv0GqIDVsMumdq3V0VuOYU5zyNdaJ/YzEXS0cuPr3SXyRVWVxsEcQNVr8e31JbYL56zenJrT9gL3jXT4+LnAH8AAA"
+  }
+}

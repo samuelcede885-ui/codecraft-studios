@@ -1,0 +1,372 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter/opsz.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+/* ─────────────────────────────────────────────────────────────
+   Tokens de marca Punkie's (fuente: manual de marca v1.0 + fotos)
+   Rojo, crema y tinta dominan; burdeos, dorado y amarillo son
+   acentos puntuales. Nada de degradados ni sombras difusas.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-rojo: #8f2924;
+  --color-rojo-hondo: #76201c;
+  --color-crema: #f3efc3;
+  --color-tinta: #1a0c09;
+  --color-burdeos: #391510;
+  --color-dorado: #c97812;
+  --color-amarillo: #ece52a;
+
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius-tile: 18px;
+  --radius-panel: 28px;
+
+  --ease-pm: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tokens de movimiento (skill base44-premium-motion: convención --pm-*) */
+:root {
+  --pm-fast: 130ms;
+  --pm-normal: 240ms;
+  --pm-slow: 380ms;
+  --pm-stagger: 55ms;
+  --pm-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pm-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --pm-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --pm-translate: 12px;
+  --pm-scale: 0.985;
+  --focus: var(--color-amarillo);
+  --header-h: 72px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 84px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pm-fast: 0ms;
+    --pm-normal: 0ms;
+    --pm-slow: 0ms;
+    --pm-stagger: 0ms;
+    --pm-translate: 0px;
+    --pm-scale: 1;
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-tinta);
+    color: var(--color-crema);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 16px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: var(--color-amarillo);
+    color: var(--color-tinta);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+/* Superficie crema: el foco pasa a rojo para mantener contraste */
+@utility surface-crema {
+  background-color: var(--color-crema);
+  color: var(--color-tinta);
+  --focus: var(--color-rojo);
+}
+
+/* Titulares: Inter en corte Display (opsz automático), Black, compacto */
+@utility font-black-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  font-optical-sizing: auto;
+  font-feature-settings: "ss01" 0;
+}
+
+/* Etiquetas estilo ticket: monoespaciada, mayúsculas, tracking abierto */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Foto impresa con marco crema (lenguaje del collage editorial) */
+@utility print {
+  background: var(--color-crema);
+  padding: clamp(6px, 0.9vw, 11px);
+  border-radius: 4px;
+}
+
+/* ── Cinta de marca ─────────────────────────────────────────── */
+@keyframes cinta {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.cinta-track {
+  animation: cinta 42s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinta-track {
+    animation: none;
+  }
+}
+
+/* ── Aparición progresiva de fotografías ─────────────────────── */
+html.js .reveal {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0) rotate(var(--r, 0deg)) scale(0.97);
+  transition:
+    opacity 650ms var(--pm-ease-out),
+    transform 800ms var(--pm-ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+html.js .reveal[data-visible="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal {
+    opacity: 1;
+    transform: rotate(var(--r, 0deg));
+    transition: none;
+  }
+}
+
+/* ── Entrada del hero: un solo momento orquestado ─────────────── */
+@keyframes hero-word {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.18em, 0) scaleY(1.12);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, 0.02em, 0) scaleY(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scaleY(1);
+  }
+}
+
+@keyframes hero-print {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) rotate(calc(var(--r, 0deg) * 3)) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)) scale(1);
+  }
+}
+
+.hero-word {
+  display: block;
+  transform-origin: 0 100%;
+  animation: hero-word 620ms var(--pm-ease-out) both;
+  animation-delay: calc(120ms + var(--i, 0) * 110ms);
+}
+
+.hero-print {
+  transform: rotate(var(--r, 0deg));
+  animation: hero-print 900ms var(--pm-ease-out) both;
+  animation-delay: calc(260ms + var(--i, 0) * 120ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word,
+  .hero-print {
+    animation: none;
+  }
+}
+
+/* ── Microinteracciones ─────────────────────────────────────── */
+.pm-interactive {
+  transition:
+    transform var(--pm-fast) var(--pm-ease-standard),
+    background-color var(--pm-normal) var(--pm-ease-standard),
+    color var(--pm-normal) var(--pm-ease-standard),
+    border-color var(--pm-normal) var(--pm-ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pm-interactive:hover {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.pm-interactive:active {
+  transform: scale(0.97);
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bump {
+  animation: bump 420ms var(--pm-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-interactive,
+  .pm-interactive:hover,
+  .pm-interactive:active {
+    transition: none;
+    transform: none;
+  }
+
+  .bump {
+    animation: none;
+  }
+}
+
+/* ── Modo revisión (?revision): marca los datos pendientes ───── */
+html.revision [data-pendiente] {
+  outline: 2px dashed var(--color-amarillo);
+  outline-offset: 3px;
+  position: relative;
+}
+
+html.revision [data-pendiente]::after {
+  content: "PENDIENTE · " attr(data-pendiente);
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: calc(100% + 6px);
+  max-width: 260px;
+  padding: 4px 6px;
+  background: var(--color-amarillo);
+  color: var(--color-tinta);
+  font: 700 10px/1.25 var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: normal;
+  pointer-events: none;
+}
+
+/* ── Overlays (ficha, carrito, menú móvil), aviso y barra móvil ── */
+.ov-backdrop {
+  opacity: 0;
+  transition: opacity 220ms var(--pm-ease-standard);
+}
+
+.ov[data-shown="true"] > .ov-backdrop {
+  opacity: 1;
+}
+
+.ov-panel {
+  transition:
+    transform 340ms var(--pm-ease-out),
+    opacity 260ms var(--pm-ease-out);
+}
+
+.ov-panel[data-placement="center"] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0) scale(0.985);
+}
+
+.ov-panel[data-placement="right"] {
+  transform: translate3d(100%, 0, 0);
+}
+
+.ov-panel[data-placement="top"] {
+  opacity: 0;
+  transform: translate3d(0, -20px, 0);
+}
+
+.ov[data-shown="true"] > .ov-panel {
+  opacity: 1;
+  transform: none;
+}
+
+.toast,
+.order-bar {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition:
+    transform 260ms var(--pm-ease-out),
+    opacity 200ms var(--pm-ease-out);
+}
+
+.order-bar {
+  transform: translate3d(0, 120%, 0);
+}
+
+.toast[data-shown="true"],
+.order-bar[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-backdrop,
+  .ov-panel,
+  .toast,
+  .order-bar {
+    transition: none;
+  }
+}
+
+/* Barras de scroll de chips sin barra visible */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Image to Code"
+  short_description: "Convierte referencias visuales en frontend fiel y limpio"

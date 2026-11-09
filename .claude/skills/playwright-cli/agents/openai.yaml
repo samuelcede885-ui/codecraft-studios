@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright CLI Browser Automation"
+  short_description: "Automatiza pruebas, formularios y capturas de navegador con Playwright CLI."
+  brand_color: "#2784FF"

@@ -214,7 +214,10 @@
   }
 
   .monthly-mark {
-    position: relative;
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
     font-size: 17cqw;
     text-align: center;
     rotate: -8deg;

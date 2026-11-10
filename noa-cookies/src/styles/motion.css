@@ -1,0 +1,152 @@
+/* ------------------------------------------------------------------
+   Capa de microinteracciones (convención --pm-* / pm-*).
+   Solo transform y opacity. GSAP se reserva para el hero, el vuelo al
+   carrito y las apariciones al hacer scroll.
+   ------------------------------------------------------------------ */
+:root {
+  --pm-fast: 130ms;
+  --pm-normal: 240ms;
+  --pm-slow: 380ms;
+  --pm-stagger: 55ms;
+  --pm-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pm-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --pm-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --pm-translate: 12px;
+  --pm-scale: 0.985;
+}
+
+@keyframes pm-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--pm-translate), 0) scale(var(--pm-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes pm-enter-left {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(var(--pm-translate) * -1), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pm-enter-right {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--pm-translate), 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pm-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@layer components {
+  .pm-enter {
+    animation: pm-enter var(--pm-slow) var(--pm-ease-out) both;
+  }
+
+  .pm-enter-left {
+    animation: pm-enter-left var(--pm-normal) var(--pm-ease-out) both;
+  }
+
+  .pm-enter-right {
+    animation: pm-enter-right var(--pm-normal) var(--pm-ease-out) both;
+  }
+
+  .pm-pop {
+    animation: pm-pop var(--pm-normal) var(--pm-ease-out) both;
+  }
+
+  .pm-stagger > * {
+    animation: pm-enter var(--pm-slow) var(--pm-ease-out) both;
+    animation-delay: calc(min(var(--pm-index, 0), 8) * var(--pm-stagger));
+  }
+
+  /* Respuesta al toque: se hunde un 1,5 %; en escritorio se eleva 2 px. */
+  .pm-interactive {
+    transition:
+      transform var(--pm-fast) var(--pm-ease-standard),
+      opacity var(--pm-fast) var(--pm-ease-standard),
+      background-color var(--pm-normal) var(--pm-ease-standard),
+      color var(--pm-normal) var(--pm-ease-standard);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pm-interactive:not(:disabled):hover {
+      transform: translate3d(0, -2px, 0);
+    }
+  }
+
+  .pm-interactive:not(:disabled):active {
+    transform: scale(0.97);
+  }
+}
+
+/* Apariciones al hacer scroll: transparentes solo si el sistema de movimiento
+   arrancó. Se usa opacity (no visibility) para que el contenido siga en el
+   árbol de accesibilidad y se pueda alcanzar con teclado antes de aparecer. */
+html.has-motion [data-reveal-item],
+html.has-motion [data-reveal] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pm-fast: 0ms;
+    --pm-normal: 0ms;
+    --pm-slow: 0ms;
+    --pm-stagger: 0ms;
+    --pm-translate: 0px;
+    --pm-scale: 1;
+    --h-swap: 0s;
+  }
+
+  .pm-enter,
+  .pm-enter-left,
+  .pm-enter-right,
+  .pm-pop,
+  .pm-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .pm-interactive,
+  .pm-interactive:hover,
+  .pm-interactive:active {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  html.has-motion [data-reveal-item],
+  html.has-motion [data-reveal] {
+    opacity: 1;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@import "./motion.css";
+@import "./hero.css";
+@import "./shop.css";
+@import "./cart.css";
+
+/* ------------------------------------------------------------------
+   Tokens de marca. HEX exactos del manual de NOA Cookies.
+   ------------------------------------------------------------------ */
+@theme {
+  --color-noa-orange: #f2b052;
+  --color-navy: #112951;
+  --color-butter: #f2bb40;
+  --color-choco: #5a3a22;
+  --color-dough: #fff6e8;
+  /* Funcional (no es color de marca): solo para errores de formulario. */
+  --color-danger: #b3261e;
+
+  --font-display: "Oswald Variable", "Oswald", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root {
+  --gutter: clamp(16px, 4vw, 48px);
+  --header-h: 68px;
+  /* Espacio que ocupa la barra inferior del pedido en móvil (0 si no se ve). */
+  --cartbar-space: 0px;
+  /* Color del anillo de foco: cada sección lo ajusta para contrastar con su fondo. */
+  --focus-ring: var(--color-navy);
+
+  /* Escena inicial del hero (Signature sobre Midnight Navy). JS los actualiza. */
+  --h-bg: #112951;
+  --h-fg: #fff6e8;
+  --h-label-bg: #f2b052;
+  --h-label-fg: #112951;
+  --h-cta-bg: #f2b052;
+  --h-cta-fg: #112951;
+  --h-sticker-bg: #f2bb40;
+  --h-sticker-fg: #112951;
+  --h-logo-ring: transparent;
+  /* Los colores de la interfaz cambian cuando el color nuevo, que crece desde
+     el centro, llega a los bordes: por eso esperan un instante. */
+  --h-swap: 0.28s var(--pm-ease-standard) 0.42s;
+}
+
+@media (min-width: 860px) {
+  :root {
+    --header-h: 88px;
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-dough);
+    color: var(--color-navy);
+    scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html.is-locked {
+    overflow: hidden;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  button:not(:disabled),
+  [role="radio"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-navy);
+    color: var(--color-dough);
+  }
+
+  img {
+    -webkit-user-drag: none;
+  }
+}
+
+@layer components {
+  .wrap {
+    width: min(100% - 2 * var(--gutter), 1320px);
+    margin-inline: auto;
+  }
+
+  /* Titulares: Oswald en mayúsculas, como indica el manual. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.92;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+  }
+
+  /* Etiqueta azul del menú de NOA: el nombre del producto en una caja sólida. */
+  .navy-label {
+    display: inline-block;
+    padding: 0.2em 0.5em 0.24em;
+    background: var(--label-bg, var(--color-navy));
+    color: var(--label-fg, var(--color-dough));
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.08;
+    text-transform: uppercase;
+    letter-spacing: 0.012em;
+  }
+
+  .price {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .price-symbol,
+  .price-cents {
+    font-size: 0.58em;
+    vertical-align: 0.52em;
+  }
+
+  .price-symbol {
+    margin-right: 0.06em;
+  }
+
+  .img-fallback {
+    display: grid;
+    place-items: center;
+    padding: 12%;
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1;
+    color: currentColor;
+    border: 2px dashed currentColor;
+    border-radius: 50%;
+    aspect-ratio: 1;
+  }
+
+  /* Botón principal fuera del hero. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    min-height: 56px;
+    padding: 0 1.6em;
+    border-radius: 999px;
+    background: var(--btn-bg, var(--color-navy));
+    color: var(--btn-fg, var(--color-dough));
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+  }
+
+  .btn--orange {
+    --btn-bg: var(--color-noa-orange);
+    --btn-fg: var(--color-navy);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: currentColor;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+
+  .text-link {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+  }
+
+  /* Papel: el grano sutil del menú de NOA sobre los fondos crema. */
+  .paper {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .paper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: url("/img/grain.png") 0 0 / 180px 180px;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .fly-cookie {
+    position: fixed;
+    z-index: 2147483000;
+    object-fit: contain;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+}

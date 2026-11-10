@@ -1,0 +1,604 @@
+/* ------------------------------------------------------------------
+   Catálogo, sección destacada y footer.
+   Dos recursos heredados de la marca y ninguno más: el círculo (logo e
+   historias destacadas) y la etiqueta azul (menú).
+   ------------------------------------------------------------------ */
+@layer components {
+  .skip-link {
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    z-index: 100;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--color-navy);
+    color: var(--color-dough);
+    font-weight: 600;
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
+  /* ---------- Catálogo ---------- */
+  .shop {
+    z-index: 2;
+    margin-top: -28px;
+    padding: clamp(52px, 8vw, 104px) 0 clamp(64px, 9vw, 128px);
+    border-radius: 28px 28px 0 0;
+    background: var(--color-dough);
+    scroll-margin-top: -1px;
+  }
+
+  .shop--pending {
+    min-height: 100vh;
+  }
+
+  .shop-title {
+    font-size: clamp(2.75rem, 7.4vw, 6.5rem);
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  .shop-notice {
+    margin-top: 20px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--color-butter) 45%, var(--color-dough));
+    font-size: 0.9375rem;
+  }
+
+  .shop-group {
+    margin-top: clamp(40px, 6vw, 72px);
+  }
+
+  .shop-group-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: clamp(8px, 2vw, 20px);
+  }
+
+  .shop-group-name {
+    font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  }
+
+  .shop-group-price {
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+  }
+
+  .shop-group-price .price {
+    font-size: 1em;
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 16px;
+  }
+
+  @media (min-width: 768px) {
+    .shop-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 52px 32px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .shop-grid--cookies {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    .shop-grid--especiales {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* Con cinco columnas la fila queda completa: la ficha del sabor del mes sobra. */
+    .shop-grid--cookies .item--monthly {
+      display: none;
+    }
+  }
+
+  /* ---------- Producto ---------- */
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .item-visual {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    margin-bottom: 14px;
+  }
+
+  .item-disc {
+    position: absolute;
+    inset: 3%;
+    border-radius: 50%;
+    background: var(--disc);
+  }
+
+  /* La foto no participa en el flujo: el cuadro siempre es un cuadrado exacto. */
+  .item-img {
+    position: absolute;
+    inset: 9%;
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 8px rgb(17 41 81 / 0.28));
+    transition: transform 0.55s var(--pm-ease-out);
+  }
+
+  .item-visual[data-wide] .item-img {
+    inset: -3%;
+    width: 106%;
+    height: 106%;
+  }
+
+  .item-img.img-fallback {
+    inset: 15%;
+    width: 70%;
+    height: 70%;
+    color: var(--color-dough);
+    filter: none;
+  }
+
+  /* Al pasar el cursor la cookie crece y se sale del disco. */
+  @media (hover: hover) and (pointer: fine) {
+    .item:hover .item-img {
+      transform: translate3d(0, -4%, 0) rotate(-5deg) scale(1.1);
+    }
+
+    .item:hover .item-visual[data-wide] .item-img {
+      transform: translate3d(0, -3%, 0) rotate(-4deg) scale(1.04);
+    }
+  }
+
+  .item[data-soldout] .item-img {
+    filter: grayscale(0.85) opacity(0.55);
+  }
+
+  .item-info {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-dough);
+    color: var(--color-navy);
+    box-shadow: inset 0 0 0 2px var(--color-navy);
+  }
+
+  .item-name {
+    font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  }
+
+  .item-note {
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .item-desc {
+    flex: 1;
+    margin-top: 8px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--color-navy) 82%, transparent);
+  }
+
+  .item-buy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 12px;
+  }
+
+  .item-price {
+    font-size: 1.75rem;
+  }
+
+  .item--monthly .item-visual {
+    container-type: inline-size;
+  }
+
+  .monthly-mark {
+    position: relative;
+    font-size: 17cqw;
+    text-align: center;
+    rotate: -8deg;
+  }
+
+  .item--monthly .text-link {
+    font-size: 0.875rem;
+  }
+
+  /* ---------- Variantes ---------- */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    min-height: 34px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    transition:
+      background-color var(--pm-normal) var(--pm-ease-standard),
+      color var(--pm-normal) var(--pm-ease-standard);
+  }
+
+  .chip[aria-checked="true"] {
+    background: var(--color-navy);
+    color: var(--color-dough);
+    box-shadow: none;
+  }
+
+  .chips--dark .chip[aria-checked="true"] {
+    background: var(--color-noa-orange);
+    color: var(--color-navy);
+  }
+
+  /* ---------- Añadir / cantidad ---------- */
+  .add-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-navy);
+    color: var(--color-dough);
+  }
+
+  .add-btn:disabled {
+    opacity: 0.4;
+  }
+
+  .add-btn--lg {
+    width: 64px;
+    height: 64px;
+    background: var(--color-noa-orange);
+    color: var(--color-navy);
+  }
+
+  .add-labeled {
+    min-height: 64px;
+    padding: 0 1.4em;
+    font-size: 1.1875rem;
+    white-space: nowrap;
+  }
+
+  .add-soldout {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+  }
+
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    height: 48px;
+    border-radius: 999px;
+    background: var(--color-navy);
+    color: var(--color-dough);
+  }
+
+  .stepper-btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .stepper-btn:disabled {
+    opacity: 0.35;
+  }
+
+  .stepper-qty {
+    min-width: 1.4em;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1875rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stepper--lg {
+    height: 64px;
+    background: var(--color-noa-orange);
+    color: var(--color-navy);
+  }
+
+  .stepper--lg .stepper-btn {
+    width: 56px;
+  }
+
+  .stepper--lg .stepper-qty {
+    font-size: 1.5rem;
+  }
+
+  .stepper--sm {
+    height: 40px;
+    margin-top: 8px;
+  }
+
+  .stepper--sm .stepper-btn {
+    width: 40px;
+  }
+
+  .stepper--sm .stepper-qty {
+    font-size: 1.0625rem;
+  }
+
+  /* ---------- Destacado ---------- */
+  .featured {
+    position: relative;
+    z-index: 2;
+    overflow: clip;
+    padding-top: clamp(64px, 10vw, 136px);
+    background: var(--color-navy);
+    color: var(--color-dough);
+    --focus-ring: var(--color-dough);
+  }
+
+  .featured-kicker {
+    max-width: 22ch;
+    font-size: clamp(1.25rem, 2.6vw, 2rem);
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .featured-stage {
+    position: relative;
+    margin-top: clamp(20px, 4vw, 48px);
+  }
+
+  .featured-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 100px;
+    line-height: 0.86;
+    letter-spacing: -0.012em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-noa-orange);
+    will-change: transform;
+  }
+
+  .featured-title-row {
+    display: inline-flex;
+    gap: 0.28em;
+  }
+
+  .featured-visual {
+    position: relative;
+    width: min(96vw, 900px);
+    margin: -14% auto 0;
+  }
+
+  .featured-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 28px 26px rgb(0 0 0 / 0.38));
+    will-change: transform;
+  }
+
+  .featured-body {
+    display: grid;
+    gap: 28px;
+    padding-block: clamp(28px, 5vw, 56px) clamp(56px, 9vw, 120px);
+  }
+
+  .featured-note {
+    --label-bg: var(--color-noa-orange);
+    --label-fg: var(--color-navy);
+    margin-bottom: 14px;
+    font-size: 1.125rem;
+  }
+
+  .featured-desc {
+    max-width: 30ch;
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    line-height: 1.4;
+  }
+
+  .featured-buy .chips {
+    margin-top: 0;
+  }
+
+  .featured-buy .chip {
+    min-height: 44px;
+    padding-inline: 18px;
+    font-size: 1rem;
+  }
+
+  .featured-buy-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 22px;
+    margin-top: 20px;
+  }
+
+  .featured-price {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    color: var(--color-noa-orange);
+  }
+
+  @media (min-width: 860px) {
+    .featured-body {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 48px;
+    }
+
+    .featured-buy {
+      justify-self: end;
+    }
+
+    .featured-buy-row {
+      justify-content: flex-end;
+    }
+
+    .featured-visual {
+      margin-top: -7%;
+    }
+  }
+
+  /* ---------- Sabor del mes ---------- */
+  .monthly {
+    --focus-ring: var(--color-navy);
+    background: var(--color-butter);
+    color: var(--color-navy);
+    padding-block: clamp(44px, 7vw, 88px);
+  }
+
+  .monthly-inner {
+    display: grid;
+    justify-items: start;
+    gap: 20px;
+  }
+
+  .monthly-title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .monthly-copy {
+    max-width: 32ch;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.625rem, 3.6vw, 2.75rem);
+    line-height: 1.12;
+  }
+
+  @media (min-width: 860px) {
+    .monthly-inner {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      column-gap: 48px;
+    }
+
+    .monthly-title,
+    .monthly-copy {
+      grid-column: 1;
+    }
+
+    .monthly-cta {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: end;
+    }
+  }
+
+  /* ---------- Footer ---------- */
+  .site-footer {
+    position: relative;
+    z-index: 2;
+    overflow: clip;
+    padding: clamp(48px, 7vw, 88px) 0 calc(28px + var(--cartbar-space) + env(safe-area-inset-bottom));
+    background: var(--color-noa-orange);
+    color: var(--color-navy);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 24px;
+    font-size: 0.9375rem;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-weight: 600;
+  }
+
+  .footer-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--color-navy);
+  }
+
+  .footer-head {
+    margin-bottom: 8px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .footer-grid p + p {
+    margin-top: 4px;
+  }
+
+  .footer-handle {
+    opacity: 0.75;
+  }
+
+  .footer-slogan {
+    margin-top: clamp(36px, 6vw, 72px);
+    padding-inline: var(--gutter);
+  }
+
+  .footer-slogan-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 100px;
+    line-height: 0.9;
+    letter-spacing: -0.012em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .footer-slogan-text > span {
+    display: inline-block;
+  }
+
+  .footer-legal {
+    margin-top: 20px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  @media (min-width: 860px) {
+    .footer-grid {
+      grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
+    }
+
+    .footer-brand {
+      grid-column: auto;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

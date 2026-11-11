@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCatalog } from '../services/catalog.js'
-import { whatsappAskUrl } from '../services/orders.js'
+import { WhatsAppLink } from './ui/WhatsAppLink.jsx'
 import { ui, useUi } from '../store/ui.js'
 import { Icon } from './ui/Icon.jsx'
 import { Price } from './ui/Price.jsx'
@@ -58,14 +58,9 @@ export function InfoSheet() {
           ) : (
             <p className="info-text">
               NOA todavía no ha publicado la lista completa. Si tienes alguna alergia, pregunta antes de pedir.{' '}
-              <a
-                className="text-link"
-                href={whatsappAskUrl(`¡Hola, NOA! ¿Qué ingredientes y alérgenos tiene ${product.name}?`)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <WhatsAppLink className="text-link" question={`¡Hola, NOA! ¿Qué ingredientes y alérgenos tiene ${product.name}?`}>
                 Preguntar por WhatsApp
-              </a>
+              </WhatsAppLink>
             </p>
           )}
         </div>

@@ -2,7 +2,7 @@
 import { useSyncExternalStore } from 'react'
 
 const listeners = new Set()
-let state = { cartOpen: false, cartView: 'pedido', infoProductId: null, announcement: '' }
+let state = { cartOpen: false, cartView: 'pedido', infoProductId: null, announcement: '', toast: null }
 
 function set(patch) {
   state = { ...state, ...patch }
@@ -20,6 +20,12 @@ export const ui = {
   setCartView: (cartView) => set({ cartView }),
   openInfo: (infoProductId) => set({ infoProductId }),
   closeInfo: () => set({ infoProductId: null }),
+  /** Aviso visible que se cierra solo. */
+  toast(message) {
+    set({ toast: { id: Date.now(), message } })
+    ui.announce(message)
+  },
+  clearToast: () => set({ toast: null }),
   /** Mensaje breve para la región aria-live (se repite aunque el texto sea igual). */
   announce(message) {
     set({ announcement: '' })

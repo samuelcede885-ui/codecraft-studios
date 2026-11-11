@@ -16,8 +16,10 @@ npm run dev        # desarrollo, http://localhost:5173
 npm run build      # genera dist/ (HTML, CSS, JS e imágenes estáticos)
 npm run preview    # sirve dist/ en http://localhost:4173
 npm test           # 30 pruebas unitarias (carrito, pedido, validación)
-npm run test:e2e   # 67 comprobaciones del flujo de compra en escritorio y móvil
+npm run test:e2e   # 73 comprobaciones del flujo de compra en escritorio y móvil,
+                   # incluidos teléfonos de 320 y 360 px
                    # (requiere Playwright y `npm run preview` activo)
+npm run build:artifact   # versión de demostración para compartir (ver más abajo)
 ```
 
 Requiere Node 20 o superior. `dist/` es estático y usa rutas relativas: se puede
@@ -89,12 +91,34 @@ reales de la marca, pero su nitidez es reconstruida. Para sustituirlas basta
 reemplazar los archivos de `public/img/` con el mismo nombre y actualizar ancho
 y alto en `src/data/images.json`.
 
-## Sin logotipo
+## Marca del sitio
 
-El sitio no usa el logo de NOA Cookies. La cabecera y el footer muestran el
-nombre de la marca en texto, y el icono del sitio es una cookie sobre azul.
-Cuando la marca entregue su logotipo en vector, se añade en
-`src/components/Header.jsx` y `src/components/Footer.jsx`.
+El sitio no usa el logotipo de NOA Cookies. La marca que aparece en la cabecera,
+el footer y el icono del sitio es un dibujo propio de esta propuesta: una cookie
+con un mordisco, junto al nombre en Oswald. Vive en
+`src/components/ui/BrandMark.jsx` (y, para el icono, en `public/favicon.svg`).
+Toma el color del texto que la rodea, así que funciona sobre los cinco fondos.
+
+Cuando la marca entregue su logotipo en vector, basta sustituir ese componente
+y los archivos de icono.
+
+## Versión de demostración (artefacto)
+
+`npm run build:artifact` genera `dist-artifact/propuesta-noa-cookies.html` y la
+carpeta `dist-artifact/img/`: la misma tienda en una sola página, pensada para
+enseñar la propuesta sin que pueda confundirse con la tienda real.
+
+| | Sitio normal | Demostración |
+| --- | --- | --- |
+| Aviso fijo "Propuesta de diseño. No es la tienda oficial" | No (solo en el footer) | Sí, siempre visible |
+| Enlaces a WhatsApp | Abren el chat de NOA | Muestran un aviso; no salen de la página |
+| Último paso del pedido | Abre WhatsApp con el mensaje | Enseña cómo llegaría el mensaje; no envía nada |
+| Apariciones al hacer scroll | Sí | No: la página se ve completa en reposo |
+| React y GSAP | Empaquetados | Se piden a cdnjs y jsDelivr (hace falta conexión) |
+| Fuentes | Empaquetadas | Google Fonts |
+
+El modo se activa solo en ese build (variable `VITE_DEMO`, expuesta como
+`site.demo`). El build normal no cambia.
 
 Las migas flotantes del hero también se generan a partir de esas fotos (textura
 de cada cookie y de su relleno), para que correspondan al producto real.
@@ -104,6 +128,8 @@ de cada cookie y de su relleno), para que correspondan al producto real.
 ```
 index.html               Plantilla (el plugin completa <head> y la foto inicial)
 build/noa-html.js        JSON-LD del menú, foto inicial en el HTML, noindex en preview
+artifact/                Build de demostración: sustitutos de las librerías y ensamblado
+vite.artifact.config.js  Configuración de ese build (entrada: src/main.artifact.jsx)
 src/config/site.js       Datos del negocio y de la operación
 src/data/                Catálogo, tamaños de imagen y escenas de color del hero
 src/services/            Disponibilidad (catalog.js) y envío del pedido (orders.js)
@@ -135,6 +161,9 @@ DESIGN.md                Sistema de diseño: color, tipografía, componentes, mo
   rendimiento; móvil 93 con la simulación por defecto y 87 aplicando de verdad
   4G lenta y CPU ×4 (foto principal a los 2,3 s, CLS 0). Accesibilidad 100 y
   buenas prácticas 100. SEO marca 66 solo por el `noindex` de la propuesta.
+- Probado de 320 a 1440 px de ancho. En teléfonos de 360 px o menos las
+  miniaturas y flechas del hero encogen para caber; por debajo de 332 px se
+  oculta el enlace "Menú" de la cabecera.
 - Compatibilidad: iOS/Safari 16.2+, Chrome y Edge 111+, Firefox 113+.
 
 ## Skills usadas en la construcción

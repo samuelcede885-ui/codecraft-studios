@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/flujo-compra.mjs"
+    "test:e2e": "node tests/e2e/flujo-compra.mjs",
+    "build:artifact": "vite build --config vite.artifact.config.js && node artifact/assemble.mjs"
   },
   "dependencies": {
     "@fontsource-variable/oswald": "^5.3.0",

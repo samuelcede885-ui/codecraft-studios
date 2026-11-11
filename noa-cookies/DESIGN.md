@@ -105,9 +105,10 @@ interfaz en Poppins van en frase normal.
   inferior al 92 % en móvil. Pie fijo con totales y acción.
 - **Formulario:** campos de 54px con texto de 16px (iOS no hace zoom),
   autocompletado nativo, error bajo el campo y foco al primero que falla.
-- **Cabecera:** nombre de la marca en texto (Oswald 700, sin logotipo), "Menú"
-  y eslogan. El acceso al pedido es fijo: píldora crema con borde azul, legible
-  sobre los cinco fondos.
+- **Cabecera:** marca (una cookie mordida, dibujo propio que no es el logotipo
+  de NOA, más el nombre en Oswald 700), "Menú" y eslogan. La marca toma el
+  color del texto de cada escena. El acceso al pedido es fijo: píldora crema
+  con borde azul, legible sobre los cinco fondos.
 
 ## Elevation and motion
 

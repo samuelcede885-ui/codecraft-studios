@@ -38,7 +38,8 @@ let locks = 0
  * librería ni siquiera se descarga. Devuelve una función para desmontarlo.
  */
 export function initSmoothScroll() {
-  if (prefersReducedMotion() || isCoarsePointer()) return () => {}
+  // En la versión de demostración (incrustada en un marco) manda el scroll nativo.
+  if (import.meta.env.VITE_DEMO || prefersReducedMotion() || isCoarsePointer()) return () => {}
   let cancelled = false
   let raf = null
   import('lenis').then(({ default: Lenis }) => {

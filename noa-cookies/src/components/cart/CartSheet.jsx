@@ -202,6 +202,11 @@ function CheckoutView({ summary, onSent }) {
       paymentMethodId: draft.paymentMethodId,
     })
 
+    if (site.demo) {
+      onSent({ kind: 'demo', order, text: orderToText(order) })
+      return
+    }
+
     if (api) {
       setSending(true)
       try {
@@ -275,7 +280,14 @@ function CheckoutView({ summary, onSent }) {
               .filter(Boolean)
               .map((way) => (
                 <label key={way.id} className="segmented-option">
-                  <input type="radio" name="fulfillment" value={way.id} checked={draft.type === way.id} onChange={() => update({ type: way.id })} />
+                  <input
+                    type="radio"
+                    id={`entrega-${way.id}`}
+                    name="fulfillment"
+                    value={way.id}
+                    checked={draft.type === way.id}
+                    onChange={() => update({ type: way.id })}
+                  />
                   <span>{way.label}</span>
                 </label>
               ))}
@@ -310,6 +322,7 @@ function CheckoutView({ summary, onSent }) {
                 <label key={method.id} className="choice">
                   <input
                     type="radio"
+                    id={`pago-${method.id}`}
                     name="payment"
                     data-field={i === 0 ? 'payment' : undefined}
                     value={method.id}
@@ -360,23 +373,39 @@ function CheckoutView({ summary, onSent }) {
           </p>
         )}
         <button type="submit" className="btn btn--orange cart-primary pm-interactive" disabled={sending || summary.hasIssues || !summary.items.length} data-testid="send-order">
-          {api ? (sending ? 'Registrando pedido…' : 'Confirmar pedido') : 'Enviar pedido por WhatsApp'}
+          {site.demo ? 'Ver cómo llegaría el pedido' : api ? (sending ? 'Registrando pedido…' : 'Confirmar pedido') : 'Enviar pedido por WhatsApp'}
         </button>
-        {!api && <p className="cart-foot-note">Se abre WhatsApp con tu pedido escrito. NOA lo confirma por ahí.</p>}
+        {site.demo ? (
+          <p className="cart-foot-note">Demostración: no se envía nada ni se guarda fuera de tu navegador.</p>
+        ) : (
+          !api && <p className="cart-foot-note">Se abre WhatsApp con tu pedido escrito. NOA lo confirma por ahí.</p>
+        )}
       </div>
     </form>
   )
 }
 
 function SentView({ result, onDone }) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState('no')
+  const textRef = useRef(null)
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(result.text)
-      setCopied(true)
+      setCopied('si')
     } catch {
-      setCopied(false)
+      // El portapapeles puede negarse (vistas incrustadas): se deja el texto seleccionado.
+      const selection = window.getSelection()
+      const range = document.createRange()
+      range.selectNodeContents(textRef.current)
+      selection.removeAllRanges()
+      selection.addRange(range)
+      setCopied('seleccionado')
     }
+  }
+  const copyLabel = { no: 'Copiar pedido', si: 'Pedido copiado', seleccionado: 'Texto seleccionado: cópialo' }[copied]
+  const toMenu = () => {
+    onDone()
+    scrollToTarget('#menu')
   }
 
   if (result.kind === 'registered') {
@@ -389,9 +418,32 @@ function SentView({ result, onDone }) {
         <p>
           Total: <strong>{result.order.total === null ? `${formatPrice(result.order.subtotal)} más delivery` : formatPrice(result.order.total)}</strong>
         </p>
-        <button type="button" className="btn pm-interactive" onClick={onDone}>
+        <button type="button" className="btn pm-interactive" onClick={toMenu}>
           Volver al menú
         </button>
+      </div>
+    )
+  }
+
+  if (result.kind === 'demo') {
+    return (
+      <div className="sent pm-enter" data-testid="sent">
+        <p className="display sent-title">Así llegaría tu pedido</p>
+        <p>
+          Esto es una demostración: <strong>no se envió nada</strong>. En el sitio real, este paso abre WhatsApp con este mensaje ya escrito
+          para NOA.
+        </p>
+        <pre ref={textRef} className="sent-text" tabIndex={0} aria-label="Texto del pedido">
+          {result.text}
+        </pre>
+        <div className="sent-actions">
+          <button type="button" className="btn btn--orange pm-interactive" onClick={toMenu}>
+            Volver al menú
+          </button>
+          <button type="button" className="btn btn--ghost pm-interactive" onClick={copy}>
+            {copyLabel}
+          </button>
+        </div>
       </div>
     )
   }
@@ -408,7 +460,7 @@ function SentView({ result, onDone }) {
       )}
       <p className="sent-warning">Tu pedido no queda hecho hasta que lo envíes por WhatsApp y NOA te responda.</p>
 
-      <pre className="sent-text" tabIndex={0} aria-label="Texto de tu pedido">
+      <pre ref={textRef} className="sent-text" tabIndex={0} aria-label="Texto de tu pedido">
         {result.text}
       </pre>
 
@@ -417,7 +469,7 @@ function SentView({ result, onDone }) {
           {result.opened ? 'Abrir WhatsApp otra vez' : 'Abrir WhatsApp'}
         </a>
         <button type="button" className="btn btn--ghost pm-interactive" onClick={copy}>
-          {copied ? 'Pedido copiado' : 'Copiar pedido'}
+          {copyLabel}
         </button>
       </div>
       <button
@@ -436,7 +488,7 @@ function SentView({ result, onDone }) {
 
 /* ------------------------------------------------------------------ */
 
-const TITLES = { pedido: 'Tu pedido', datos: 'Tus datos', enviado: 'Casi listo' }
+const TITLES = { pedido: 'Tu pedido', datos: 'Tus datos', enviado: site.demo ? 'Demostración' : 'Casi listo' }
 
 export function CartSheet() {
   const open = useUi((s) => s.cartOpen)
@@ -464,7 +516,7 @@ export function CartSheet() {
   return (
     <Sheet open={open} onClose={close} labelledBy="cart-title">
       <header className="sheet-head">
-        {current === 'datos' || (current === 'enviado' && result?.kind === 'handoff') ? (
+        {current === 'datos' || (current === 'enviado' && result?.kind !== 'registered') ? (
           <button
             type="button"
             className="sheet-back pm-interactive"

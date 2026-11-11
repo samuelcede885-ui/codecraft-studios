@@ -1,6 +1,6 @@
 import { categories, featured } from '../../data/catalog.js'
 import { refreshAvailability, useCatalog } from '../../services/catalog.js'
-import { whatsappAskUrl } from '../../services/orders.js'
+import { WhatsAppLink } from '../ui/WhatsAppLink.jsx'
 import { Price } from '../ui/Price.jsx'
 import { ProductItem } from './ProductItem.jsx'
 
@@ -15,13 +15,7 @@ const DISC = { cookies: 'noa-orange', especiales: 'navy' }
 
 function MonthlyTile() {
   return (
-    <a
-      className="item item--monthly"
-      data-reveal-item
-      href={whatsappAskUrl('¡Hola, NOA! ¿Cuál es el sabor del mes?')}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <WhatsAppLink className="item item--monthly" data-reveal-item question="¡Hola, NOA! ¿Cuál es el sabor del mes?">
       <div className="item-visual" style={{ '--disc': 'var(--color-butter)' }}>
         <span className="item-disc" />
         <span className="monthly-mark display" aria-hidden="true">
@@ -35,7 +29,7 @@ function MonthlyTile() {
       <span className="item-buy">
         <span className="text-link">Preguntar por WhatsApp</span>
       </span>
-    </a>
+    </WhatsAppLink>
   )
 }
 

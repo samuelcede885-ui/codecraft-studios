@@ -16,6 +16,15 @@ export const site = {
 
   /** `true` muestra en el footer que es una propuesta aún no aprobada por la marca. */
   preview: true,
+
+  /**
+   * Modo demostración. Se activa solo al compilar la versión para compartir
+   * (`npm run build:artifact`, que define VITE_DEMO). Muestra un aviso fijo de
+   * "propuesta, no es la tienda oficial", no abre WhatsApp y no envía pedidos,
+   * para que la página no pueda confundirse con la tienda real de la marca.
+   */
+  demo: Boolean(import.meta.env?.VITE_DEMO),
+
   /** `true` avisa que las fotos salen del menú público y no son los originales. */
   provisionalPhotos: true,
 

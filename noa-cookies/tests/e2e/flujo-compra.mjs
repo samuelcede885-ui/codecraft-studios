@@ -182,11 +182,35 @@ async function reducedMotion(browser) {
   await context.close()
 }
 
+/** Nada del hero puede salirse de la pantalla (el recorte no lo detecta la prueba de desbordamiento). */
+async function narrow(browser, width) {
+  const suite = `Teléfono estrecho ${width} px`
+  const { context, page } = await open(browser, suite, { viewport: { width, height: 700 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 })
+  for (let i = 0; i < 12; i++) await page.getByTestId('hero-add').click()
+  await page.waitForTimeout(900)
+  const m = await page.evaluate(() => {
+    const W = document.documentElement.clientWidth
+    const rect = (el) => el.getBoundingClientRect()
+    const outside = [...document.querySelectorAll('.hero-rail > *, .btn-cta, .hero-name, .hero-desc, .hero-panel, .hero-stage, .site-header')]
+      .map(rect)
+      .filter((r) => r.width && (r.right > W + 0.5 || r.left < -0.5)).length
+    const nav = document.querySelector('.site-header nav')
+    const lastInHeader = nav.offsetParent ? rect(nav) : rect(document.querySelector('.site-brand'))
+    return { outside, gap: Math.round(rect(document.querySelector('.cart-fab')).left - lastInHeader.right), arrow: Math.round(rect(document.querySelector('.hero-arrow--next')).width) }
+  })
+  check(suite, 'El hero cabe completo: flechas, miniaturas y botón de compra', m.outside === 0, JSON.stringify(m))
+  check(suite, 'La cabecera no choca con el botón del pedido', m.gap >= 8, JSON.stringify(m))
+  check(suite, 'Las flechas conservan un tamaño cómodo para el dedo', m.arrow >= 36, JSON.stringify(m))
+  await context.close()
+}
+
 const browser = await chromium.launch()
 try {
   await flow(browser, 'Escritorio 1440×900', { viewport: { width: 1440, height: 900 } }, { mobile: false })
   await flow(browser, 'Móvil 390×700', { viewport: { width: 390, height: 700 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }, { mobile: true })
   await reducedMotion(browser)
+  await narrow(browser, 320)
+  await narrow(browser, 360)
 } finally {
   await browser.close()
 }

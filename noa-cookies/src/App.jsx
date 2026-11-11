@@ -1,4 +1,5 @@
 import { startTransition, useEffect, useRef, useState } from 'react'
+import site from './config/site.js'
 import { EASE, ScrollTrigger, gsap, initSmoothScroll, prefersReducedMotion, useGSAP } from './lib/motion.js'
 import { refreshAvailability } from './services/catalog.js'
 import { Header } from './components/Header.jsx'
@@ -10,6 +11,8 @@ import { CartButton } from './components/cart/CartButton.jsx'
 import { CartSheet } from './components/cart/CartSheet.jsx'
 import { InfoSheet } from './components/InfoSheet.jsx'
 import { LiveRegion } from './components/LiveRegion.jsx'
+import { DemoBar } from './components/DemoBar.jsx'
+import { Toast } from './components/Toast.jsx'
 
 export default function App() {
   const rootRef = useRef(null)
@@ -28,7 +31,9 @@ export default function App() {
   // Apariciones al hacer scroll: una por bloque, una sola vez.
   useGSAP(
     () => {
-      if (!below || prefersReducedMotion()) return
+      // En modo demostración la página se muestra completa en reposo, sin
+      // esperar al scroll (así se ve entera en una vista previa o miniatura).
+      if (!below || site.demo || prefersReducedMotion()) return
       document.documentElement.classList.add('has-motion')
 
       gsap.utils.toArray('[data-reveal-group]').forEach((group) => {
@@ -67,10 +72,11 @@ export default function App() {
   )
 
   return (
-    <div ref={rootRef} id="top">
+    <div ref={rootRef} id="top" className="site">
       <a className="skip-link" href="#menu">
         Ir al menú
       </a>
+      {site.demo && <DemoBar />}
       <Header />
       <CartButton />
       <main>
@@ -93,6 +99,7 @@ export default function App() {
         </>
       )}
       <LiveRegion />
+      <Toast />
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import site from '../config/site.js'
 import { useFitText } from '../lib/hooks.js'
-import { whatsappAskUrl } from '../services/orders.js'
+import { WhatsAppLink } from './ui/WhatsAppLink.jsx'
+import { BrandMark } from './ui/BrandMark.jsx'
 
 export function Footer() {
   const sloganRef = useRef(null)
@@ -13,7 +14,10 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div className="footer-brand">
-          <p className="footer-name">{site.name}</p>
+          <p className="footer-name">
+            <BrandMark size={52} />
+            <span>{site.name}</span>
+          </p>
           <p>{site.descriptor}</p>
         </div>
 
@@ -52,9 +56,9 @@ export function Footer() {
         <div>
           <h2 className="footer-head">Escríbenos</h2>
           <p>
-            <a className="text-link" href={whatsappAskUrl('¡Hola, NOA!')} target="_blank" rel="noopener noreferrer">
+            <WhatsAppLink className="text-link" question="¡Hola, NOA!">
               WhatsApp
-            </a>
+            </WhatsAppLink>
           </p>
           {social.map((s) => (
             <p key={s.id}>

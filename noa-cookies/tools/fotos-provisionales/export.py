@@ -1,4 +1,4 @@
-"""Exporta los assets web: productos (WebP con alfa en varios anchos), migas, iconos y grano de papel."""
+"""Exporta los assets web: productos (WebP con alfa en varios anchos), migas y grano de papel."""
 import json, sys, math
 from pathlib import Path
 import numpy as np, cv2
@@ -117,29 +117,6 @@ for fam in FAMILIES:
     for k in (1, 2, 3):
         make(fam, k, rng)
 print("crumbs ok")
-
-# ---------- iconos del sitio ----------
-# El sitio no usa el logotipo de la marca: favicon e icono de inicio muestran
-# la primera cookie del menu sobre Midnight Navy.
-NAVY = (17, 41, 81, 255)
-cookie = Image.open(WORK / f"{PRODUCTS[0]}-cut.png").convert("RGBA")
-
-def icon(size, round_bg):
-    ss = size * 4
-    canvas = Image.new("RGBA", (ss, ss), (0, 0, 0, 0))
-    if round_bg:
-        ImageDraw.Draw(canvas).ellipse([0, 0, ss - 1, ss - 1], fill=NAVY)
-    else:
-        canvas.paste(NAVY, [0, 0, ss, ss])
-    box = int(ss * 0.74)
-    scale = box / max(cookie.size)
-    c = cookie.resize((round(cookie.width * scale), round(cookie.height * scale)), Image.LANCZOS)
-    canvas.alpha_composite(c, ((ss - c.width) // 2, (ss - c.height) // 2))
-    return canvas.resize((size, size), Image.LANCZOS)
-
-icon(180, round_bg=False).convert("RGB").save(OUT.parent / "apple-touch-icon.png")
-icon(64, round_bg=True).save(OUT.parent / "favicon.png")
-print("iconos ok")
 
 # ---------- grano de papel ----------
 g = np.random.default_rng(3).normal(0, 1, (180, 180)).astype(np.float32)

@@ -137,6 +137,7 @@
   .item-visual[data-wide] .item-img {
     inset: -3%;
     width: 106%;
+    max-width: none; /* se asoman del disco a propósito */
     height: 106%;
   }
 
@@ -221,6 +222,10 @@
     font-size: 17cqw;
     text-align: center;
     rotate: -8deg;
+  }
+
+  .item--monthly {
+    text-align: left;
   }
 
   .item--monthly .text-link {
@@ -542,6 +547,10 @@
   }
 
   .footer-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.75rem;
@@ -568,7 +577,8 @@
 
   .footer-slogan {
     margin-top: clamp(36px, 6vw, 72px);
-    padding-inline: var(--gutter);
+    padding-left: var(--gutter-l);
+    padding-right: var(--gutter-r);
   }
 
   .footer-slogan-text {

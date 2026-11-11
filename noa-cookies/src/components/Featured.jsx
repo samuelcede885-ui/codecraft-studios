@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { featured } from '../data/catalog.js'
 import { useCatalog } from '../services/catalog.js'
-import { whatsappAskUrl } from '../services/orders.js'
+import { WhatsAppLink } from './ui/WhatsAppLink.jsx'
 import { defaultOptionId } from '../store/cartLogic.js'
 import { useFitText, useMediaQuery } from '../lib/hooks.js'
 import { gsap, prefersReducedMotion, useGSAP } from '../lib/motion.js'
@@ -90,15 +90,9 @@ export function Featured() {
             <p className="monthly-copy" data-reveal-item>
               {featured.monthlyCopy}
             </p>
-            <a
-              className="btn pm-interactive monthly-cta"
-              data-reveal-item
-              href={whatsappAskUrl('¡Hola, NOA! ¿Cuál es el sabor del mes?')}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <WhatsAppLink className="btn pm-interactive monthly-cta" data-reveal-item question="¡Hola, NOA! ¿Cuál es el sabor del mes?">
               Preguntar cuál es el de este mes
-            </a>
+            </WhatsAppLink>
           </div>
         </aside>
       )}

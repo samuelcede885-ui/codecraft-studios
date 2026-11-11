@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Marca del sitio (misma geometría que src/components/ui/BrandMark.jsx). No es el logotipo de NOA Cookies. -->
+  <rect width="64" height="64" rx="14" fill="#112951"/>
+  <g transform="translate(10.5 9.5) scale(0.9)">
+    <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="48">
+      <circle cx="24" cy="25" r="20" fill="#fff"/>
+      <circle cx="39" cy="9.5" r="8.4"/>
+      <circle cx="29.5" cy="4.5" r="5"/>
+      <circle cx="45" cy="19" r="4.6"/>
+      <rect x="13" y="15" width="6.4" height="5.6" rx="2" transform="rotate(-18 16 18)"/>
+      <rect x="24" y="23" width="7" height="6" rx="2.2" transform="rotate(14 27.5 26)"/>
+      <rect x="11.5" y="28" width="5.6" height="5" rx="1.8" transform="rotate(26 14 30.5)"/>
+      <rect x="21" y="35" width="6.2" height="5" rx="1.9" transform="rotate(-10 24 37.5)"/>
+      <rect x="33" y="31" width="5" height="4.6" rx="1.7" transform="rotate(32 35.5 33)"/>
+    </mask>
+    <rect width="48" height="48" fill="#f2b052" mask="url(#m)"/>
+    <circle cx="43.5" cy="3.6" r="1.7" fill="#f2b052"/>
+    <circle cx="46" cy="9.8" r="1.1" fill="#f2b052"/>
+  </g>
+</svg>

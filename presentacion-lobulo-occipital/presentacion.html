@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>El Lóbulo Occipital</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root{
+    --cream:#FFF8F6; --blush:#F9E1E5; --rose:#E9A6B3; --rose-d:#C9768A;
+    --mauve:#9C6B80; --plum:#5B3B4A; --lav:#ECE3F5; --lav-d:#A88FC9;
+    --peach:#FCEBE1; --line:#EBCAD1;
+  }
+  @page{ size:1280px 720px; margin:0 }
+  *{ box-sizing:border-box; margin:0; padding:0 }
+  html,body{ background:#eee }
+  body{ font-family:'Quicksand',sans-serif; color:var(--plum) }
+  .slide{
+    width:1280px; height:720px; position:relative; overflow:hidden;
+    background:var(--cream); page-break-after:always; break-after:page;
+  }
+  .slide:last-child{ page-break-after:auto; break-after:auto }
+  /* soft decorative blobs */
+  .blob{ position:absolute; border-radius:50%; filter:blur(2px); opacity:.75 }
+  .b1{ width:520px; height:520px; right:-180px; top:-200px; background:radial-gradient(circle at 40% 40%, #F9DCE2 0%, rgba(249,220,226,0) 70%) }
+  .b2{ width:460px; height:460px; left:-170px; bottom:-200px; background:radial-gradient(circle at 60% 40%, #EADFF5 0%, rgba(234,223,245,0) 70%) }
+  .frame{ position:absolute; inset:22px; border:1.5px solid var(--line); border-radius:26px; pointer-events:none }
+  .tag{
+    position:absolute; left:70px; top:58px; font-size:15px; font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--rose-d); display:flex; align-items:center; gap:10px
+  }
+  .tag::before{ content:""; width:28px; height:1.5px; background:var(--rose-d) }
+  .num{ position:absolute; right:62px; bottom:46px; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:22px; color:var(--mauve) }
+  .num::before{ content:"♡ "; color:var(--rose); font-style:normal; font-size:16px }
+  h1,h2{ font-family:'Cormorant Garamond',serif; font-weight:600; font-style:italic; color:var(--plum); line-height:1.02 }
+  h2{ position:absolute; left:70px; top:92px; font-size:60px }
+  h2 em{ color:var(--rose-d) }
+  .sub{ font-size:20px; color:var(--mauve); font-weight:500 }
+  .pill{ display:inline-block; padding:6px 16px; border-radius:999px; background:var(--blush); color:var(--rose-d); font-weight:700; font-size:15px; letter-spacing:.05em }
+  .pill.l{ background:var(--lav); color:#7E66A6 }
+  .card{
+    background:#fff; border:1.5px solid var(--line); border-radius:24px; padding:26px 26px 24px;
+    box-shadow:0 10px 30px -18px rgba(156,107,128,.45)
+  }
+  .card h3{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600; font-size:32px; margin:12px 0 8px; color:var(--plum) }
+  .card p{ font-size:18px; line-height:1.45; color:#6E5160 }
+  .card b{ color:var(--rose-d) }
+  .facts{ list-style:none; display:flex; flex-direction:column; gap:18px }
+  .facts li{ display:flex; gap:16px; align-items:flex-start; font-size:21px; line-height:1.35 }
+  .facts li .dot{ flex:none; width:38px; height:38px; border-radius:50%; background:var(--blush); display:grid; place-items:center; color:var(--rose-d); font-weight:700; font-size:16px }
+  .facts li b{ color:var(--rose-d); font-weight:700 }
+  .facts small{ display:block; font-size:16px; color:var(--mauve); margin-top:2px }
+  svg text{ font-family:'Quicksand',sans-serif }
+  .spark{ position:absolute }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+
+<script>
+/* ---------- reusable art ---------- */
+const C = {rose:'#E9A6B3', roseD:'#C9768A', mauve:'#9C6B80', plum:'#5B3B4A', lav:'#ECE3F5', lavD:'#A88FC9', blush:'#F9E1E5', peach:'#FCEBE1', line:'#D9A9B6'};
+
+const sparkle = (x,y,s=22,c=C.rose,o=1)=>`<svg class="spark" style="left:${x}px;top:${y}px;opacity:${o}" width="${s}" height="${s}" viewBox="0 0 20 20"><path d="M10 0 C11 7 13 9 20 10 C13 11 11 13 10 20 C9 13 7 11 0 10 C7 9 9 7 10 0Z" fill="${c}"/></svg>`;
+
+const CEREBRUM = "M 70 170 C 48 118, 82 58, 152 44 C 214 30, 292 36, 342 70 C 382 98, 398 142, 386 182 C 379 206, 360 216, 334 212 C 310 226, 270 226, 246 215 C 214 229, 160 229, 128 214 C 94 208, 74 194, 70 170 Z";
+
+function brain({uid, occ=C.rose, others=true, medial=false, extra='', w=520}){
+  const pale = others ? null : '#F6EEF0';
+  return `<svg width="${w}" viewBox="20 20 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs><clipPath id="cp${uid}"><path d="${CEREBRUM}"/></clipPath></defs>
+  <path d="M 252 212 C 258 245, 262 272, 256 302 L 284 302 C 281 272, 284 245, 292 218 Z" fill="#F3E3E7" stroke="${C.line}" stroke-width="2"/>
+  <ellipse cx="322" cy="236" rx="54" ry="31" fill="#F7EAF0" stroke="${C.line}" stroke-width="2"/>
+  <g stroke="${C.line}" stroke-width="1.2" fill="none" opacity=".8">
+    <path d="M276 228 C300 222 340 222 368 232"/><path d="M272 240 C300 236 345 236 372 244"/><path d="M280 252 C305 250 340 250 362 256"/>
+  </g>
+  <g clip-path="url(#cp${uid})">
+    ${medial ? `
+      <rect x="0" y="0" width="460" height="320" fill="${pale||'#FBEFF2'}"/>
+      <path d="M 318 30 L 460 30 L 460 300 L 300 300 L 304 168 Z" fill="${occ}"/>
+      <path d="M150 128 C 170 82, 290 78, 306 126 C 300 140, 286 138, 280 126 C 270 100, 180 100, 168 132 C 162 142, 148 140, 150 128 Z" fill="#fff" stroke="${C.line}" stroke-width="1.5"/>
+    ` : `
+      <polygon points="0,0 206,0 172,148 116,170 106,320 0,320" fill="${pale||'#FBEAEC'}"/>
+      <polygon points="206,0 322,0 302,166 250,140 172,148" fill="${pale||'#F1E8F6'}"/>
+      <polygon points="116,170 172,148 250,140 302,166 306,320 106,320" fill="${pale||'#FDEDE3'}"/>
+      <polygon points="322,0 460,0 460,320 306,320 302,166" fill="${occ}"/>
+    `}
+    <g stroke="#fff" stroke-width="2.2" fill="none" opacity=".75" stroke-linecap="round">
+      <path d="M95 120 C120 100 120 80 150 70"/><path d="M110 150 C135 135 150 110 175 100"/>
+      <path d="M232 60 C245 80 238 100 255 115"/><path d="M265 50 C285 70 275 95 292 110"/>
+      <path d="M150 190 C190 182 230 186 270 180"/><path d="M335 80 C350 105 345 130 365 150"/>
+      <path d="M318 180 C335 170 355 178 375 168"/>
+    </g>
+  </g>
+  ${medial ? '' : `<g stroke="${C.mauve}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7">
+    <path d="M206 38 C196 80 186 110 172 148"/><path d="M118 168 C160 150 210 140 250 140 C270 142 288 152 302 166"/>
+  </g>`}
+  <path d="${CEREBRUM}" fill="none" stroke="${C.mauve}" stroke-width="2.6"/>
+  ${extra}
+  </svg>`;
+}
+
+/* small line icons */
+const I = {
+  eye:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round"><path d="M4 24 C12 12 36 12 44 24 C36 36 12 36 4 24Z"/><circle cx="24" cy="24" r="7" fill="${C.blush}"/><circle cx="24" cy="24" r="2.5" fill="${C.roseD}" stroke="none"/></svg>`,
+  eyeOff:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round"><path d="M4 24 C12 12 36 12 44 24 C36 36 12 36 4 24Z"/><circle cx="24" cy="24" r="7" fill="${C.blush}"/><path d="M8 40 L40 8"/></svg>`,
+  ques:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="36" height="36" rx="10" fill="${C.blush}"/><path d="M18 19 C18 13 30 13 30 19 C30 24 24 24 24 29"/><circle cx="24" cy="35" r="1.6" fill="${C.roseD}"/></svg>`,
+  film:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linejoin="round"><rect x="3" y="12" width="12" height="24" rx="3" fill="${C.blush}"/><rect x="18" y="12" width="12" height="24" rx="3" fill="${C.blush}"/><rect x="33" y="12" width="12" height="24" rx="3" fill="${C.blush}"/><circle cx="9" cy="28" r="2.5" fill="${C.roseD}"/><circle cx="24" cy="24" r="2.5" fill="${C.roseD}"/><circle cx="39" cy="20" r="2.5" fill="${C.roseD}"/></svg>`,
+  shapes:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linejoin="round"><path d="M14 6 L24 22 L4 22Z" fill="${C.blush}"/><rect x="27" y="6" width="16" height="16" rx="3"/><circle cx="14" cy="35" r="8"/><path d="M28 28 L44 44 M44 28 L28 44" stroke-linecap="round"/></svg>`,
+  palette:`<svg width="54" height="54" viewBox="0 0 48 48"><circle cx="16" cy="18" r="10" fill="#F4B6C2"/><circle cx="32" cy="18" r="10" fill="#CDB8E6" opacity=".9"/><circle cx="24" cy="31" r="10" fill="#F9D3B8" opacity=".9"/></svg>`,
+  motion:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round"><circle cx="33" cy="24" r="9" fill="${C.blush}"/><path d="M4 18 H18 M8 24 H20 M4 30 H18"/></svg>`,
+  apple:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M24 14 C14 8 6 16 8 26 C10 38 18 44 24 40 C30 44 38 38 40 26 C42 16 34 8 24 14Z" fill="#F4B6C2"/><path d="M24 14 C24 9 26 6 29 4"/><path d="M26 10 C30 6 35 7 36 9 C32 12 28 12 26 10Z" fill="#DCEBD6" stroke="#9DBF92"/></svg>`,
+  catch:`<svg width="54" height="54" viewBox="0 0 48 48" fill="none" stroke="#7E66A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="34" cy="12" r="7" fill="${C.lav}"/><path d="M8 44 L8 30 C8 26 12 24 14 26 L14 22 C14 18 19 18 19 22 L19 20 C19 16 24 16 24 20 L24 22 C24 18 29 18 29 22 L29 34 C29 40 24 44 18 44"/><path d="M38 22 L40 26 M42 16 L46 17" /></svg>`,
+  sun:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="${C.roseD}" stroke-width="2.4" stroke-linecap="round"><circle cx="24" cy="24" r="8" fill="${C.blush}"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6M10 10l4 4M34 34l4 4M38 10l-4 4M14 34l-4 4"/></svg>`,
+  camera:`<svg width="120" height="120" viewBox="0 0 48 48" fill="none" stroke="${C.mauve}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="14" width="38" height="26" rx="6" fill="#fff"/><path d="M17 14 L20 9 H28 L31 14"/><circle cx="24" cy="27" r="7" fill="${C.blush}"/><path d="M6 44 L42 8" stroke="${C.roseD}" stroke-width="2.4"/></svg>`,
+};
+
+const slide = (inner, n, tag)=>`<section class="slide"><div class="blob b1"></div><div class="blob b2"></div><div class="frame"></div>${tag?`<div class="tag">${tag}</div>`:''}${inner}${n?`<div class="num">${String(n).padStart(2,'0')}</div>`:''}</section>`;
+
+/* ---------- slides ---------- */
+const S = [];
+
+/* 1 · Portada */
+S.push(slide(`
+  ${sparkle(150,150,26)}${sparkle(1080,560,30,C.lavD,.8)}${sparkle(1110,170,16)}${sparkle(560,610,14,C.lavD,.7)}
+  <div style="position:absolute;left:110px;top:170px;width:560px">
+    <span class="pill">Neuroanatomía · Exposición</span>
+    <h1 style="font-size:104px;margin-top:26px">El Lóbulo<br><em style="color:var(--rose-d)">Occipital</em></h1>
+    <p class="sub" style="margin-top:26px;font-size:24px">El centro del procesamiento visual del cerebro</p>
+    <div style="margin-top:40px;width:90px;height:2px;background:var(--rose)"></div>
+  </div>
+  <div style="position:absolute;right:70px;top:150px">${brain({uid:'a',w:560, extra:`
+    <circle cx="372" cy="128" r="56" fill="none" stroke="${C.roseD}" stroke-width="1.6" stroke-dasharray="4 6"/>`})}</div>
+`, 0));
+
+/* 2 · Contenido */
+const idx = [['01','Anatomía y ubicación'],['02','Corteza visual primaria (V1)'],['03','Áreas de asociación visual'],['04','Las dos vías de procesamiento'],['05','Patologías y conclusión']];
+S.push(slide(`
+  <h2>Lo que <em>veremos</em> hoy</h2>
+  ${sparkle(1090,120,22)}
+  <div style="position:absolute;left:70px;top:230px;right:70px;display:grid;grid-template-columns:repeat(5,1fr);gap:22px">
+    ${idx.map(([n,t],i)=>`<div class="card" style="padding:28px 22px;min-height:250px;${i%2?'background:#FDF6FA':''}">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:62px;color:${i%2?C.lavD:C.rose};line-height:1">${n}</div>
+      <div style="width:36px;height:2px;background:var(--line);margin:18px 0"></div>
+      <p style="font-size:21px;font-weight:600;color:var(--plum);line-height:1.35">${t}</p>
+      <p style="font-size:15px;margin-top:10px;color:var(--mauve)">Integrante ${i+1}</p>
+    </div>`).join('')}
+  </div>
+`, 2));
+
+/* 3 · Ubicación */
+S.push(slide(`
+  <h2>¿Dónde se <em>encuentra</em>?</h2>
+  <ul class="facts" style="position:absolute;left:74px;top:225px;width:520px">
+    <li><span class="dot">✦</span><div>Región <b>posterior</b> y más caudal del encéfalo</div></li>
+    <li><span class="dot">✦</span><div>Sobre el <b>cerebelo</b>, apoyado en la tienda del cerebelo</div></li>
+    <li><span class="dot">✦</span><div>El <b>más pequeño</b> de los 4 lóbulos</div></li>
+    <li><span class="dot">✦</span><div>Centro neurálgico de la <b>visión</b></div></li>
+  </ul>
+  <div style="position:absolute;right:60px;top:160px">${brain({uid:'b',w:600, extra:`
+    <g font-size="13" font-weight="600" fill="${C.plum}">
+      <line x1="365" y1="120" x2="384" y2="44" stroke="${C.roseD}" stroke-width="1.4"/><circle cx="365" cy="120" r="3.5" fill="${C.roseD}"/>
+      <text x="418" y="38" text-anchor="end" fill="${C.roseD}" font-size="14">Lóbulo occipital</text>
+      <line x1="350" y1="258" x2="380" y2="295" stroke="${C.mauve}" stroke-width="1.2"/><circle cx="350" cy="258" r="3" fill="${C.mauve}"/>
+      <text x="350" y="310">Cerebelo</text>
+      <line x1="330" y1="211" x2="230" y2="275" stroke="${C.mauve}" stroke-width="1.2"/><circle cx="330" cy="211" r="3" fill="${C.mauve}"/>
+      <text x="120" y="290">Tienda del cerebelo</text>
+      <text x="40" y="300" font-size="11" fill="${C.mauve}" font-weight="500">← anterior</text>
+      <text x="40" y="316" font-size="11" fill="${C.mauve}" font-weight="500">posterior →</text>
+    </g>`})}</div>
+  <div style="position:absolute;left:74px;bottom:60px" class="pill">≈ 10 % de la corteza cerebral</div>
+`, 3, '01 · Anatomía y ubicación'));
+
+/* 4 · Límites */
+S.push(slide(`
+  <h2>Sus <em>límites</em> · cara medial</h2>
+  <div style="position:absolute;left:40px;top:200px">${brain({uid:'c',w:640, medial:true, occ:'#F4C3CD', extra:`
+    <g fill="none" stroke-linecap="round">
+      <path d="M322 42 C318 90 312 130 304 168" stroke="${C.lavD}" stroke-width="4"/>
+      <path d="M304 168 C330 160 360 158 392 150" stroke="${C.roseD}" stroke-width="4"/>
+    </g>
+    <g font-size="12.5" font-weight="700">
+      <text x="180" y="30" fill="#7E66A6">Cisura parietooccipital</text>
+      <line x1="300" y1="34" x2="319" y2="60" stroke="${C.lavD}" stroke-width="1.2"/>
+      <line x1="372" y1="156" x2="340" y2="292" stroke="${C.roseD}" stroke-width="1.2"/>
+      <text x="298" y="308" fill="${C.roseD}">Cisura calcarina</text>
+      <text x="335" y="128" font-size="11" font-weight="600" fill="${C.mauve}">cuña</text>
+      <text x="198" y="128" font-size="11" font-weight="600" fill="${C.mauve}">cuerpo calloso</text>
+    </g>`})}</div>
+  <div style="position:absolute;right:70px;top:230px;width:440px;display:flex;flex-direction:column;gap:22px">
+    <div class="card"><span class="pill l">Límite</span><h3>Cisura parietooccipital</h3><p>Lo separa del <b>lóbulo parietal</b>.</p></div>
+    <div class="card"><span class="pill">Surco profundo</span><h3>Cisura calcarina</h3><p>Divide la <b>corteza visual</b>.</p></div>
+  </div>
+`, 4, '01 · Anatomía y ubicación'));
+
+/* 5 · V1 */
+const layers = ['I','II','III','IV','V','VI'];
+const layerCol = ['#FCEFF2','#F9E1E7','#F6D4DD','#F3C6D2','#EFB7C6','#E9A6B8'];
+S.push(slide(`
+  <h2>Corteza visual <em>primaria</em></h2>
+  <div style="position:absolute;left:74px;top:178px;display:flex;gap:10px">
+    <span class="pill">V1</span><span class="pill l">Área 17 de Brodmann</span><span class="pill">Corteza estriada</span>
+  </div>
+  <ul class="facts" style="position:absolute;left:74px;top:270px;width:520px">
+    <li><span class="dot">1</span><div>Primera <b>parada cortical</b> de la información visual</div></li>
+    <li><span class="dot">2</span><div>Se llama <b>“estriada”</b> por una franja blanca de mielina visible a simple vista</div></li>
+    <li><span class="dot">3</span><div>Esa franja es la <b>estría de Gennari</b><small>ubicada en su capa de entrada (capa IV)</small></div></li>
+  </ul>
+  <svg style="position:absolute;right:90px;top:190px" width="480" height="440" viewBox="0 0 480 440">
+    <text x="20" y="22" font-size="14" font-weight="700" fill="${C.mauve}" letter-spacing="2">CORTE DE LA CORTEZA</text>
+    ${layers.map((l,i)=>{const y=40+i*58; return `
+      <path d="M20 ${y} C120 ${y-10} 220 ${y+10} 320 ${y} L320 ${y+58} C220 ${y+68} 120 ${y+48} 20 ${y+58} Z" fill="${layerCol[i]}"/>
+      <text x="40" y="${y+(i==3?47:35)}" font-size="17" font-weight="700" fill="${C.plum}" font-family="Cormorant Garamond" font-style="italic">${l}</text>`}).join('')}
+    <path d="M20 233 C120 223 220 243 320 233" stroke="#fff" stroke-width="10" fill="none"/>
+    <path d="M20 233 C120 223 220 243 320 233" stroke="${C.line}" stroke-width="1" stroke-dasharray="3 4" fill="none"/>
+    <g fill="${C.roseD}" opacity=".55">${Array.from({length:18},(_,k)=>`<circle cx="${50+((k*53)%260)}" cy="${70+((k*97)%300)}" r="3"/>`).join('')}</g>
+    <rect x="20" y="40" width="300" height="348" rx="2" fill="none" stroke="${C.mauve}" stroke-width="1.5" opacity=".5"/>
+    <line x1="320" y1="233" x2="352" y2="233" stroke="${C.roseD}" stroke-width="1.6"/><circle cx="320" cy="233" r="4" fill="${C.roseD}"/>
+    <text x="360" y="234" font-size="17" font-weight="700" fill="${C.roseD}">Estría de</text>
+    <text x="360" y="256" font-size="17" font-weight="700" fill="${C.roseD}">Gennari</text>
+    <text x="360" y="280" font-size="13" fill="${C.mauve}">mielina · capa IV</text>
+  </svg>
+`, 5, '02 · Corteza visual primaria'));
+
+/* 6 · El viaje de la luz */
+const steps = ['Retina','Nervio óptico','Quiasma óptico','Cuerpo geniculado lateral','V1 · corteza occipital'];
+S.push(slide(`
+  <h2>El <em>viaje</em> de la luz</h2>
+  <svg style="position:absolute;left:80px;top:170px" width="520" height="520" viewBox="0 0 400 400">
+    <path d="M115 40 A60 60 0 0 1 175 -0" fill="none"/>
+    <path d="M90 50 A110 70 0 0 1 200 0 L200 50 Z" fill="${C.lav}" opacity=".9"/>
+    <path d="M200 0 A110 70 0 0 1 310 50 L200 50 Z" fill="${C.blush}"/>
+    <text x="118" y="38" font-size="12" font-weight="700" fill="#7E66A6">campo izq.</text>
+    <text x="222" y="38" font-size="12" font-weight="700" fill="${C.roseD}">campo der.</text>
+    <ellipse cx="200" cy="235" rx="150" ry="150" fill="#FFF" stroke="${C.line}" stroke-width="2"/>
+    <path d="M70 310 C110 370 290 370 330 310 C300 340 100 340 70 310Z" fill="${C.rose}" opacity=".55"/>
+    <path d="M90 318 C140 372 260 372 310 318" fill="none" stroke="${C.roseD}" stroke-width="0" />
+    <circle cx="150" cy="78" r="24" fill="#fff" stroke="${C.mauve}" stroke-width="2"/><circle cx="150" cy="70" r="8" fill="${C.lavD}"/>
+    <circle cx="250" cy="78" r="24" fill="#fff" stroke="${C.mauve}" stroke-width="2"/><circle cx="250" cy="70" r="8" fill="${C.roseD}"/>
+    <g fill="none" stroke-width="5" stroke-linecap="round" opacity=".9">
+      <path d="M160 100 L200 150 L252 196 L288 316" stroke="${C.lavD}"/>
+      <path d="M265 100 L262 150 L258 196 L288 316" stroke="${C.lavD}"/>
+      <path d="M240 100 L200 150 L148 196 L112 316" stroke="${C.rose}"/>
+      <path d="M135 100 L138 150 L142 196 L112 316" stroke="${C.rose}"/>
+    </g>
+    <circle cx="200" cy="150" r="8" fill="#fff" stroke="${C.mauve}" stroke-width="2"/>
+    <ellipse cx="145" cy="198" rx="12" ry="9" fill="#FCEBE1" stroke="${C.mauve}" stroke-width="2"/>
+    <ellipse cx="255" cy="198" rx="12" ry="9" fill="#FCEBE1" stroke="${C.mauve}" stroke-width="2"/>
+    <g font-size="11.5" font-weight="700" fill="${C.plum}">
+      <text x="212" y="146">quiasma</text><text x="272" y="202">NGL</text><text x="98" y="202">NGL</text>
+      <text x="166" y="360" fill="${C.roseD}">corteza visual</text>
+    </g>
+  </svg>
+  <div style="position:absolute;right:80px;top:200px;width:480px">
+    ${steps.map((s,i)=>`<div style="display:flex;align-items:center;gap:18px;margin-bottom:${i<4?'8px':'0'}">
+        <div style="width:46px;height:46px;border-radius:50%;background:${i==4?C.rose:C.blush};color:${i==4?'#fff':C.roseD};display:grid;place-items:center;font-weight:700;font-size:18px">${i+1}</div>
+        <div style="font-size:23px;font-weight:${i==4?700:600};color:${i==4?C.roseD:C.plum}">${s}${i==3?'<div style="font-size:15px;color:#9C6B80;font-weight:500">en el tálamo</div>':''}</div></div>
+        ${i<4?`<div style="margin:0 0 8px 22px;width:2px;height:22px;background:${C.line}"></div>`:''}`).join('')}
+  </div>
+`, 6, '02 · Corteza visual primaria'));
+
+/* 7 · Retinotopía y contralateralidad */
+const dotCols = ['#F4B6C2','#E9A6B3','#C9768A','#CDB8E6','#A88FC9','#F9D3B8','#F6C5A8','#B7D3C4','#9FC4B2'];
+S.push(slide(`
+  <h2>Un <em>mapa</em> ordenado</h2>
+  <div style="position:absolute;left:70px;right:70px;top:210px;display:grid;grid-template-columns:1fr 1fr;gap:34px">
+    <div class="card" style="height:400px">
+      <span class="pill">Organización retinotópica</span>
+      <svg width="100%" height="250" viewBox="0 0 480 200" style="margin:16px 0 8px">
+        <circle cx="95" cy="100" r="78" fill="#FFF8F6" stroke="${C.line}" stroke-width="2"/>
+        ${dotCols.map((c,k)=>`<circle cx="${60+(k%3)*35}" cy="${65+Math.floor(k/3)*35}" r="12" fill="${c}"/>`).join('')}
+        <path d="M195 100 H275" stroke="${C.mauve}" stroke-width="2" stroke-dasharray="5 6"/><path d="M270 92 L282 100 L270 108" fill="none" stroke="${C.mauve}" stroke-width="2"/>
+        <path d="M300 40 C360 20 440 50 460 100 C440 150 360 180 300 160 Z" fill="${C.blush}" stroke="${C.line}" stroke-width="2"/>
+        ${dotCols.map((c,k)=>`<circle cx="${330+(k%3)*40}" cy="${70+Math.floor(k/3)*30}" r="11" fill="${c}"/>`).join('')}
+        <text x="58" y="194" font-size="13" font-weight="600" fill="${C.mauve}">campo visual</text>
+        <text x="352" y="194" font-size="13" font-weight="600" fill="${C.mauve}">V1</text>
+      </svg>
+      <p>Puntos <b>vecinos</b> del campo visual → neuronas <b>vecinas</b> en V1.</p>
+    </div>
+    <div class="card" style="height:400px;background:#FDF8FC">
+      <span class="pill l">Funcionamiento contralateral</span>
+      <svg width="100%" height="250" viewBox="0 0 480 200" style="margin:16px 0 8px">
+        <path d="M110 70 A130 60 0 0 1 240 20 L240 70 Z" fill="${C.lav}"/>
+        <path d="M240 20 A130 60 0 0 1 370 70 L240 70 Z" fill="${C.blush}"/>
+        <text x="150" y="58" font-size="13" font-weight="700" fill="#7E66A6">izquierdo</text>
+        <text x="262" y="58" font-size="13" font-weight="700" fill="${C.roseD}">derecho</text>
+        <path d="M150 128 C150 100 232 100 234 128 L234 175 C232 195 150 195 150 175Z" fill="${C.blush}" stroke="${C.line}" stroke-width="2"/>
+        <path d="M246 128 C248 100 330 100 330 128 L330 175 C330 195 248 195 246 175Z" fill="${C.lav}" stroke="${C.line}" stroke-width="2"/>
+        <path d="M175 78 C230 95 260 110 290 140" stroke="${C.lavD}" stroke-width="3" fill="none"/><path d="M282 138 L292 142 L290 131" fill="none" stroke="${C.lavD}" stroke-width="3"/>
+        <path d="M305 78 C250 95 220 110 190 140" stroke="${C.roseD}" stroke-width="3" fill="none"/><path d="M198 138 L188 142 L190 131" fill="none" stroke="${C.roseD}" stroke-width="3"/>
+        <text x="160" y="160" font-size="12" font-weight="700" fill="${C.plum}">hemisf. izq.</text>
+        <text x="256" y="160" font-size="12" font-weight="700" fill="${C.plum}">hemisf. der.</text>
+      </svg>
+      <p>Campo visual <b>izquierdo</b> → hemisferio <b>derecho</b>, y viceversa.</p>
+    </div>
+  </div>
+`, 7, '02 · Corteza visual primaria'));
+
+/* 8 · Áreas de asociación */
+S.push(slide(`
+  <h2>Áreas de <em>asociación</em> visual</h2>
+  <svg style="position:absolute;left:90px;top:200px" width="440" height="440" viewBox="0 0 440 440">
+    <circle cx="220" cy="220" r="200" fill="${C.lav}" opacity=".7"/>
+    <circle cx="220" cy="220" r="148" fill="${C.blush}"/>
+    <circle cx="220" cy="220" r="92" fill="${C.rose}"/>
+    <text x="220" y="214" text-anchor="middle" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="40" fill="#fff">V1</text>
+    <text x="220" y="240" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">área 17</text>
+    <text x="220" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="${C.roseD}">área 18 · V2</text>
+    <text x="220" y="48" text-anchor="middle" font-size="16" font-weight="700" fill="#7E66A6">área 19 · V3 · V4 · V5</text>
+  </svg>
+  <div style="position:absolute;right:80px;top:225px;width:560px">
+    <ul class="facts">
+      <li><span class="dot">✦</span><div>Rodean a V1 · <b>áreas 18 y 19</b> de Brodmann</div></li>
+      <li><span class="dot">✦</span><div>Su misión: <b>interpretar</b> lo que llega de V1</div></li>
+      <li><span class="dot">✦</span><div>El trabajo se <b>divide</b> en subáreas especializadas</div></li>
+    </ul>
+    <div class="card" style="margin-top:34px;background:#FDF6F8">
+      <p style="font-size:19px"><b>Sin ellas…</b> veríamos formas y colores <b>planos</b>, sin poder integrarlos en una escena coherente.</p>
+    </div>
+  </div>
+`, 8, '03 · Áreas de asociación'));
+
+/* 9 · V2-V5 */
+const areas = [
+  ['V2 · V3', I.shapes, 'Geometría básica', ['Orientación','Profundidad','Bordes de los objetos'], ''],
+  ['V4', I.palette, 'Color', ['Percepción del color','Detalles finos de las formas'], 'background:#FDF8FC'],
+  ['V5 · MT', I.motion, 'Movimiento', ['Dirección','Velocidad'], ''],
+];
+S.push(slide(`
+  <h2>Cada área, <em>una especialidad</em></h2>
+  <div style="position:absolute;left:70px;right:70px;top:220px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px">
+    ${areas.map(([t,ic,k,list,st])=>`<div class="card" style="height:380px;padding:32px;${st}">
+      <div style="display:flex;justify-content:space-between;align-items:center">${ic}<span class="pill">${k}</span></div>
+      <h3 style="font-size:46px;margin-top:22px">${t}</h3>
+      <div style="width:40px;height:2px;background:var(--line);margin:8px 0 18px"></div>
+      ${list.map(x=>`<p style="font-size:23px;margin-bottom:14px"><span style="color:${C.rose}">✦</span>&nbsp; ${x}</p>`).join('')}
+      ${t==='V5 · MT'?'<p style="font-size:15px;margin-top:14px;color:#9C6B80">también llamada <i>temporal media</i></p>':''}
+    </div>`).join('')}
+  </div>
+`, 9, '03 · Áreas de asociación'));
+
+/* 10 · Dos vías */
+S.push(slide(`
+  <h2>Las <em>dos vías</em> de procesamiento</h2>
+  <div style="position:absolute;left:40px;top:190px">${brain({uid:'d',w:600, extra:`
+    <defs>
+      <marker id="ah1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#7E66A6"/></marker>
+      <marker id="ah2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="${C.roseD}"/></marker>
+    </defs>
+    <path d="M352 130 C320 80 280 70 240 78" fill="none" stroke="#7E66A6" stroke-width="7" stroke-linecap="round" marker-end="url(#ah1)"/>
+    <path d="M352 150 C320 200 260 200 196 196" fill="none" stroke="${C.roseD}" stroke-width="7" stroke-linecap="round" marker-end="url(#ah2)"/>
+    <g font-size="14" font-weight="700">
+      <text x="200" y="34" fill="#7E66A6">vía dorsal → parietal</text>
+      <text x="60" y="262" fill="${C.roseD}">vía ventral → temporal</text>
+    </g>`})}</div>
+  <div style="position:absolute;right:70px;top:200px;width:500px;display:flex;flex-direction:column;gap:22px">
+    <div class="card"><div style="display:flex;gap:16px;align-items:center">${I.apple}<div><span class="pill">Vía ventral</span><h3 style="margin:6px 0 0">La ruta del “¿Qué?”</h3></div></div>
+      <p style="margin-top:12px">Reconoce <b>objetos</b>, <b>rostros</b> (área fusiforme), color y textura. <i>“Eso es una manzana roja”.</i></p></div>
+    <div class="card" style="background:#FDF8FC"><div style="display:flex;gap:16px;align-items:center">${I.catch}<div><span class="pill l">Vía dorsal</span><h3 style="margin:6px 0 0">La ruta del “¿Dónde? / ¿Cómo?”</h3></div></div>
+      <p style="margin-top:12px">Ubicación espacial, <b style="color:#7E66A6">movimiento</b> e interacción. <i>Atrapar una pelota en el aire.</i></p></div>
+  </div>
+`, 10, '04 · Las dos vías'));
+
+/* 11 · Patologías */
+const pats = [
+  [I.eyeOff,'Ceguera cortical','Daño bilateral de V1','Ojos y nervios ópticos sanos, pero el cerebro no procesa la imagen.','A veces: <b>visión ciega</b> (blindsight)'],
+  [I.ques,'Agnosia visual','Daño en áreas de asociación','El paciente ve el objeto, pero no reconoce qué es.',''],
+  [I.film,'Acinetopsia','Pérdida de la visión del movimiento','El mundo se percibe como una secuencia de fotos estáticas.',''],
+];
+S.push(slide(`
+  <h2>Cuando el lóbulo se <em>lesiona</em></h2>
+  <div style="position:absolute;left:70px;right:70px;top:220px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px">
+    ${pats.map(([ic,t,k,d,x],i)=>`<div class="card" style="height:370px;padding:32px;${i==1?'background:#FDF8FC':''}">
+      ${ic}
+      <h3 style="font-size:38px">${t}</h3>
+      <span class="pill ${i==1?'l':''}" style="font-size:13.5px">${k}</span>
+      <p style="margin-top:20px;font-size:21px">${d}</p>
+      ${x?`<p style="margin-top:14px;font-size:17px;padding:10px 14px;border-radius:14px;background:${C.blush}">${x}</p>`:''}
+    </div>`).join('')}
+  </div>
+`, 11, '05 · Patologías'));
+
+/* 12 · Conclusión */
+const build = [[I.sun,'Luz'],[I.palette,'Color'],[I.shapes,'Forma'],[I.motion,'Movimiento']];
+S.push(slide(`
+  <h2>En <em>conclusión</em></h2>
+  <div style="position:absolute;left:70px;top:210px;width:330px;text-align:center" class="card">
+    ${I.camera}
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:var(--plum);line-height:1.15;margin-top:8px">No es una cámara fotográfica pasiva</p>
+  </div>
+  <div style="position:absolute;left:450px;right:70px;top:210px">
+    <p style="font-size:22px;line-height:1.45">Es un centro de procesamiento <b style="color:var(--rose-d)">sofisticado</b> y <b style="color:var(--rose-d)">jerárquico</b> que descompone…</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:34px">
+      ${build.map(([ic,t])=>`<div style="text-align:center;width:118px"><div style="width:96px;height:96px;margin:0 auto;border-radius:50%;background:#fff;border:1.5px solid var(--line);display:grid;place-items:center">${ic}</div><p style="margin-top:10px;font-weight:700;font-size:18px">${t}</p></div>`).join('<div style="color:#E9A6B3;font-size:26px;margin-top:-30px">+</div>')}
+    </div>
+    <div style="margin-top:38px;display:flex;align-items:center;gap:18px">
+      <div style="font-size:30px;color:var(--rose)">→</div>
+      <div style="padding:18px 30px;border-radius:999px;background:var(--rose);color:#fff;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:34px;font-weight:600">…para construir nuestra realidad</div>
+    </div>
+  </div>
+`, 12, '05 · Conclusión'));
+
+/* 13 · Cierre */
+S.push(slide(`
+  ${sparkle(240,180,26)}${sparkle(1010,480,32,C.lavD,.8)}${sparkle(980,190,16)}${sparkle(300,520,14,C.lavD,.7)}
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+    <div style="font-size:40px;color:var(--rose)">♡</div>
+    <h1 style="font-size:110px;margin-top:6px">¡Gracias!</h1>
+    <p class="sub" style="margin-top:22px;font-size:24px">A continuación…</p>
+    <div style="margin-top:20px;padding:14px 34px;border-radius:999px;background:var(--blush);color:var(--rose-d);font-weight:700;font-size:22px;letter-spacing:.06em">CASO CLÍNICO</div>
+  </div>
+`, 0));
+
+document.getElementById('deck').innerHTML = S.join('');
+</script>
+</body>
+</html>

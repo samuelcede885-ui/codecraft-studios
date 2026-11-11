@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import site from '../config/site.js'
-import { asset } from '../lib/format.js'
 import { useFitText } from '../lib/hooks.js'
 import { whatsappAskUrl } from '../services/orders.js'
 
@@ -14,7 +13,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div className="footer-brand">
-          <img className="footer-logo" src={asset('img/logo-noa-256.webp')} width="96" height="96" alt={site.name} loading="lazy" decoding="async" />
+          <p className="footer-name">{site.name}</p>
           <p>{site.descriptor}</p>
         </div>
 

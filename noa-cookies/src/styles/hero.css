@@ -545,21 +545,19 @@
     transition: color var(--h-swap);
   }
 
-  .site-logo {
-    display: block;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+  /* Nombre de la marca en texto: el sitio no usa logotipo. */
+  .site-brand {
+    display: inline-flex;
+    align-items: center;
     flex: none;
-    box-shadow: 0 0 0 3px var(--h-logo-ring, transparent);
-    transition: box-shadow var(--h-swap);
-  }
-
-  .site-logo img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.375rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .site-nav-link {
@@ -578,9 +576,8 @@
   }
 
   @media (min-width: 860px) {
-    .site-logo {
-      width: 60px;
-      height: 60px;
+    .site-brand {
+      font-size: 1.625rem;
     }
 
     .site-slogan {

@@ -16,7 +16,7 @@ const { orange, navy, butter, choco, dough } = palette
 /**
  * bg: fondo de la escena · title: titular gigante detrás de la cookie
  * fg: texto de interfaz · label: etiqueta del nombre · cta: botón principal
- * sticker: precio · logoRing: aro del logo (el manual lo pide blanco sobre amarillo)
+ * sticker: precio
  */
 export const heroThemes = {
   navy: {
@@ -36,7 +36,6 @@ export const heroThemes = {
     labelBg: navy, labelFg: dough,
     ctaBg: navy, ctaFg: dough,
     stickerBg: navy, stickerFg: butter,
-    logoRing: dough,
   },
   choco: {
     bg: choco, title: butter, fg: dough,

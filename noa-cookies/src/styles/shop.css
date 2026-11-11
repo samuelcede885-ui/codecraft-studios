@@ -538,17 +538,15 @@
 
   .footer-brand {
     grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: 16px;
     font-weight: 600;
   }
 
-  .footer-logo {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px var(--color-navy);
+  .footer-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
   .footer-head {
@@ -600,8 +598,6 @@
 
     .footer-brand {
       grid-column: auto;
-      flex-direction: column;
-      align-items: flex-start;
     }
   }
 }

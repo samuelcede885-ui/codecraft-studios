@@ -15,7 +15,6 @@ CROPS = {
     "pastelito":       ("menu-especiales", 605,  500, 1165,  790),
     "cookie-sandwich": ("menu-especiales",  55, 1090,  500, 1400),
     "cookie-cake":     ("menu-especiales", 615, 1095, 1160, 1405),
-    "logo":            ("perfil",           37,  322,  319,  603),
 }
 
 net = ncnn.Net()

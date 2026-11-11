@@ -8,7 +8,7 @@ la procedencia; **no hacen falta para ejecutar ni compilar el sitio**.
 | --- | --- |
 | `upscale.py` | Recorta cada producto de la captura y lo amplía ×4 con Real-ESRGAN (ncnn, CPU) |
 | `matte.py` | Quita el fondo crema (rembg, modelo isnet-general-use) y limpia el halo del borde |
-| `export.py` | Exporta WebP con transparencia en 160, 480, 800 y 1200 px, genera las migas del hero, el logo y el grano de papel, y escribe `src/data/images.json` |
+| `export.py` | Exporta WebP con transparencia en 160, 480, 800 y 1200 px, genera las migas del hero, los iconos del sitio y el grano de papel, y escribe `src/data/images.json` |
 
 Dependencias: `pip install numpy opencv-python-headless ncnn "rembg[cpu]" pillow`
 y los modelos `realesrgan-x4plus` (release `realesrgan-ncnn-vulkan` de Real-ESRGAN).

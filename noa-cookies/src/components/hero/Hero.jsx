@@ -150,7 +150,6 @@ export function Hero() {
       '--h-cta-fg': theme.ctaFg,
       '--h-sticker-bg': theme.stickerBg,
       '--h-sticker-fg': theme.stickerFg,
-      '--h-logo-ring': theme.logoRing ?? 'transparent',
     }
     Object.entries(vars).forEach(([key, value]) => root.style.setProperty(key, value))
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.bg)

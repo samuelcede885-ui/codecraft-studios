@@ -80,14 +80,21 @@ POST ordersEndpoint       ← pedido (items, subtotal, entrega, cliente, pago)
 - Lista oficial de ingredientes y alérgenos.
 - Fotografías originales y logotipo en vector.
 
-## Fotos y logo: provisionales
+## Fotos: provisionales
 
 No había archivos originales, así que las fotos salen de las capturas del menú
 público de @noacookies: se recortaron, se ampliaron ×4 con Real-ESRGAN y se les
 quitó el fondo (scripts en `tools/fotos-provisionales/`). Son los productos
-reales de la marca, pero su nitidez es reconstruida. El logo sale de la foto de
-perfil. Para sustituirlos basta reemplazar los archivos de `public/img/` con el
-mismo nombre y actualizar ancho y alto en `src/data/images.json`.
+reales de la marca, pero su nitidez es reconstruida. Para sustituirlas basta
+reemplazar los archivos de `public/img/` con el mismo nombre y actualizar ancho
+y alto en `src/data/images.json`.
+
+## Sin logotipo
+
+El sitio no usa el logo de NOA Cookies. La cabecera y el footer muestran el
+nombre de la marca en texto, y el icono del sitio es una cookie sobre azul.
+Cuando la marca entregue su logotipo en vector, se añade en
+`src/components/Header.jsx` y `src/components/Footer.jsx`.
 
 Las migas flotantes del hero también se generan a partir de esas fotos (textura
 de cada cookie y de su relleno), para que correspondan al producto real.

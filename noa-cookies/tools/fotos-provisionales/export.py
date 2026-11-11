@@ -1,4 +1,4 @@
-"""Exporta los assets web: productos (WebP con alfa en varios anchos), migas, logo y grano de papel."""
+"""Exporta los assets web: productos (WebP con alfa en varios anchos), migas, iconos y grano de papel."""
 import json, sys, math
 from pathlib import Path
 import numpy as np, cv2
@@ -118,42 +118,28 @@ for fam in FAMILIES:
         make(fam, k, rng)
 print("crumbs ok")
 
-# ---------- logo ----------
-lg = np.asarray(Image.open(WORK / "logo-x4.png").convert("RGB")).astype(np.float32)
-H, W = lg.shape[:2]
-# centro/radio del disco naranja: marchar desde el centro hasta el aro blanco
-cx0, cy0 = W / 2, H / 2
-def radius_at(cx, cy, ang):
-    for r in range(300, 620):
-        x, y = int(cx + math.cos(ang) * r), int(cy + math.sin(ang) * r)
-        if not (0 <= x < W and 0 <= y < H): return r
-        p = lg[y, x]
-        if p.min() > 225: return r
-    return 620
-pts = []
-for ang in np.linspace(0, 2*math.pi, 180, endpoint=False):
-    r = radius_at(cx0, cy0, ang); pts.append((cx0 + math.cos(ang)*r, cy0 + math.sin(ang)*r))
-pts = np.array(pts, np.float32)
-(cx, cy), rad = cv2.minEnclosingCircle(pts)
-A = np.c_[2*pts[:, 0], 2*pts[:, 1], np.ones(len(pts))]; b = (pts**2).sum(1)
-sol = np.linalg.lstsq(A, b, rcond=None)[0]; cx, cy = sol[0], sol[1]; rad = math.sqrt(sol[2] + cx*cx + cy*cy)
-print("logo circle", round(cx), round(cy), round(rad))
-rad -= 6
-ORANGE = np.array([242, 176, 82], np.float32)
-dist = np.abs(lg - lg[int(cy), int(cx - rad * 0.8)]).sum(2)
-near = np.clip(1 - (dist - 40) / 50, 0, 1)[..., None]           # 1 = pixel del disco naranja
-flat = lg * (1 - near) + ORANGE * near
-yy, xx = np.mgrid[0:H, 0:W]
-alpha = np.clip(rad - np.sqrt((xx - cx)**2 + (yy - cy)**2) + 0.5, 0, 1)
-out = np.dstack([flat, alpha * 255]).clip(0, 255).astype(np.uint8)
-x0, y0, x1, y1 = int(cx - rad - 1), int(cy - rad - 1), int(cx + rad + 2), int(cy + rad + 2)
-logo = Image.fromarray(out, "RGBA").crop((x0, y0, x1, y1))
-side = min(logo.size); logo = logo.crop((0, 0, side, side))
-for w in (512, 256, 128):
-    logo.resize((w, w), Image.LANCZOS).save(OUT / f"logo-noa-{w}.webp", "WEBP", quality=92, method=6)
-logo.resize((180, 180), Image.LANCZOS).save(OUT.parent / "apple-touch-icon.png")
-logo.resize((64, 64), Image.LANCZOS).save(OUT.parent / "favicon.png")
-print("logo ok", logo.size)
+# ---------- iconos del sitio ----------
+# El sitio no usa el logotipo de la marca: favicon e icono de inicio muestran
+# la primera cookie del menu sobre Midnight Navy.
+NAVY = (17, 41, 81, 255)
+cookie = Image.open(WORK / f"{PRODUCTS[0]}-cut.png").convert("RGBA")
+
+def icon(size, round_bg):
+    ss = size * 4
+    canvas = Image.new("RGBA", (ss, ss), (0, 0, 0, 0))
+    if round_bg:
+        ImageDraw.Draw(canvas).ellipse([0, 0, ss - 1, ss - 1], fill=NAVY)
+    else:
+        canvas.paste(NAVY, [0, 0, ss, ss])
+    box = int(ss * 0.74)
+    scale = box / max(cookie.size)
+    c = cookie.resize((round(cookie.width * scale), round(cookie.height * scale)), Image.LANCZOS)
+    canvas.alpha_composite(c, ((ss - c.width) // 2, (ss - c.height) // 2))
+    return canvas.resize((size, size), Image.LANCZOS)
+
+icon(180, round_bg=False).convert("RGB").save(OUT.parent / "apple-touch-icon.png")
+icon(64, round_bg=True).save(OUT.parent / "favicon.png")
+print("iconos ok")
 
 # ---------- grano de papel ----------
 g = np.random.default_rng(3).normal(0, 1, (180, 180)).astype(np.float32)

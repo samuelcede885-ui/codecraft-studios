@@ -1,0 +1,84 @@
+/* Tema de Pookies.
+   Sustituye a src/brand/theme.css (ver build/brand.js). Redefine los colores
+   por función y las fuentes; el diseño, las medidas y el movimiento son los
+   del proyecto base. Los valores salen de su perfil público (ver themes.js). */
+:root {
+  --pk-red: #e90133;
+  --pk-pink: #feacd4;
+  --pk-yellow: #fde502;
+  --pk-blue: #0085ff;
+  --pk-green: #00d628;
+  --pk-ink: #323939;
+  --pk-paper: #f0f0f0;
+
+  --ink: var(--pk-ink);
+  --ink-rgb: 50 57 57;
+  --paper: var(--pk-paper);
+  --primary: var(--pk-red);
+  --on-primary: #fff;
+  --accent: var(--pk-pink);
+  --on-accent: var(--pk-ink);
+  --accent-2: var(--pk-yellow);
+  --on-accent-2: var(--pk-ink);
+  --field: #fff;
+
+  --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+  --font-brand: "DynaPuff", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif;
+
+  /* Primera escena del hero (Pooktachio sobre rojo), antes de que arranque el JS. */
+  --h-bg: var(--pk-red);
+  --h-fg: #fff;
+  --h-label-bg: #fff;
+  --h-label-fg: var(--pk-red);
+  --h-cta-bg: #fff;
+  --h-cta-fg: var(--pk-red);
+  --h-sticker-bg: var(--pk-yellow);
+  --h-sticker-fg: var(--pk-ink);
+
+  /* Anton solo tiene un grosor: sin negrita simulada. */
+  font-synthesis-weight: none;
+}
+
+/* El logo es una palabra, no un símbolo cuadrado. */
+.site-brand-mark {
+  width: auto;
+  height: 30px;
+}
+
+@media (max-width: 359px) {
+  .site-brand-mark {
+    width: auto;
+    height: 26px;
+  }
+}
+
+@media (min-width: 860px) {
+  .site-brand-mark {
+    width: auto;
+    height: 40px;
+  }
+}
+
+/* Etiquetas de nombre redondeadas, como sus letras. */
+.navy-label {
+  padding: 0.22em 0.62em 0.28em;
+  border-radius: 0.6em;
+  letter-spacing: 0;
+}
+
+/* El titular gigante en letras burbuja necesita más aire arriba y abajo que una condensada. */
+.hero-title-mask {
+  padding: 0.2em 0.06em 0.12em;
+  margin: -0.2em 0 -0.12em;
+}
+
+/* Rosa sobre rojo es su combinación, pero el precio se tiene que leer: amarillo. */
+.featured-price {
+  color: var(--accent-2);
+}
+
+/* En los paneles, la acción principal va en su rojo. */
+.sheet .btn--orange {
+  --btn-bg: var(--primary);
+  --btn-fg: var(--on-primary);
+}

@@ -1,0 +1,199 @@
+{
+  "crops": {
+    "red-velvet": [
+      "menu.jpg",
+      55,
+      400,
+      415,
+      618
+    ],
+    "plain-vainilla": [
+      "menu.jpg",
+      420,
+      395,
+      722,
+      622
+    ],
+    "plain-chocolate": [
+      "menu.jpg",
+      726,
+      395,
+      1020,
+      632
+    ],
+    "cookies-n-cream": [
+      "menu.jpg",
+      72,
+      800,
+      400,
+      1012
+    ],
+    "brookie": [
+      "menu.jpg",
+      405,
+      805,
+      742,
+      1012
+    ],
+    "pooktachio": [
+      "menu.jpg",
+      746,
+      815,
+      1066,
+      1012
+    ],
+    "choco-nucita": [
+      "menu.jpg",
+      78,
+      1190,
+      415,
+      1402
+    ],
+    "choco-ferrero": [
+      "menu.jpg",
+      420,
+      1205,
+      728,
+      1402
+    ],
+    "og-chocolate-chip": [
+      "menu.jpg",
+      752,
+      1185,
+      1032,
+      1400
+    ],
+    "ny-ferrero": [
+      "menu.jpg",
+      52,
+      1550,
+      420,
+      1760
+    ],
+    "double-choconut": [
+      "menu.jpg",
+      422,
+      1565,
+      772,
+      1762
+    ],
+    "nucita": [
+      "menu.jpg",
+      776,
+      1565,
+      1112,
+      1762
+    ],
+    "cricri": [
+      "menu-nuevos.png",
+      128,
+      550,
+      570,
+      875
+    ],
+    "coconut": [
+      "menu-nuevos.png",
+      640,
+      548,
+      1000,
+      875
+    ],
+    "cocosette": [
+      "menu-nuevos.png",
+      158,
+      1032,
+      525,
+      1385
+    ],
+    "pistachio-dubai": [
+      "menu-nuevos.png",
+      620,
+      1048,
+      1025,
+      1370
+    ],
+    "kinderella": [
+      "menu-nuevos.png",
+      375,
+      1530,
+      795,
+      1868
+    ]
+  },
+  "products": [
+    "red-velvet",
+    "plain-vainilla",
+    "plain-chocolate",
+    "cookies-n-cream",
+    "brookie",
+    "pooktachio",
+    "choco-nucita",
+    "choco-ferrero",
+    "og-chocolate-chip",
+    "ny-ferrero",
+    "double-choconut",
+    "nucita",
+    "cricri",
+    "coconut",
+    "cocosette",
+    "pistachio-dubai",
+    "kinderella"
+  ],
+  "widths": [
+    1200,
+    800,
+    480,
+    160
+  ],
+  "crumbs": {
+    "golden": [
+      "plain-vainilla",
+      0.5,
+      0.55,
+      0.3,
+      "crumb"
+    ],
+    "dark": [
+      "plain-chocolate",
+      0.5,
+      0.5,
+      0.34,
+      "crumb"
+    ],
+    "red": [
+      "red-velvet",
+      0.2,
+      0.72,
+      0.14,
+      "crumb"
+    ],
+    "cream": [
+      "coconut",
+      0.52,
+      0.42,
+      0.12,
+      "blob"
+    ],
+    "choco": [
+      "og-chocolate-chip",
+      0.5,
+      0.48,
+      0.14,
+      "chunk"
+    ],
+    "pistachio": [
+      "pistachio-dubai",
+      0.5,
+      0.42,
+      0.07,
+      "blob"
+    ],
+    "pcream": [
+      "pooktachio",
+      0.52,
+      0.42,
+      0.14,
+      "blob"
+    ]
+  }
+}

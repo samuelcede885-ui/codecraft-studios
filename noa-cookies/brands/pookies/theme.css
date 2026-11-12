@@ -82,3 +82,21 @@
   --btn-bg: var(--primary);
   --btn-fg: var(--on-primary);
 }
+
+/* El logo va en rojo sobre rosa y amarillo (cada escena puede fijar su color). */
+.site-brand {
+  color: var(--h-logo, inherit);
+  transition: color var(--h-swap);
+}
+
+/* En el pie, el logo en su rojo sobre rosa, como en su perfil. */
+.footer-name {
+  color: var(--primary);
+}
+
+/* Las letras burbuja son anchas: en móvil el nombre baja un punto para no partirse. */
+@media (max-width: 859px) {
+  .item-name {
+    font-size: 0.9375rem;
+  }
+}

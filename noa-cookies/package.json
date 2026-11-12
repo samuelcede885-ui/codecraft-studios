@@ -13,6 +13,7 @@
     "pookies:dev": "vite --mode pookies",
     "pookies:build": "vite build --mode pookies",
     "pookies:preview": "vite preview --mode pookies --port 4175",
+    "pookies:test": "BRAND=pookies node tests/e2e/marca.mjs",
     "pookies:artifact": "vite build --config vite.artifact.config.js --mode pookies && node artifact/assemble.mjs pookies"
   },
   "dependencies": {

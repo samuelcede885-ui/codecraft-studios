@@ -54,7 +54,7 @@ export function Featured() {
         </p>
       </div>
 
-      <div ref={stageRef} className="featured-stage">
+      <div ref={stageRef} className="featured-stage" data-lines={rows.length}>
         <h2 id="featured-title" className="featured-title" data-fit aria-label={product.name}>
           {rows.map((row) => (
             <span className="featured-title-row" data-fit-line aria-hidden="true" key={row.join('-')}>

@@ -45,7 +45,7 @@ export const artifact = {
 /**
  * bg: fondo de la escena · title: titular gigante detrás de la cookie
  * fg: texto de interfaz · label: etiqueta del nombre · cta: botón principal
- * sticker: precio
+ * sticker: precio · logo (opcional): color de la marca en la cabecera
  *
  * Cada cookie va sobre el color que más la separa del fondo y de su titular.
  */
@@ -63,13 +63,13 @@ export const heroThemes = {
     stickerBg: white, stickerFg: ink,
   },
   pink: {
-    bg: pink, title: red, fg: ink,
+    bg: pink, title: red, fg: ink, logo: red,
     labelBg: red, labelFg: white,
     ctaBg: red, ctaFg: white,
     stickerBg: white, stickerFg: red,
   },
   yellow: {
-    bg: yellow, title: red, fg: ink,
+    bg: yellow, title: red, fg: ink, logo: red,
     labelBg: red, labelFg: white,
     ctaBg: red, ctaFg: white,
     stickerBg: ink, stickerFg: yellow,

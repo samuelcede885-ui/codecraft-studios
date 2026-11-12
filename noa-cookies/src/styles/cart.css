@@ -478,6 +478,15 @@
     color: var(--color-danger);
   }
 
+  /* Una sola forma de entrega: se informa, no se elige. */
+  .field-static {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+
   .segmented {
     display: grid;
     grid-auto-flow: column;

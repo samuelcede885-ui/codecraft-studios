@@ -52,7 +52,17 @@ function crumbStyle(c, i) {
   }
 }
 
-function Title({ lines, narrow, color, scene }) {
+/**
+ * Cuánto le sobra de ancho a una foto apaisada (0–100). Las fotos casi cuadradas
+ * dan 0 y no se tocan; a las apaisadas se las sube y agranda para que llenen la
+ * escena igual que una cookie redonda.
+ */
+function wideFit(image) {
+  if (!image?.w || !image?.h) return 0
+  return Math.round(Math.max(0, 1 - image.h / image.w - 0.13) * 100)
+}
+
+function Title({ lines, narrow, color, scene, drop }) {
   // Ancho: palabras en una sola fila (la cookie queda entre ellas).
   // Estrecho: una palabra por línea.
   const rows = narrow ? lines.map((w) => [w]) : [lines]
@@ -64,7 +74,8 @@ function Title({ lines, narrow, color, scene }) {
       data-fit
       data-fit-width={narrow ? 0.94 : 0.95}
       data-fit-height={narrow ? 0.34 : 0.56}
-      style={{ color }}
+      data-drop={drop ? '' : undefined}
+      style={drop ? { color, '--title-drop': `${drop}%` } : { color }}
     >
       {rows.map((words, r) => (
         <span className="hero-title-mask" key={r}>
@@ -154,6 +165,9 @@ export function Hero() {
       '--h-sticker-fg': theme.stickerFg,
     }
     Object.entries(vars).forEach(([key, value]) => root.style.setProperty(key, value))
+    // Color propio para la marca de la cabecera, solo si la escena lo define.
+    if (theme.logo) root.style.setProperty('--h-logo', theme.logo)
+    else root.style.removeProperty('--h-logo')
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.bg)
   }, [theme])
 
@@ -449,6 +463,7 @@ export function Hero() {
                 narrow={narrow}
                 lines={narrow ? slides[i].hero.narrow : slides[i].hero.wide}
                 color={heroThemes[slides[i].hero.theme].title}
+                drop={wideFit(slides[i].image)}
               />
             ))}
           </div>
@@ -465,7 +480,14 @@ export function Hero() {
             <div className="hero-slot">
               <div ref={dragRef} className="hero-cookie-drag">
                 {visible.map((i) => (
-                  <div className="hero-cookie" data-scene={i} data-part="cookie" key={slides[i].id}>
+                  <div
+                    className="hero-cookie"
+                    data-scene={i}
+                    data-part="cookie"
+                    data-wide={wideFit(slides[i].image) ? '' : undefined}
+                    style={wideFit(slides[i].image) ? { '--wide': wideFit(slides[i].image) } : undefined}
+                    key={slides[i].id}
+                  >
                     <span className="hero-cookie-shadow" />
                     <div className="hero-cookie-float">
                       <ProductImage

@@ -165,6 +165,7 @@ function CheckoutView({ summary, onSent }) {
   const { pickup, delivery } = site.fulfillment
   const methods = site.payment.methods
   const isDelivery = draft.type === 'delivery'
+  const ways = [pickup.enabled && { id: 'pickup', ...pickup }, delivery.enabled && { id: 'delivery', ...delivery }].filter(Boolean)
   const fee = isDelivery ? delivery.fee : 0
   const total = fee === null ? null : summary.subtotal + fee
 
@@ -272,13 +273,9 @@ function CheckoutView({ summary, onSent }) {
 
         <fieldset className="field">
           <legend>¿Cómo lo recibes?</legend>
-          <div className="segmented">
-            {[
-              pickup.enabled && { id: 'pickup', ...pickup },
-              delivery.enabled && { id: 'delivery', ...delivery },
-            ]
-              .filter(Boolean)
-              .map((way) => (
+          {ways.length > 1 ? (
+            <div className="segmented">
+              {ways.map((way) => (
                 <label key={way.id} className="segmented-option">
                   <input
                     type="radio"
@@ -291,7 +288,10 @@ function CheckoutView({ summary, onSent }) {
                   <span>{way.label}</span>
                 </label>
               ))}
-          </div>
+            </div>
+          ) : (
+            <p className="field-static">{ways[0]?.label}</p>
+          )}
           <p className="field-hint">{isDelivery ? delivery.detail : pickup.detail}</p>
         </fieldset>
 

@@ -466,6 +466,13 @@
     color: var(--accent);
   }
 
+  /* Móvil, nombre de una sola palabra: la foto pisa menos el titular para que se lea. */
+  @media (max-width: 859px) {
+    .featured-stage[data-lines="1"] .featured-visual {
+      margin-top: 1%;
+    }
+  }
+
   @media (min-width: 860px) {
     .featured-body {
       grid-template-columns: minmax(0, 1fr) auto;

@@ -21,13 +21,27 @@ const HERO_SIZES = '(max-width: 859px) 80vw, 44vw'
 export function boot(first, heroThemes, bar = 0) {
   const { w, h, widths } = first.image
   const fit = Math.min(1, w / h) // ancho de la foto respecto al cuadro
-  const drop = ((1 - Math.min(1, h / w)) / 2 + 0.05).toFixed(3) // apoyo inferior + pose de entrada
+  // Fotos apaisadas: mismo ajuste que .hero-cookie[data-wide] en hero.css (subir y agrandar).
+  const wide = Math.round(Math.max(0, 1 - h / w - 0.13) * 100)
+  const place = (lift, grow) => {
+    const scale = 1 + wide * grow
+    return {
+      width: (fit * scale).toFixed(3),
+      // apoyo inferior + pose de entrada, menos lo que sube
+      drop: (0.5 - (Math.min(1, h / w) * scale) / 2 - wide * lift + 0.05).toFixed(3),
+    }
+  }
+  const mobile = place(0.004, 0.0035)
+  const desktop = place(0.003, 0.007)
+  const desktopImg = wide
+    ? `.boot img{top:calc(var(--top) + var(--size)*${desktop.drop});width:calc(var(--size)*${desktop.width})}`
+    : ''
   const srcset = widths.map((x) => `./img/products/${first.id}-${x}.webp ${x}w`).join(', ')
   const screen = `100svh - ${bar}px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)`
   const css = `
       .boot{position:relative;overflow:hidden;--h:clamp(560px,calc(${screen}),1200px);--stage:calc(var(--h) - 328px);--size:min(86vw,calc(var(--stage)*.66));--top:calc(${bar}px + 68px + var(--stage)*.63);height:calc(var(--h) + ${bar}px)}
-      .boot img{position:absolute;left:50%;top:calc(var(--top) + var(--size)*${drop});width:calc(var(--size)*${fit.toFixed(3)});max-width:none;height:auto;transform:translate(-50%,-50%) scale(.86) rotate(12deg)}
-      @media (min-width:860px){.boot{--h:clamp(640px,calc(${screen}),1200px);--stage:calc(var(--h) - 246px);--size:min(40vw,calc(var(--stage)*.92),640px);--top:calc(${bar}px + 88px + var(--stage)*.54)}}
+      .boot img{position:absolute;left:50%;top:calc(var(--top) + var(--size)*${mobile.drop});width:calc(var(--size)*${mobile.width});max-width:none;height:auto;transform:translate(-50%,-50%) scale(.86) rotate(12deg)}
+      @media (min-width:860px){.boot{--h:clamp(640px,calc(${screen}),1200px);--stage:calc(var(--h) - 246px);--size:min(40vw,calc(var(--stage)*.92),640px);--top:calc(${bar}px + 88px + var(--stage)*.54)}${desktopImg}}
       @media (prefers-reduced-motion:reduce){.boot img{transform:translate(-50%,-50%)}}`
   const html = `<div class="boot" aria-hidden="true" style="background:${heroThemes[first.hero.theme].bg}"><img src="./img/products/${first.id}-800.webp" srcset="${srcset}" sizes="${HERO_SIZES}" width="${w}" height="${h}" alt="" fetchpriority="high" decoding="sync" /></div>`
   return { css, html }

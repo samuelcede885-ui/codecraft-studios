@@ -1,23 +1,44 @@
-# Fotos provisionales
+# Fotos y logo provisionales
 
-Scripts con los que se obtuvieron las imágenes de `public/img/` a partir de las
-capturas del menú público de @noacookies. Se conservan para dejar constancia de
-la procedencia; **no hacen falta para ejecutar ni compilar el sitio**.
+Herramientas con las que se obtienen las imágenes de una marca a partir de las
+capturas de su menú público, mientras no entregue sus archivos originales. Se
+conservan para dejar constancia de la procedencia y para preparar la vista
+previa de una marca nueva; **no hacen falta para ejecutar ni compilar el sitio**.
 
-| Script | Qué hace |
+| Archivo | Qué hace |
 | --- | --- |
-| `upscale.py` | Recorta cada producto de la captura y lo amplía ×4 con Real-ESRGAN (ncnn, CPU) |
-| `matte.py` | Quita el fondo crema (rembg, modelo isnet-general-use) y limpia el halo del borde |
-| `export.py` | Exporta WebP con transparencia en 160, 480, 800 y 1200 px, genera las migas del hero y el grano de papel, y escribe `src/data/images.json` |
+| `pipeline.py` | Recorta cada producto de la captura, lo amplía ×4 con Real-ESRGAN, le quita el fondo (rembg) y exporta WebP con transparencia en 160, 480, 800 y 1200 px, las migas del hero, el grano de papel y el manifiesto `images.json` |
+| `logo.py` | Recorta un logo de un solo color (p. ej. de la foto de perfil), lo amplía y lo traza como vector |
+| `noa.json`, `pookies.json` | La receta de cada marca: cajas de recorte, orden de productos y texturas de las migas |
 
 Dependencias: `pip install numpy opencv-python-headless ncnn "rembg[cpu]" pillow`
 y los modelos `realesrgan-x4plus` (release `realesrgan-ncnn-vulkan` de Real-ESRGAN).
+
+## Preparar una marca nueva
+
+1. Guarda sus capturas en `<trabajo>/src/` y los modelos en `<trabajo>/models/`.
+2. Copia `pookies.json` como `<marca>.json` y ajusta las cajas de recorte.
+   `python3 pipeline.py <marca>.json recortes --root <trabajo>` las deja en
+   `<trabajo>/work/` para comprobarlas en segundos.
+3. Ejecuta los pasos, en orden:
+
+   ```bash
+   python3 pipeline.py <marca>.json upscale --root <trabajo>
+   python3 pipeline.py <marca>.json matte   --root <trabajo>
+   python3 pipeline.py <marca>.json export  --root <trabajo> \
+     --out ../../brands/<marca>/public/img --manifest ../../brands/<marca>/images.json
+   ```
+
+Las capturas de iPhone vienen en Display P3; `pipeline.py` las convierte a sRGB
+para que los colores no salgan apagados. Al medir los colores de una marca en
+una captura hay que hacer la misma conversión.
 
 ## Cuando lleguen las fotos originales
 
 No hace falta este proceso. Para cada producto:
 
 1. Exporta la foto con fondo transparente en WebP a 160, 480, 800 y 1200 px de
-   ancho, con el nombre `<id>-<ancho>.webp`, dentro de `public/img/products/`.
-2. Actualiza su ancho y alto originales (`w`, `h`) en `src/data/images.json`.
-3. Pon `provisionalPhotos: false` en `src/config/site.js`.
+   ancho, con el nombre `<id>-<ancho>.webp`, dentro de `img/products/` de la
+   carpeta pública de la marca (`public/` para NOA, `brands/<marca>/public/`).
+2. Actualiza su ancho y alto originales (`w`, `h`) en el `images.json` de la marca.
+3. Pon `provisionalPhotos: false` en su `site.js`.

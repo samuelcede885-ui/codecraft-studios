@@ -16,10 +16,18 @@
  *  - maxPerOrder       → tope por pedido aunque haya stock.
  */
 import images from './images.json' with { type: 'json' }
+import { buildProducts, heroOrder } from './normalize.js'
 
+/**
+ * Grupos del catálogo.
+ *  - priceNote: precio común que se anuncia junto al título (null si varía).
+ *  - grid: columnas en pantallas grandes (5 o 4).
+ *  - disc: color del disco tras la foto. Como en las historias destacadas de
+ *    NOA, naranja y azul se alternan.
+ */
 export const categories = [
-  { id: 'cookies', name: 'Cookies', priceNote: 4 },
-  { id: 'especiales', name: 'Especiales', priceNote: null },
+  { id: 'cookies', name: 'Cookies', priceNote: 4, grid: 5, disc: 'var(--accent)' },
+  { id: 'especiales', name: 'Especiales', priceNote: null, grid: 4, disc: 'var(--primary)' },
 ]
 
 const raw = [
@@ -135,24 +143,12 @@ const raw = [
   },
 ]
 
-const DEFAULT_MAX_PER_ORDER = 24
-
-export const products = raw.map((p) => ({
-  available: true,
-  stock: null,
-  maxPerOrder: DEFAULT_MAX_PER_ORDER,
-  options: null,
-  note: null,
-  hero: null,
-  ...p,
-  info: { fromMenu: [], ingredients: null, allergens: null, ...p.info },
-  image: { ...images[p.id], alt: `${p.name} de NOA Cookies` },
-}))
+export const products = buildProducts(raw, images, 'NOA Cookies')
 
 export const productsById = Object.fromEntries(products.map((p) => [p.id, p]))
 
 /** Cookies que rotan en el hero, en este orden. */
-export const heroProducts = products.filter((p) => p.hero)
+export const heroProducts = heroOrder(products)
 
 /**
  * Producto destacado de la sección editorial.
@@ -164,6 +160,7 @@ export const featured = {
   productId: 'cookie-cake',
   headline: 'Lo que tu próxima celebración necesita',
   monthly: null, // p. ej. { productId: 'caramel-mani', until: '2026-11-30' }
+  /** Texto con el que la marca explica su sabor del mes. `null` si no tiene ese concepto. */
   monthlyCopy:
     'Todos los meses tenemos un sabor especial que está disponible únicamente durante ese mes. ¡No te pierdas el chance de probarlo!',
 }

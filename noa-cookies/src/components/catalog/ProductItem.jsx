@@ -8,8 +8,8 @@ import { AddControl } from './AddControl.jsx'
 import { OptionChips } from './OptionChips.jsx'
 
 /**
- * Producto del catálogo, al estilo del menú de NOA: foto sobre un disco de
- * color, etiqueta azul con el nombre, una línea de descripción y el "+".
+ * Producto del catálogo: foto sobre un disco de color, etiqueta con el nombre,
+ * una línea de descripción (si la marca la da) y el "+".
  */
 export function ProductItem({ product, disc, sizes }) {
   const [optionId, setOptionId] = useState(defaultOptionId(product))
@@ -19,8 +19,13 @@ export function ProductItem({ product, disc, sizes }) {
   const wide = product.image.w / product.image.h > 1.3
 
   return (
-    <article className="item" data-reveal-item data-soldout={soldOut || undefined} data-testid={`item-${product.id}`}>
-      <div className="item-visual" ref={visualRef} data-wide={wide || undefined} style={{ '--disc': `var(--color-${disc})` }}>
+    <article
+      className={product.description ? 'item' : 'item item--bare'}
+      data-reveal-item
+      data-soldout={soldOut || undefined}
+      data-testid={`item-${product.id}`}
+    >
+      <div className="item-visual" ref={visualRef} data-wide={wide || undefined} style={{ '--disc': disc }}>
         <span className="item-disc" />
         <ProductImage product={product} sizes={sizes} className="item-img" />
         <button
@@ -35,7 +40,7 @@ export function ProductItem({ product, disc, sizes }) {
 
       <h4 className="navy-label item-name">{product.name}</h4>
       {product.note && <p className="item-note">{product.note}</p>}
-      <p className="item-desc">{product.description}</p>
+      {product.description && <p className="item-desc">{product.description}</p>}
 
       {product.options && <OptionChips product={product} value={optionId} onChange={setOptionId} />}
 

@@ -1,0 +1,23 @@
+{
+  "crops": {
+    "choco-lovers": ["menu-cookies.png", 105, 480, 495, 905],
+    "signature": ["menu-cookies.png", 655, 485, 1095, 905],
+    "velvet": ["menu-cookies.png", 340, 1040, 825, 1465],
+    "nutella-bomb": ["menu-cookies.png", 50, 1570, 515, 2022],
+    "mani-fica": ["menu-cookies.png", 680, 1530, 1125, 2025],
+    "noa-roll": ["menu-especiales.png", 85, 455, 480, 840],
+    "pastelito": ["menu-especiales.png", 605, 500, 1165, 790],
+    "cookie-sandwich": ["menu-especiales.png", 55, 1090, 500, 1400],
+    "cookie-cake": ["menu-especiales.png", 615, 1095, 1160, 1405]
+  },
+  "products": ["signature", "choco-lovers", "velvet", "nutella-bomb", "mani-fica", "noa-roll", "pastelito", "cookie-sandwich", "cookie-cake"],
+  "widths": [1200, 800, 480, 160],
+  "crumbs": {
+    "golden": ["signature", 0.42, 0.74, 0.3, "crumb"],
+    "dark": ["choco-lovers", 0.5, 0.76, 0.34, "crumb"],
+    "red": ["velvet", 0.5, 0.76, 0.3, "crumb"],
+    "cream": ["velvet", 0.5, 0.325, 0.16, "blob"],
+    "choco": ["nutella-bomb", 0.46, 0.33, 0.13, "chunk"],
+    "peanut": ["mani-fica", 0.5, 0.335, 0.2, "blob"]
+  }
+}

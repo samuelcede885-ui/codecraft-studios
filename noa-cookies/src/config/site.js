@@ -11,6 +11,23 @@ export const site = {
   descriptor: 'Premium big cookies',
   lang: 'es',
 
+  /** Nombre corto con el que se habla de la marca en los mensajes ("le escribes a NOA"). */
+  shortName: 'NOA',
+  /** `true` si el logo ya incluye el nombre: entonces no se repite en texto a su lado. */
+  logoIncludesName: false,
+  /** Línea que acompaña a un producto sin descripción propia. En NOA todos la tienen. */
+  tagline: null,
+  /** Titular de la página para buscadores y lectores de pantalla. */
+  heading: 'NOA Cookies: premium big cookies en Valle Arriba, Caracas',
+  /** Textos de la pestaña del navegador y de la vista previa al compartir el enlace. */
+  seo: {
+    title: 'NOA Cookies | Premium big cookies en Caracas',
+    description:
+      'Cookies grandes, gruesas y rellenas, horneadas en Valle Arriba, Caracas. Elige tus sabores y arma tu pedido para delivery o pick-up.',
+    shareDescription: 'Because bigger is better. Elige tus sabores y arma tu pedido para delivery o pick-up.',
+    locale: 'es_VE',
+  },
+
   /** Dominio final, sin barra al final. Se usa para canonical y Open Graph. */
   url: '',
 
@@ -51,7 +68,7 @@ export const site = {
    * El menú de NOA muestra los precios sin símbolo (4.00, 3, 2.5…).
    * Se asume dólares; cambiar aquí si la marca usa otra referencia.
    */
-  currency: { code: 'USD', symbol: '$' },
+  currency: { code: 'USD', symbol: '$', decimal: '.' },
 
   ordering: {
     /**

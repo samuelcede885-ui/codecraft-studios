@@ -32,8 +32,21 @@
   --header-h: 68px;
   /* Espacio que ocupa la barra inferior del pedido en móvil (0 si no se ve). */
   --cartbar-space: 0px;
+  /* Colores por función. La marca base (NOA) los resuelve con su paleta; otra
+     marca redefine solo estos en su theme.css y el diseño no cambia. */
+  --ink: var(--color-navy); /* texto y trazos sobre fondos claros; avisos neutros */
+  --ink-rgb: 17 41 81; /* la misma tinta en canales, para sombras y velos */
+  --paper: var(--color-dough); /* fondo claro */
+  --primary: var(--color-navy); /* superficies y controles de marca */
+  --on-primary: var(--color-dough);
+  --accent: var(--color-noa-orange); /* discos, botón sobre oscuro, footer */
+  --on-accent: var(--color-navy);
+  --accent-2: var(--color-butter); /* banda del sabor del mes, avisos */
+  --on-accent-2: var(--color-navy);
+  --field: #fff; /* campos de formulario */
+
   /* Color del anillo de foco: cada sección lo ajusta para contrastar con su fondo. */
-  --focus-ring: var(--color-navy);
+  --focus-ring: var(--ink);
 
   /* Escena inicial del hero (Signature sobre Midnight Navy). JS los actualiza. */
   --h-bg: #112951;
@@ -57,8 +70,8 @@
 
 @layer base {
   html {
-    background: var(--color-dough);
-    color: var(--color-navy);
+    background: var(--paper);
+    color: var(--ink);
     scrollbar-gutter: stable;
     -webkit-text-size-adjust: 100%;
   }
@@ -86,8 +99,8 @@
   }
 
   ::selection {
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
   }
 
   img {
@@ -115,9 +128,9 @@
     inset: 0 0 auto;
     z-index: 60;
     padding-top: var(--safe-t);
-    background: var(--color-navy);
-    color: var(--color-dough);
-    box-shadow: 0 2px 0 var(--color-noa-orange);
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 0 2px 0 var(--accent);
   }
 
   .demo-bar-text {
@@ -139,11 +152,11 @@
     padding: 12px 18px;
     border: 0;
     border-radius: 16px;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--ink);
+    color: var(--paper);
     box-shadow:
-      0 0 0 2px var(--color-dough),
-      0 10px 28px rgb(17 41 81 / 0.32);
+      0 0 0 2px var(--paper),
+      0 10px 28px rgb(var(--ink-rgb) / 0.32);
     font-size: 0.9375rem;
     font-weight: 500;
     line-height: 1.35;
@@ -164,9 +177,9 @@
   .navy-label {
     display: inline-block;
     padding: 0.2em 0.5em 0.24em;
-    background: var(--label-bg, var(--color-navy));
-    color: var(--label-fg, var(--color-dough));
-    font-family: var(--font-display);
+    background: var(--label-bg, var(--primary));
+    color: var(--label-fg, var(--on-primary));
+    font-family: var(--font-brand, var(--font-display));
     font-weight: 700;
     line-height: 1.08;
     text-transform: uppercase;
@@ -215,8 +228,8 @@
     min-height: 56px;
     padding: 0 1.6em;
     border-radius: 999px;
-    background: var(--btn-bg, var(--color-navy));
-    color: var(--btn-fg, var(--color-dough));
+    background: var(--btn-bg, var(--primary));
+    color: var(--btn-fg, var(--on-primary));
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.0625rem;
@@ -231,8 +244,8 @@
   }
 
   .btn--orange {
-    --btn-bg: var(--color-noa-orange);
-    --btn-fg: var(--color-navy);
+    --btn-bg: var(--accent);
+    --btn-fg: var(--on-accent);
   }
 
   .btn--ghost {

@@ -16,7 +16,7 @@ export function Footer() {
         <div className="footer-brand">
           <p className="footer-name">
             <BrandMark size={52} />
-            <span>{site.name}</span>
+            <span className={site.logoIncludesName ? 'sr-only' : undefined}>{site.name}</span>
           </p>
           <p>{site.descriptor}</p>
         </div>
@@ -30,7 +30,8 @@ export function Footer() {
                 <br />
               </>
             )}
-            {location.area}, {location.city}, {location.country}
+            {location.area && <>{location.area}, </>}
+            {location.city}, {location.country}
           </p>
           {ways && <p>{ways}</p>}
           {location.mapsUrl && (
@@ -56,7 +57,7 @@ export function Footer() {
         <div>
           <h2 className="footer-head">Escríbenos</h2>
           <p>
-            <WhatsAppLink className="text-link" question="¡Hola, NOA!">
+            <WhatsAppLink className="text-link" question={`¡Hola, ${site.shortName}!`}>
               WhatsApp
             </WhatsAppLink>
           </p>
@@ -95,8 +96,8 @@ export function Footer() {
 
       {(site.preview || site.provisionalPhotos) && (
         <div className="wrap footer-legal">
-          {site.preview && <p>Propuesta de diseño: sitio no oficial, pendiente de aprobación de NOA Cookies.</p>}
-          {site.provisionalPhotos && <p>Fotos provisionales tomadas del menú público de @noacookies; se sustituyen por las originales.</p>}
+          {site.preview && <p>{`Propuesta de diseño: sitio no oficial, pendiente de aprobación de ${site.name}.`}</p>}
+          {site.provisionalPhotos && <p>{`Fotos provisionales tomadas del menú público de ${social[0].handle}; se sustituyen por las originales.`}</p>}
         </div>
       )}
     </footer>

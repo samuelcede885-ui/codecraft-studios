@@ -1,5 +1,6 @@
 /**
- * Plugin de Vite: completa el HTML a partir de los datos del catálogo.
+ * Plugin de Vite: completa el HTML a partir de los datos de la marca activa.
+ *  - Título, descripción y demás textos de la plantilla index.html.
  *  - Foto inicial del hero dentro del HTML: se pinta sin esperar al JavaScript
  *    y React la sustituye al arrancar (misma URL, sale de caché). Va un poco
  *    más grande que el primer fotograma de React para que siga contando como
@@ -9,10 +10,6 @@
  *  - og:url / canonical / og:image cuando `site.url` está definido.
  *  - `noindex` mientras el sitio sea una propuesta (`site.preview`).
  */
-import site from '../src/config/site.js'
-import { categories, heroProducts, products } from '../src/data/catalog.js'
-import { heroThemes } from '../src/data/themes.js'
-
 /** Debe coincidir con el `sizes` de la cookie en src/components/hero/Hero.jsx. */
 const HERO_SIZES = '(max-width: 859px) 80vw, 44vw'
 
@@ -21,7 +18,7 @@ const HERO_SIZES = '(max-width: 859px) 80vw, 44vw'
  * en la pose inicial de su animación de entrada, para que el relevo no se note.
  * `bar` es el alto de un aviso fijo sobre la página (modo demostración).
  */
-export function boot(first, bar = 0) {
+export function boot(first, heroThemes, bar = 0) {
   const { w, h, widths } = first.image
   const fit = Math.min(1, w / h) // ancho de la foto respecto al cuadro
   const drop = ((1 - Math.min(1, h / w)) / 2 + 0.05).toFixed(3) // apoyo inferior + pose de entrada
@@ -36,7 +33,7 @@ export function boot(first, bar = 0) {
   return { css, html }
 }
 
-function jsonLd() {
+function jsonLd({ site, categories, products }) {
   const base = site.url ? `${site.url}/` : ''
   return {
     '@context': 'https://schema.org',
@@ -48,7 +45,7 @@ function jsonLd() {
     address: {
       '@type': 'PostalAddress',
       ...(site.location.address ? { streetAddress: site.location.address } : {}),
-      addressLocality: `${site.location.area}, ${site.location.city}`,
+      addressLocality: [site.location.area, site.location.city].filter(Boolean).join(', '),
       addressCountry: 'VE',
     },
     sameAs: site.social.map((s) => s.url),
@@ -62,8 +59,8 @@ function jsonLd() {
           .map((p) => ({
             '@type': 'MenuItem',
             name: p.name,
-            description: p.description,
-            image: `${base}img/products/${p.id}-1200.webp`,
+            ...(p.description ? { description: p.description } : {}),
+            image: `${base}img/products/${p.id}-${Math.max(...p.image.widths)}.webp`,
             offers: {
               '@type': 'Offer',
               price: p.price.toFixed(2),
@@ -76,7 +73,11 @@ function jsonLd() {
   }
 }
 
-export function noaHtml() {
+/** Escapa un texto para usarlo dentro de HTML (contenido o atributo). */
+const esc = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+export function noaHtml(brand) {
+  const { site, heroProducts, heroThemes, preloadFont } = brand
   return {
     name: 'noa-html',
     transformIndexHtml: {
@@ -84,19 +85,33 @@ export function noaHtml() {
       handler(html, ctx) {
         const first = heroProducts[0]
         const tags = []
-        const shell = first ? boot(first) : { css: '', html: '' }
+        const shell = first ? boot(first, heroThemes) : { css: '', html: '' }
+        const text = {
+          title: site.seo.title,
+          description: site.seo.description,
+          shareDescription: site.seo.shareDescription,
+          locale: site.seo.locale,
+          name: site.name,
+          heading: site.heading,
+          themeColor: first ? heroThemes[first.hero.theme].bg.toLowerCase() : '#ffffff',
+          socialUrl: site.social[0].url,
+          socialHandle: site.social[0].handle,
+        }
         if (shell.css) tags.push(`<style>${shell.css}\n    </style>`)
         if (site.preview) tags.push('<meta name="robots" content="noindex, nofollow" />')
         // La fuente del titular gigante: se precarga para que no cambie de tamaño al llegar.
-        const font = Object.keys(ctx.bundle ?? {}).find((file) => /oswald-latin-wght-normal.*\.woff2$/.test(file))
+        const font = Object.keys(ctx.bundle ?? {}).find((file) => file.includes(preloadFont) && file.endsWith('.woff2'))
         if (font) tags.push(`<link rel="preload" as="font" type="font/woff2" href="./${font}" crossorigin />`)
         if (site.url) {
           tags.push(`<link rel="canonical" href="${site.url}/" />`)
           tags.push(`<meta property="og:url" content="${site.url}/" />`)
           tags.push(`<meta property="og:image" content="${site.url}/og.jpg" />`)
         }
-        tags.push(`<script type="application/ld+json">${JSON.stringify(jsonLd())}</script>`)
-        return html.replace('<!-- noa:head -->', tags.join('\n    ')).replace('<!-- noa:boot -->', shell.html)
+        tags.push(`<script type="application/ld+json">${JSON.stringify(jsonLd(brand))}</script>`)
+        return html
+          .replace(/\{\{(\w+)\}\}/g, (match, key) => (key in text ? esc(text[key]) : match))
+          .replace('<!-- noa:head -->', tags.join('\n    '))
+          .replace('<!-- noa:boot -->', shell.html)
       },
     },
   }

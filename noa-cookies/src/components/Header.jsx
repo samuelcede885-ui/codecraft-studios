@@ -17,7 +17,8 @@ export function Header() {
     <header className="site-header">
       <a className="site-brand" href="#top">
         <BrandMark className="site-brand-mark" />
-        <span>{site.name}</span>
+        {/* Si el logo ya trae el nombre no se repite a la vista, pero se sigue anunciando. */}
+        <span className={site.logoIncludesName ? 'sr-only' : undefined}>{site.name}</span>
       </a>
       <nav aria-label="Principal">
         <a className="site-nav-link" href="#menu" onClick={toMenu}>

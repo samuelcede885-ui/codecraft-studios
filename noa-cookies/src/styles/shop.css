@@ -11,8 +11,8 @@
     z-index: 100;
     padding: 10px 16px;
     border-radius: 999px;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--ink);
+    color: var(--paper);
     font-weight: 600;
     transform: translateY(-200%);
   }
@@ -27,7 +27,7 @@
     margin-top: -28px;
     padding: clamp(52px, 8vw, 104px) 0 clamp(64px, 9vw, 128px);
     border-radius: 28px 28px 0 0;
-    background: var(--color-dough);
+    background: var(--paper);
     scroll-margin-top: -1px;
   }
 
@@ -45,7 +45,7 @@
     margin-top: 20px;
     padding: 14px 18px;
     border-radius: 16px;
-    background: color-mix(in srgb, var(--color-butter) 45%, var(--color-dough));
+    background: color-mix(in srgb, var(--accent-2) 45%, var(--paper));
     font-size: 0.9375rem;
   }
 
@@ -86,17 +86,17 @@
   }
 
   @media (min-width: 1200px) {
-    .shop-grid--cookies {
+    .shop-grid--5 {
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 28px;
     }
 
-    .shop-grid--especiales {
+    .shop-grid--4 {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     /* Con cinco columnas la fila queda completa: la ficha del sabor del mes sobra. */
-    .shop-grid--cookies .item--monthly {
+    .shop-grid--5 .item--monthly {
       display: none;
     }
   }
@@ -130,7 +130,7 @@
     width: 82%;
     height: 82%;
     object-fit: contain;
-    filter: drop-shadow(0 10px 8px rgb(17 41 81 / 0.28));
+    filter: drop-shadow(0 10px 8px rgb(var(--ink-rgb) / 0.28));
     transition: transform 0.55s var(--pm-ease-out);
   }
 
@@ -145,7 +145,7 @@
     inset: 15%;
     width: 70%;
     height: 70%;
-    color: var(--color-dough);
+    color: var(--paper);
     filter: none;
   }
 
@@ -173,9 +173,9 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: var(--color-dough);
-    color: var(--color-navy);
-    box-shadow: inset 0 0 0 2px var(--color-navy);
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 2px var(--ink);
   }
 
   .item-name {
@@ -193,7 +193,7 @@
     margin-top: 8px;
     font-size: 0.875rem;
     line-height: 1.4;
-    color: color-mix(in srgb, var(--color-navy) 82%, transparent);
+    color: color-mix(in srgb, var(--ink) 82%, transparent);
   }
 
   .item-buy {
@@ -208,6 +208,13 @@
 
   .item-price {
     font-size: 1.75rem;
+  }
+
+  /* Sin descripción (hay marcas cuyo menú solo da nombre y precio), la fila de
+     compra baja al fondo para que todas queden alineadas. */
+  .item--bare .item-buy {
+    margin-top: auto;
+    padding-top: 12px;
   }
 
   .item--monthly .item-visual {
@@ -254,14 +261,14 @@
   }
 
   .chip[aria-checked="true"] {
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
     box-shadow: none;
   }
 
   .chips--dark .chip[aria-checked="true"] {
-    background: var(--color-noa-orange);
-    color: var(--color-navy);
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   /* ---------- Añadir / cantidad ---------- */
@@ -272,8 +279,8 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
   }
 
   .add-btn:disabled {
@@ -283,8 +290,8 @@
   .add-btn--lg {
     width: 64px;
     height: 64px;
-    background: var(--color-noa-orange);
-    color: var(--color-navy);
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   .add-labeled {
@@ -308,8 +315,8 @@
     flex: none;
     height: 48px;
     border-radius: 999px;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
   }
 
   .stepper-btn {
@@ -335,8 +342,8 @@
 
   .stepper--lg {
     height: 64px;
-    background: var(--color-noa-orange);
-    color: var(--color-navy);
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   .stepper--lg .stepper-btn {
@@ -366,9 +373,9 @@
     z-index: 2;
     overflow: clip;
     padding-top: clamp(64px, 10vw, 136px);
-    background: var(--color-navy);
-    color: var(--color-dough);
-    --focus-ring: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
+    --focus-ring: var(--on-primary);
   }
 
   .featured-kicker {
@@ -387,14 +394,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: var(--font-display);
+    font-family: var(--font-brand, var(--font-display));
     font-weight: 700;
     font-size: 100px;
     line-height: 0.86;
     letter-spacing: -0.012em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--color-noa-orange);
+    color: var(--accent);
     will-change: transform;
   }
 
@@ -424,8 +431,8 @@
   }
 
   .featured-note {
-    --label-bg: var(--color-noa-orange);
-    --label-fg: var(--color-navy);
+    --label-bg: var(--accent);
+    --label-fg: var(--on-accent);
     margin-bottom: 14px;
     font-size: 1.125rem;
   }
@@ -456,7 +463,7 @@
 
   .featured-price {
     font-size: clamp(3rem, 6vw, 4.5rem);
-    color: var(--color-noa-orange);
+    color: var(--accent);
   }
 
   @media (min-width: 860px) {
@@ -481,9 +488,9 @@
 
   /* ---------- Sabor del mes ---------- */
   .monthly {
-    --focus-ring: var(--color-navy);
-    background: var(--color-butter);
-    color: var(--color-navy);
+    --focus-ring: var(--on-accent-2);
+    background: var(--accent-2);
+    color: var(--on-accent-2);
     padding-block: clamp(44px, 7vw, 88px);
   }
 
@@ -530,8 +537,8 @@
     z-index: 2;
     overflow: clip;
     padding: clamp(48px, 7vw, 88px) 0 calc(28px + var(--cartbar-space) + env(safe-area-inset-bottom));
-    background: var(--color-noa-orange);
-    color: var(--color-navy);
+    background: var(--accent);
+    color: var(--on-accent);
   }
 
   .footer-grid {

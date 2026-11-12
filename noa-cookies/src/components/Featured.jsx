@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import site from '../config/site.js'
 import { featured } from '../data/catalog.js'
 import { useCatalog } from '../services/catalog.js'
 import { WhatsAppLink } from './ui/WhatsAppLink.jsx'
@@ -12,8 +13,9 @@ import { OptionChips } from './catalog/OptionChips.jsx'
 
 /**
  * Sección editorial. Muestra el sabor del mes cuando la marca lo confirme
- * (`featured.monthly`); mientras tanto destaca un producto real del menú y
- * explica el sabor del mes con las palabras de NOA, sin inventar cuál es.
+ * (`featured.monthly`); mientras tanto destaca un producto real del menú y, si
+ * la marca tiene sabor del mes (`featured.monthlyCopy`), lo explica con sus
+ * palabras sin inventar cuál es.
  */
 export function Featured() {
   const { byId } = useCatalog()
@@ -70,7 +72,7 @@ export function Featured() {
       <div className="wrap featured-body" data-reveal-group>
         <div className="featured-copy" data-reveal-item>
           {product.note && <p className="navy-label featured-note">{product.note}</p>}
-          <p className="featured-desc">{product.description}</p>
+          <p className="featured-desc">{product.description ?? site.tagline}</p>
         </div>
         <div className="featured-buy" data-reveal-item>
           {product.options && <OptionChips product={product} value={optionId} onChange={setOptionId} tone="dark" />}
@@ -81,7 +83,7 @@ export function Featured() {
         </div>
       </div>
 
-      {!monthly && (
+      {!monthly && featured.monthlyCopy && (
         <aside className="monthly" aria-labelledby="monthly-title">
           <div className="wrap monthly-inner" data-reveal-group>
             <h2 id="monthly-title" className="navy-label monthly-title" data-reveal-item>
@@ -90,7 +92,7 @@ export function Featured() {
             <p className="monthly-copy" data-reveal-item>
               {featured.monthlyCopy}
             </p>
-            <WhatsAppLink className="btn pm-interactive monthly-cta" data-reveal-item question="¡Hola, NOA! ¿Cuál es el sabor del mes?">
+            <WhatsAppLink className="btn pm-interactive monthly-cta" data-reveal-item question={`¡Hola, ${site.shortName}! ¿Cuál es el sabor del mes?`}>
               Preguntar cuál es el de este mes
             </WhatsAppLink>
           </div>

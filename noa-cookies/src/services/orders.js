@@ -1,9 +1,9 @@
 /**
  * Envío del pedido.
  *
- * Hoy NOA recibe los pedidos por WhatsApp, así que el proveedor por defecto
+ * La marca recibe los pedidos por WhatsApp, así que el proveedor por defecto
  * arma el mensaje y abre el chat: el pedido queda hecho cuando el cliente lo
- * envía y NOA responde. La web nunca muestra un "pedido confirmado" propio.
+ * envía y la marca responde. La web nunca muestra un "pedido confirmado" propio.
  *
  * Con un backend (config.ordering.provider = 'api') el pedido se registra por
  * POST y la confirmación muestra el número que devuelva el servidor.
@@ -44,7 +44,7 @@ export function orderToText(order) {
     const option = i.option ? ` (${i.option.label.toLowerCase()}: ${i.option.name})` : ''
     return `• ${i.qty} × ${i.name}${option} — ${formatPrice(i.total)}`
   })
-  const out = ['¡Hola, NOA! 🍪 Quiero hacer este pedido:', '', ...lines, '', `Subtotal: ${formatPrice(order.subtotal)}`]
+  const out = [`¡Hola, ${site.shortName}! 🍪 Quiero hacer este pedido:`, '', ...lines, '', `Subtotal: ${formatPrice(order.subtotal)}`]
 
   if (order.fulfillment.type === 'delivery') {
     out.push(`Entrega: delivery a ${order.fulfillment.address}`)
@@ -61,7 +61,7 @@ export function orderToText(order) {
 /**
  * Destino en WhatsApp.
  * Con número configurado el mensaje llega ya escrito (`prefilled: true`).
- * Sin número solo se puede abrir el enlace público de NOA, y el cliente pega
+ * Sin número solo se puede abrir el enlace público de la marca, y el cliente pega
  * el pedido que la web le copia al portapapeles.
  */
 export function whatsappTarget(text) {
@@ -71,7 +71,7 @@ export function whatsappTarget(text) {
   return { url: shortLink, prefilled: false }
 }
 
-/** Enlace para escribirle a NOA una pregunta puntual (sabor del mes, alérgenos…). */
+/** Enlace para escribirle a la marca una pregunta puntual (sabor del mes, alérgenos…). */
 export function whatsappAskUrl(question) {
   return whatsappTarget(question).url
 }

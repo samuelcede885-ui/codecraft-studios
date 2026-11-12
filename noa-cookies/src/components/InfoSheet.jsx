@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import site from '../config/site.js'
 import { useCatalog } from '../services/catalog.js'
 import { WhatsAppLink } from './ui/WhatsAppLink.jsx'
 import { ui, useUi } from '../store/ui.js'
@@ -36,14 +37,18 @@ export function InfoSheet() {
               </p>
             </div>
           </div>
-          <p className="info-desc">{product.description}</p>
+          {product.description && <p className="info-desc">{product.description}</p>}
 
-          <h3 className="info-sub">Lo que dice el menú</h3>
-          <ul className="info-list">
-            {product.info.fromMenu.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
+          {product.info.fromMenu.length > 0 && (
+            <>
+              <h3 className="info-sub">Lo que dice el menú</h3>
+              <ul className="info-list">
+                {product.info.fromMenu.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </>
+          )}
 
           <h3 className="info-sub">Ingredientes y alérgenos</h3>
           {product.info.ingredients || product.info.allergens ? (
@@ -57,8 +62,8 @@ export function InfoSheet() {
             </>
           ) : (
             <p className="info-text">
-              NOA todavía no ha publicado la lista completa. Si tienes alguna alergia, pregunta antes de pedir.{' '}
-              <WhatsAppLink className="text-link" question={`¡Hola, NOA! ¿Qué ingredientes y alérgenos tiene ${product.name}?`}>
+              {`${site.shortName} todavía no ha publicado la lista completa. Si tienes alguna alergia, pregunta antes de pedir.`}{' '}
+              <WhatsAppLink className="text-link" question={`¡Hola, ${site.shortName}! ¿Qué ingredientes y alérgenos tiene ${product.name}?`}>
                 Preguntar por WhatsApp
               </WhatsAppLink>
             </p>

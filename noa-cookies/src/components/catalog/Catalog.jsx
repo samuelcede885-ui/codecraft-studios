@@ -1,22 +1,22 @@
+import site from '../../config/site.js'
 import { categories, featured } from '../../data/catalog.js'
 import { refreshAvailability, useCatalog } from '../../services/catalog.js'
 import { WhatsAppLink } from '../ui/WhatsAppLink.jsx'
 import { Price } from '../ui/Price.jsx'
 import { ProductItem } from './ProductItem.jsx'
 
-// Ancho real de la foto dentro de su disco (no el de la columna): así cada
-// pantalla descarga la versión justa.
+// Ancho real de la foto dentro de su disco (no el de la columna), según las
+// columnas del grupo: así cada pantalla descarga la versión justa.
 const SIZES = {
-  cookies: '(max-width: 767px) 38vw, (max-width: 1199px) 26vw, 200px',
-  especiales: '(max-width: 767px) 40vw, (max-width: 1199px) 28vw, 280px',
+  5: '(max-width: 767px) 38vw, (max-width: 1199px) 26vw, 200px',
+  4: '(max-width: 767px) 40vw, (max-width: 1199px) 28vw, 280px',
 }
-/** Como en las historias destacadas de NOA: naranja y azul se alternan. */
-const DISC = { cookies: 'noa-orange', especiales: 'navy' }
 
+/** Ficha que invita a preguntar por el sabor del mes (solo en marcas que lo tienen). */
 function MonthlyTile() {
   return (
-    <WhatsAppLink className="item item--monthly" data-reveal-item question="¡Hola, NOA! ¿Cuál es el sabor del mes?">
-      <div className="item-visual" style={{ '--disc': 'var(--color-butter)' }}>
+    <WhatsAppLink className="item item--monthly" data-reveal-item question={`¡Hola, ${site.shortName}! ¿Cuál es el sabor del mes?`}>
+      <div className="item-visual" style={{ '--disc': 'var(--accent-2)' }}>
         <span className="item-disc" />
         <span className="monthly-mark display" aria-hidden="true">
           Sabor
@@ -35,6 +35,7 @@ function MonthlyTile() {
 
 export function Catalog() {
   const { products, status } = useCatalog()
+  const monthlyTile = Boolean(featured.monthlyCopy) && !featured.monthly
 
   return (
     <section id="menu" className="shop paper" aria-labelledby="menu-title">
@@ -52,7 +53,7 @@ export function Catalog() {
           </p>
         )}
 
-        {categories.map((category) => {
+        {categories.map((category, index) => {
           const list = products.filter((p) => p.category === category.id)
           if (!list.length) return null
           return (
@@ -65,11 +66,11 @@ export function Catalog() {
                   </p>
                 )}
               </div>
-              <div className={`shop-grid shop-grid--${category.id}`}>
+              <div className={`shop-grid shop-grid--${category.grid}`}>
                 {list.map((product) => (
-                  <ProductItem key={product.id} product={product} disc={DISC[category.id]} sizes={SIZES[category.id]} />
+                  <ProductItem key={product.id} product={product} disc={category.disc} sizes={SIZES[category.grid]} />
                 ))}
-                {category.id === 'cookies' && !featured.monthly && <MonthlyTile />}
+                {index === 0 && monthlyTile && <MonthlyTile />}
               </div>
             </div>
           )

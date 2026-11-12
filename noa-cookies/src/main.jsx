@@ -1,11 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/oswald/wght.css'
-import '@fontsource/poppins/latin-400.css'
-import '@fontsource/poppins/latin-500.css'
-import '@fontsource/poppins/latin-600.css'
+import './brand/fonts.js'
 import 'lenis/dist/lenis.css'
 import './styles/index.css'
+import './brand/theme.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(

@@ -3,18 +3,22 @@
  * como artefacto: un fragmento HTML (sin <html>, <head> ni <body>) con el CSS
  * y el código de la tienda dentro, y las librerías pedidas a un CDN.
  *
- *   npm run build:artifact  →  dist-artifact/propuesta-noa-cookies.html
- *                              dist-artifact/img/…  (fotos; se publican junto a la página)
+ *   npm run build:artifact      →  dist-artifact/propuesta-noa-cookies.html + img/
+ *   npm run pookies:artifact    →  dist-artifact-pookies/propuesta-pookies.html + img/
+ *
+ * Uso directo: node artifact/assemble.mjs [marca]
  */
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { brandDirs, loadBrand, resolveBrand } from '../build/brand.js'
 import { boot } from '../build/noa-html.js'
-import { heroProducts } from '../src/data/catalog.js'
-import { palette } from '../src/data/themes.js'
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
-const dist = path.join(root, 'dist-artifact')
+const brandId = resolveBrand(process.argv[2])
+const brand = await loadBrand(brandId)
+const { artifact, heroProducts, heroThemes } = brand
+const dist = path.join(root, brandDirs(brandId).artifactDir)
 const assets = fs.readdirSync(path.join(dist, 'assets'))
 const pick = (ext) => {
   const found = assets.filter((file) => file.endsWith(ext))
@@ -30,35 +34,27 @@ const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',
 ]
 const GSAP_REACT = 'https://cdn.jsdelivr.net/npm/@gsap/react@2.1.2/dist/index.min.js'
-const FONTS = 'https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Poppins:wght@400;500;600&display=swap'
 const BAR = 33 // alto aproximado del aviso de demostración, para la foto inicial
 
 const css = pick('.css').replaceAll('url(../img/', 'url(./img/').replace(/<\/style/gi, '<\\/style')
 const js = pick('.js').replace(/<\/script/gi, '<\\/script')
 if (/\bimport\s*\(|^\s*import\s/m.test(js)) throw new Error('El código de la tienda no debe importar módulos externos')
-const shell = boot(heroProducts[0], BAR)
+const shell = boot(heroProducts[0], heroThemes, BAR)
 
-const page = `<title>Propuesta NOA Cookies</title>
+const page = `<title>${artifact.title}</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="${FONTS}">
+<link rel="stylesheet" href="${artifact.googleFonts}">
 <style>
 /* Tienda de una página: una cookie a pantalla completa con su nombre detrás, catálogo en discos de color y pedido en un panel. */
 :root {
-  --color-noa-orange: ${palette.orange.toLowerCase()};
-  --color-navy: ${palette.navy.toLowerCase()};
-  --color-butter: ${palette.butter.toLowerCase()};
-  --color-choco: ${palette.choco.toLowerCase()};
-  --color-dough: ${palette.dough.toLowerCase()};
-  --color-danger: #b3261e;
-  --font-display: "Oswald", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  color-scheme: light; /* Una sola apariencia: la paleta la fija el manual de marca. */
+${artifact.rootCss.map((line) => `  ${line}`).join('\n')}
+  color-scheme: light; /* Una sola apariencia: la paleta la fija la marca. */
 }
-html { background: var(--color-noa-orange); }
+html { background: ${artifact.canvas}; }
 body {
   margin: 0;
-  background: var(--color-dough);
-  color: var(--color-navy);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.55;
@@ -81,7 +77,7 @@ ${js}
 </script>
 `
 
-const out = path.join(dist, 'propuesta-noa-cookies.html')
+const out = path.join(dist, artifact.file)
 fs.writeFileSync(out, page)
 // Lo que no se publica: restos del build intermedio.
 fs.rmSync(path.join(dist, 'assets'), { recursive: true, force: true })

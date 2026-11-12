@@ -21,11 +21,11 @@
     height: 48px;
     padding: 0 13px;
     border-radius: 999px;
-    background: var(--color-dough);
-    color: var(--color-navy);
+    background: var(--paper);
+    color: var(--ink);
     box-shadow:
-      inset 0 0 0 2px var(--color-navy),
-      0 6px 18px rgb(17 41 81 / 0.16);
+      inset 0 0 0 2px var(--ink),
+      0 6px 18px rgb(var(--ink-rgb) / 0.16);
     font-weight: 600;
     font-size: 0.9375rem;
   }
@@ -33,11 +33,11 @@
   /* Flotan sobre cualquier sección: anillo azul con halo crema, visible en todos los fondos. */
   .cart-fab:focus-visible,
   .cart-bar:focus-visible {
-    outline: 3px solid var(--color-navy);
+    outline: 3px solid var(--ink);
     outline-offset: 2px;
     box-shadow:
-      inset 0 0 0 2px var(--color-navy),
-      0 0 0 8px var(--color-dough);
+      inset 0 0 0 2px var(--ink),
+      0 0 0 8px var(--paper);
   }
 
   .cart-fab-text,
@@ -52,8 +52,8 @@
     height: 24px;
     padding: 0 6px;
     border-radius: 999px;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.9375rem;
@@ -91,11 +91,11 @@
     height: 56px;
     padding: 0 20px 0 10px;
     border-radius: 999px;
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--ink);
+    color: var(--paper);
     box-shadow:
-      0 0 0 2px var(--color-dough),
-      0 10px 28px rgb(17 41 81 / 0.32);
+      0 0 0 2px var(--paper),
+      0 10px 28px rgb(var(--ink-rgb) / 0.32);
     font-weight: 600;
   }
 
@@ -106,8 +106,8 @@
     height: 36px;
     padding: 0 8px;
     border-radius: 999px;
-    background: var(--color-noa-orange);
-    color: var(--color-navy);
+    background: var(--accent);
+    color: var(--on-accent);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.125rem;
@@ -147,17 +147,17 @@
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--color-navy);
+    color: var(--ink);
     overflow: hidden;
   }
 
   .sheet::backdrop {
-    background: rgb(17 41 81 / 0);
+    background: rgb(var(--ink-rgb) / 0);
     transition: background-color var(--pm-normal) var(--pm-ease-standard);
   }
 
   .sheet[data-state="open"]::backdrop {
-    background: rgb(17 41 81 / 0.62);
+    background: rgb(var(--ink-rgb) / 0.62);
   }
 
   .sheet-panel {
@@ -169,7 +169,7 @@
     flex-direction: column;
     max-height: min(92dvh, 100% - 28px);
     border-radius: 26px 26px 0 0;
-    background: var(--color-dough);
+    background: var(--paper);
     transform: translate3d(0, 104%, 0);
     transition: transform var(--pm-slow) var(--pm-ease-out);
     will-change: transform;
@@ -241,7 +241,7 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    box-shadow: inset 0 0 0 2px var(--color-navy);
+    box-shadow: inset 0 0 0 2px var(--ink);
   }
 
   .sheet-back {
@@ -270,7 +270,7 @@
     gap: 14px;
     align-items: start;
     padding: 16px 0;
-    border-top: 2px solid color-mix(in srgb, var(--color-navy) 12%, transparent);
+    border-top: 2px solid color-mix(in srgb, var(--ink) 12%, transparent);
   }
 
   .line:first-child {
@@ -295,7 +295,7 @@
   .line-unit {
     margin-top: 2px;
     font-size: 0.875rem;
-    color: color-mix(in srgb, var(--color-navy) 78%, transparent);
+    color: color-mix(in srgb, var(--ink) 78%, transparent);
   }
 
   .line-issue {
@@ -331,8 +331,8 @@
     display: grid;
     gap: 12px;
     padding: 16px 22px calc(18px + env(safe-area-inset-bottom));
-    background: var(--color-dough);
-    box-shadow: 0 -2px 0 color-mix(in srgb, var(--color-navy) 12%, transparent);
+    background: var(--paper);
+    box-shadow: 0 -2px 0 color-mix(in srgb, var(--ink) 12%, transparent);
   }
 
   .totals {
@@ -382,7 +382,7 @@
   .cart-foot-note {
     font-size: 0.8125rem;
     text-align: center;
-    color: color-mix(in srgb, var(--color-navy) 80%, transparent);
+    color: color-mix(in srgb, var(--ink) 80%, transparent);
   }
 
   .cart-empty,
@@ -442,9 +442,9 @@
     min-height: 54px;
     padding: 13px 16px;
     border-radius: 14px;
-    background: #fff;
-    color: var(--color-navy);
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-navy) 30%, transparent);
+    background: var(--field);
+    color: var(--ink);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 30%, transparent);
     font: inherit;
     font-size: 1rem; /* 16 px: iOS no hace zoom al enfocar */
     resize: vertical;
@@ -452,13 +452,13 @@
 
   .field input::placeholder,
   .field textarea::placeholder {
-    color: color-mix(in srgb, var(--color-navy) 45%, transparent);
+    color: color-mix(in srgb, var(--ink) 45%, transparent);
   }
 
   .field input:focus-visible,
   .field textarea:focus-visible {
     outline: none;
-    box-shadow: inset 0 0 0 3px var(--color-navy);
+    box-shadow: inset 0 0 0 3px var(--ink);
   }
 
   .field[data-invalid] input,
@@ -468,7 +468,7 @@
 
   .field-hint {
     font-size: 0.8125rem;
-    color: color-mix(in srgb, var(--color-navy) 78%, transparent);
+    color: color-mix(in srgb, var(--ink) 78%, transparent);
   }
 
   .field-error,
@@ -485,7 +485,7 @@
     gap: 4px;
     padding: 4px;
     border-radius: 999px;
-    box-shadow: inset 0 0 0 2px var(--color-navy);
+    box-shadow: inset 0 0 0 2px var(--ink);
   }
 
   .segmented-option {
@@ -513,12 +513,12 @@
   }
 
   .segmented-option:has(input:checked) {
-    background: var(--color-navy);
-    color: var(--color-dough);
+    background: var(--primary);
+    color: var(--on-primary);
   }
 
   .segmented-option:has(input:focus-visible) {
-    outline: 2.5px solid var(--color-navy);
+    outline: 2.5px solid var(--ink);
     outline-offset: 3px;
   }
 
@@ -534,26 +534,26 @@
     min-height: 52px;
     padding: 0 16px;
     border-radius: 14px;
-    background: #fff;
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-navy) 30%, transparent);
+    background: var(--field);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 30%, transparent);
     font-weight: 500;
     cursor: pointer;
   }
 
   .choice:has(input:checked) {
-    box-shadow: inset 0 0 0 3px var(--color-navy);
+    box-shadow: inset 0 0 0 3px var(--ink);
   }
 
   .choice input {
     width: 20px;
     height: 20px;
-    accent-color: var(--color-navy);
+    accent-color: var(--primary);
   }
 
   .checkout-note {
     padding: 14px 16px;
     border-radius: 14px;
-    background: color-mix(in srgb, var(--color-butter) 40%, var(--color-dough));
+    background: color-mix(in srgb, var(--accent-2) 40%, var(--paper));
     font-size: 0.9375rem;
   }
 
@@ -561,7 +561,7 @@
   .sent-warning {
     padding: 12px 16px;
     border-radius: 14px;
-    background: color-mix(in srgb, var(--color-butter) 45%, var(--color-dough));
+    background: color-mix(in srgb, var(--accent-2) 45%, var(--paper));
     font-weight: 600;
     font-size: 0.9375rem;
   }
@@ -572,8 +572,8 @@
     overflow: auto;
     padding: 14px 16px;
     border-radius: 14px;
-    background: #fff;
-    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--color-navy) 18%, transparent);
+    background: var(--field);
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ink) 18%, transparent);
     font-family: var(--font-sans);
     font-size: 0.875rem;
     line-height: 1.5;

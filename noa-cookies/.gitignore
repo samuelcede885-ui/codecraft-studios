@@ -1,6 +1,6 @@
 node_modules/
 dist/
-dist-artifact/
+dist-*/
 *.log
 .DS_Store
 test-results/

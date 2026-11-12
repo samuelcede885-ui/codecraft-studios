@@ -341,7 +341,8 @@ function CheckoutView({ summary, onSent }) {
           </fieldset>
         ) : (
           <p className="checkout-note">
-            <strong>Pago:</strong> lo coordinas con NOA por WhatsApp al confirmar tu pedido.
+            <strong>Pago:</strong>
+            {` lo coordinas con ${site.shortName} por WhatsApp al confirmar tu pedido.`}
           </p>
         )}
       </div>
@@ -378,7 +379,7 @@ function CheckoutView({ summary, onSent }) {
         {site.demo ? (
           <p className="cart-foot-note">Demostración: no se envía nada ni se guarda fuera de tu navegador.</p>
         ) : (
-          !api && <p className="cart-foot-note">Se abre WhatsApp con tu pedido escrito. NOA lo confirma por ahí.</p>
+          !api && <p className="cart-foot-note">{`Se abre WhatsApp con tu pedido escrito. ${site.shortName} lo confirma por ahí.`}</p>
         )}
       </div>
     </form>
@@ -413,7 +414,8 @@ function SentView({ result, onDone }) {
       <div className="sent pm-enter" data-testid="sent">
         <p className="display sent-title">Pedido registrado</p>
         <p>
-          Tu número de pedido es <strong>{result.orderNumber}</strong>. Guárdalo: NOA lo usará para avisarte.
+          Tu número de pedido es <strong>{result.orderNumber}</strong>
+          {`. Guárdalo: ${site.shortName} lo usará para avisarte.`}
         </p>
         <p>
           Total: <strong>{result.order.total === null ? `${formatPrice(result.order.subtotal)} más delivery` : formatPrice(result.order.total)}</strong>
@@ -430,8 +432,8 @@ function SentView({ result, onDone }) {
       <div className="sent pm-enter" data-testid="sent">
         <p className="display sent-title">Así llegaría tu pedido</p>
         <p>
-          Esto es una demostración: <strong>no se envió nada</strong>. En el sitio real, este paso abre WhatsApp con este mensaje ya escrito
-          para NOA.
+          Esto es una demostración: <strong>no se envió nada</strong>
+          {`. En el sitio real, este paso abre WhatsApp con este mensaje ya escrito para ${site.shortName}.`}
         </p>
         <pre ref={textRef} className="sent-text" tabIndex={0} aria-label="Texto del pedido">
           {result.text}
@@ -452,13 +454,15 @@ function SentView({ result, onDone }) {
     <div className="sent pm-enter" data-testid="sent">
       <p className="display sent-title">{result.prefilled ? 'Falta un paso: envíalo en WhatsApp' : 'Falta un paso: pégalo en WhatsApp'}</p>
       {result.prefilled ? (
-        <p>Abrimos WhatsApp con tu pedido ya escrito. Pulsa enviar en el chat y NOA te confirma el pedido y el pago.</p>
+        <p>{`Abrimos WhatsApp con tu pedido ya escrito. Pulsa enviar en el chat y ${site.shortName} te confirma el pedido y el pago.`}</p>
       ) : (
         <p>
-          Copiamos tu pedido y abrimos el chat de NOA. <strong>Pégalo en el chat y envíalo</strong>: NOA te confirma el pedido y el pago.
+          {`Copiamos tu pedido y abrimos el chat de ${site.shortName}. `}
+          <strong>Pégalo en el chat y envíalo</strong>
+          {`: ${site.shortName} te confirma el pedido y el pago.`}
         </p>
       )}
-      <p className="sent-warning">Tu pedido no queda hecho hasta que lo envíes por WhatsApp y NOA te responda.</p>
+      <p className="sent-warning">{`Tu pedido no queda hecho hasta que lo envíes por WhatsApp y ${site.shortName} te responda.`}</p>
 
       <pre ref={textRef} className="sent-text" tabIndex={0} aria-label="Texto de tu pedido">
         {result.text}

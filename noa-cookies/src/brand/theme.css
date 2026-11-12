@@ -1,0 +1,5 @@
+/* Tema de la marca.
+   La marca base (NOA) define sus colores y fuentes en styles/index.css, así que
+   aquí no añade nada. Otra marca sustituye este archivo por su theme.css, donde
+   redefine los colores por función (--ink, --paper, --primary, --accent…) y sus
+   fuentes (ver brands/ y build/brand.js). */

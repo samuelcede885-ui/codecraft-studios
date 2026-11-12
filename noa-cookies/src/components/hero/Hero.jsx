@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import site from '../../config/site.js'
+import { heroOrder } from '../../data/normalize.js'
 import { heroThemes } from '../../data/themes.js'
 import { EASE, ScrollTrigger, gsap, isLowPower, prefersReducedMotion, useGSAP } from '../../lib/motion.js'
 import { useFitText, useInView, useLatest, useMediaQuery } from '../../lib/hooks.js'
@@ -107,7 +109,7 @@ function Crumbs({ product, layout, layer, scene }) {
 
 export function Hero() {
   const { byId, products } = useCatalog()
-  const slides = useMemo(() => products.filter((p) => p.hero), [products])
+  const slides = useMemo(() => heroOrder(products), [products])
   const total = slides.length
 
   const [index, setIndex] = useState(0)
@@ -429,10 +431,10 @@ export function Hero() {
       ref={rootRef}
       className="hero"
       aria-roledescription="carrusel"
-      aria-label="Cookies de NOA"
+      aria-label={`Cookies de ${site.shortName}`}
       onKeyDown={onKeyDown}
     >
-      <h1 className="sr-only">NOA Cookies: premium big cookies en Valle Arriba, Caracas</h1>
+      <h1 className="sr-only">{site.heading}</h1>
       <div ref={bgRef} className="hero-bg" />
       <div ref={wipeRef} className="hero-wipe" />
       <div className="hero-grain" />
@@ -497,7 +499,7 @@ export function Hero() {
       <div className="hero-panel">
         <div className="hero-info" aria-live="polite" aria-atomic="true">
           <h2 className="navy-label hero-name">{product.name}</h2>
-          <p className="hero-desc">{product.description}</p>
+          <p className="hero-desc">{product.description ?? site.tagline}</p>
           <p className="sr-only">Precio: <Price value={product.price} /></p>
         </div>
 

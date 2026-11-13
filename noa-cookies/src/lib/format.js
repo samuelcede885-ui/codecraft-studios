@@ -5,8 +5,12 @@ const round2 = (n) => Math.round(n * 100) / 100
 /** Separador decimal de la marca: "." en NOA ($4.00), "," donde el menú lo escribe así (€5,50). */
 const decimal = () => site.currency.decimal ?? '.'
 
-/** "$4.00" — siempre dos decimales para que los totales se lean igual. */
+/** Texto para un precio que la marca no ha publicado (nunca se inventa una cifra). */
+export const PRICE_TBD = 'Por confirmar'
+
+/** "$4.00" — siempre dos decimales para que los totales se lean igual. `null`: por confirmar. */
 export function formatPrice(value) {
+  if (value === null || value === undefined) return PRICE_TBD
   return `${site.currency.symbol}${round2(value).toFixed(2).replace('.', decimal())}`
 }
 
@@ -31,7 +35,8 @@ export function productSrcSet(product) {
 }
 
 export function productSrc(product, width = 800) {
-  const widths = product.image.widths
+  const widths = product.image?.widths
+  if (!widths) return null // producto aún sin foto
   const w = widths.includes(width) ? width : widths[widths.length - 1]
   return asset(`img/products/${product.id}-${w}.webp`)
 }

@@ -74,13 +74,17 @@ function jsonLd({ site, categories, products }) {
             '@type': 'MenuItem',
             name: p.name,
             ...(p.description ? { description: p.description } : {}),
-            image: `${base}img/products/${p.id}-${Math.max(...p.image.widths)}.webp`,
-            offers: {
-              '@type': 'Offer',
-              price: p.price.toFixed(2),
-              priceCurrency: site.currency.code,
-              availability: p.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            },
+            ...(p.image?.widths ? { image: `${base}img/products/${p.id}-${Math.max(...p.image.widths)}.webp` } : {}),
+            ...(p.price === null
+              ? {}
+              : {
+                  offers: {
+                    '@type': 'Offer',
+                    price: p.price.toFixed(2),
+                    priceCurrency: site.currency.code,
+                    availability: p.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                  },
+                }),
           })),
       })),
     },

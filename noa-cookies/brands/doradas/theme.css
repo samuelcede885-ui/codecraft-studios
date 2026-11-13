@@ -1,0 +1,123 @@
+/* Tema de Doradas.
+   Sustituye a src/brand/theme.css (ver build/brand.js). Redefine los colores
+   por función y las fuentes; el diseño, las medidas y el movimiento son los
+   del proyecto base. Los valores salen de su perfil público (ver themes.js). */
+:root {
+  --dr-chocolate: #4b2d23;
+  --dr-dorado: #deba6c;
+  --dr-arena: #c9af80;
+  --dr-crema: #faf6ee;
+  --dr-espresso: #2e1c15;
+
+  --ink: var(--dr-chocolate);
+  --ink-rgb: 75 45 35;
+  --paper: var(--dr-crema);
+  --primary: var(--dr-chocolate);
+  --on-primary: var(--dr-crema);
+  --accent: var(--dr-dorado);
+  --on-accent: var(--dr-chocolate);
+  --accent-2: var(--dr-arena);
+  --on-accent-2: var(--dr-chocolate);
+  --field: #fff;
+
+  --font-display: "Anton", "Arial Narrow", Impact, sans-serif;
+  --font-brand: "Archivo Black", "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Crimson Pro Variable", "Crimson Pro", Georgia, "Times New Roman", serif;
+
+  /* Primera escena del hero (Classique sobre chocolate), antes de que arranque el JS. */
+  --h-bg: var(--dr-chocolate);
+  --h-fg: var(--dr-crema);
+  --h-logo: var(--dr-dorado);
+  --h-label-bg: var(--dr-dorado);
+  --h-label-fg: var(--dr-chocolate);
+  --h-cta-bg: var(--dr-dorado);
+  --h-cta-fg: var(--dr-chocolate);
+  --h-sticker-bg: var(--dr-dorado);
+  --h-sticker-fg: var(--dr-chocolate);
+
+  /* Anton y Archivo Black tienen un solo grosor: sin negrita simulada. */
+  font-synthesis-weight: none;
+}
+
+/* La serifa de su menú se lee más pequeña que una palo seco: un punto más. */
+body {
+  font-size: 1.0625rem;
+}
+
+/* El logo es una palabra en cursiva, no un símbolo cuadrado. */
+.site-brand {
+  color: var(--h-logo, inherit);
+  transition: color var(--h-swap);
+}
+
+.site-brand-mark {
+  width: auto;
+  height: 34px;
+}
+
+@media (max-width: 359px) {
+  .site-brand-mark {
+    width: auto;
+    height: 28px;
+  }
+}
+
+@media (min-width: 860px) {
+  .site-brand-mark {
+    width: auto;
+    height: 46px;
+  }
+}
+
+/* Sus fotos vienen en círculo (así las presenta su menú): se respeta el círculo
+   y se enmarca con un aro del color de la etiqueta de cada escena. */
+.hero-cookie-float img {
+  /* Un disco opaco tapa más titular que una galleta recortada: algo más pequeño
+     y apoyado abajo, para que el nombre se lea entero en el móvil. */
+  scale: 0.8;
+  transform-origin: 50% 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 clamp(5px, 0.9cqw, 9px) var(--h-label-bg),
+    0 30px 50px -18px rgb(0 0 0 / 0.45);
+  transition: box-shadow var(--h-swap);
+}
+
+.hero-cookie-shadow {
+  display: none;
+}
+
+@media (min-width: 860px) {
+  .hero-cookie-float img {
+    scale: 0.84;
+    transform-origin: 50% 50%;
+  }
+}
+
+/* Etiquetas de nombre: rectas y sobrias, como los títulos de su menú. */
+.navy-label {
+  letter-spacing: 0.01em;
+}
+
+/* En el pie, su logo en chocolate sobre dorado (su logo, invertido). */
+.footer-name {
+  color: var(--primary);
+}
+
+/* En el destacado, el precio en su dorado. */
+.featured-price {
+  color: var(--accent);
+}
+
+/* En los paneles, la acción principal en chocolate. */
+.sheet .btn--orange {
+  --btn-bg: var(--primary);
+  --btn-fg: var(--on-primary);
+}
+
+/* Archivo Black es ancha: en móvil el nombre baja un punto para no partirse. */
+@media (max-width: 859px) {
+  .item-name {
+    font-size: 0.875rem;
+  }
+}

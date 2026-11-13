@@ -283,6 +283,13 @@
     object-fit: contain;
   }
 
+  /* Producto sin foto todavía: un disco del color de la marca. */
+  .line-img--none {
+    display: block;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
   .line-name {
     font-family: var(--font-display);
     font-weight: 700;

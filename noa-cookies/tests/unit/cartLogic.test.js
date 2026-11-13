@@ -131,3 +131,15 @@ describe('datos guardados', () => {
     expect(sanitizeLines('no es un arreglo')).toEqual([])
   })
 })
+
+describe('precios sin publicar', () => {
+  it('deja la línea y el subtotal por confirmar sin inventar una cifra', () => {
+    const p = { id: 'box', name: 'Box', price: null, available: true, stock: null, maxPerOrder: 24 }
+    const q = { id: 'cookie', name: 'Cookie', price: 4, available: true, stock: null, maxPerOrder: 24 }
+    const s = summarize([{ id: 'box', productId: 'box', optionId: null, qty: 2 }, { id: 'cookie', productId: 'cookie', optionId: null, qty: 1 }], { box: p, cookie: q })
+    expect(s.items[0].total).toBeNull()
+    expect(s.items[1].total).toBe(4)
+    expect(s.subtotal).toBeNull()
+    expect(s.count).toBe(3)
+  })
+})

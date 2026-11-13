@@ -10,6 +10,7 @@ import { ProductItem } from './ProductItem.jsx'
 const SIZES = {
   5: '(max-width: 767px) 38vw, (max-width: 1199px) 26vw, 200px',
   4: '(max-width: 767px) 40vw, (max-width: 1199px) 28vw, 280px',
+  3: '(max-width: 767px) 40vw, (max-width: 1199px) 28vw, 340px',
 }
 
 /** Ficha que invita a preguntar por el sabor del mes (solo en marcas que lo tienen). */

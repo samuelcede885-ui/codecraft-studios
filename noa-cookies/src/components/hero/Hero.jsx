@@ -97,7 +97,8 @@ function Title({ lines, narrow, color, scene, drop }) {
 }
 
 function Crumbs({ product, layout, layer, scene }) {
-  const families = product.hero.crumbs
+  const families = product.hero.crumbs ?? []
+  if (!families.length) return <div className="hero-crumbs" data-scene={scene} data-part="group" />
   return (
     <div className="hero-crumbs" data-scene={scene} data-part="group">
       {layout.map((c, i) =>
@@ -501,9 +502,11 @@ export function Hero() {
                   </div>
                 ))}
               </div>
-              <div className="hero-sticker">
-                <Price value={product.price} />
-              </div>
+              {product.price !== null && (
+                <div className="hero-sticker">
+                  <Price value={product.price} />
+                </div>
+              )}
             </div>
           </div>
 

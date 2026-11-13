@@ -54,7 +54,11 @@ function Line({ item }) {
   }
   return (
     <li className="line" data-issue={issue || undefined} data-testid={`line-${line.id}`}>
-      <img className="line-img" src={productSrc(product, 160)} alt="" width="64" height="64" loading="lazy" decoding="async" />
+      {product.image?.widths ? (
+        <img className="line-img" src={productSrc(product, 160)} alt="" width="64" height="64" loading="lazy" decoding="async" />
+      ) : (
+        <span className="line-img line-img--none" aria-hidden="true" />
+      )}
       <div className="line-body">
         <p className="line-name">{product.name}</p>
         {option && (
@@ -65,7 +69,7 @@ function Line({ item }) {
         {issue ? (
           <p className="line-issue">{ISSUE_TEXT[issue]}</p>
         ) : (
-          <p className="line-unit">{formatPrice(item.unitPrice)} c/u</p>
+          <p className="line-unit">{item.unitPrice === null ? 'Precio por confirmar' : `${formatPrice(item.unitPrice)} c/u`}</p>
         )}
         <div className="stepper stepper--sm" role="group" aria-label={`Cantidad de ${what}`}>
           <button type="button" className="stepper-btn" onClick={() => set(line.qty - 1)} aria-label={line.qty === 1 ? `Quitar ${what}` : `Una menos de ${what}`}>
@@ -167,7 +171,7 @@ function CheckoutView({ summary, onSent }) {
   const isDelivery = draft.type === 'delivery'
   const ways = [pickup.enabled && { id: 'pickup', ...pickup }, delivery.enabled && { id: 'delivery', ...delivery }].filter(Boolean)
   const fee = isDelivery ? delivery.fee : 0
-  const total = fee === null ? null : summary.subtotal + fee
+  const total = fee === null || summary.subtotal === null ? null : summary.subtotal + fee
 
   useEffect(() => {
     try {

@@ -1,0 +1,20 @@
+{
+  "crops": {
+    "classique": ["menu-1.png", 57, 469, 338, 750],
+    "la-dore": ["menu-1.png", 55, 854, 339, 1137],
+    "red-velvet": ["menu-1.png", 57, 1253, 338, 1534],
+    "doble-chocolate": ["menu-1.png", 56, 1642, 333, 1919],
+    "carrot-cake": ["menu-2.png", 49, 272, 343, 566],
+    "pistacho": ["menu-2.png", 48, 704, 344, 1001]
+  },
+  "circulo": true,
+  "products": ["classique", "la-dore", "red-velvet", "doble-chocolate", "carrot-cake", "pistacho"],
+  "widths": [1200, 800, 480, 160],
+  "crumbs": {
+    "golden": ["classique", 0.30, 0.42, 0.16, "crumb"],
+    "dark": ["doble-chocolate", 0.62, 0.55, 0.16, "chunk"],
+    "red": ["red-velvet", 0.25, 0.62, 0.14, "crumb"],
+    "pistachio": ["pistacho", 0.50, 0.38, 0.12, "blob"],
+    "caramel": ["la-dore", 0.45, 0.50, 0.14, "chunk"]
+  }
+}

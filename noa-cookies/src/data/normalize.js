@@ -13,6 +13,7 @@ export const heroOrder = (products) => products.filter((p) => p.hero).sort((a, b
 export function buildProducts(raw, images, brandName) {
   return raw.map((p) => ({
     available: true,
+    price: null, // sin precio publicado: la interfaz dice "Por confirmar"
     stock: null,
     maxPerOrder: DEFAULT_MAX_PER_ORDER,
     options: null,

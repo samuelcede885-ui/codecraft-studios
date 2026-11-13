@@ -16,7 +16,7 @@ function pulse(el) {
  * reducido no hay vuelo, solo el contador actualizado.
  */
 export function flyToCart(sourceEl, imageSrc) {
-  if (!sourceEl || prefersReducedMotion()) return
+  if (!sourceEl || !imageSrc || prefersReducedMotion()) return
   // Un frame de espera: la barra inferior puede acabar de montarse.
   requestAnimationFrame(() => {
     const target = cartTarget()

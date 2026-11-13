@@ -70,13 +70,15 @@ export function summarize(lines, productsById) {
     if (product.available === false || maxQty(product) === 0) issue = 'agotado'
     else if (perProduct[product.id] > maxQty(product)) issue = 'excede'
     const unitPrice = product.price
-    return { line, product, option, unitPrice, total: issue ? 0 : unitPrice * line.qty, issue }
+    // Precio sin publicar (null): la línea y el subtotal quedan "por confirmar".
+    const total = issue ? 0 : unitPrice === null || unitPrice === undefined ? null : unitPrice * line.qty
+    return { line, product, option, unitPrice, total, issue }
   })
   const valid = items.filter((i) => !i.issue)
   return {
     items,
     count: lines.reduce((t, l) => t + l.qty, 0),
-    subtotal: sum(valid, (i) => i.total),
+    subtotal: valid.some((i) => i.total === null) ? null : sum(valid, (i) => i.total),
     hasIssues: items.some((i) => i.issue),
   }
 }

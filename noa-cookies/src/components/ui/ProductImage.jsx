@@ -7,7 +7,8 @@ import { productSrc, productSrcSet } from '../../lib/format.js'
  */
 export function ProductImage({ product, sizes, className = '', eager = false, priority, alt }) {
   const [failed, setFailed] = useState(false)
-  if (failed) {
+  // Sin foto (p. ej. una caja que la marca aún no ha fotografiado) o foto rota: su nombre.
+  if (failed || !product.image?.widths) {
     return (
       <span className={`img-fallback ${className}`} role="img" aria-label={alt ?? product.image.alt}>
         {product.name}

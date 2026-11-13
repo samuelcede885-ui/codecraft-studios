@@ -32,7 +32,7 @@ export function buildOrder({ summary, customer, fulfillment, paymentMethodId }) 
     subtotal: summary.subtotal,
     fulfillment: { type: fulfillment.type, address: delivery ? fulfillment.address.trim() : null },
     deliveryFee: fee, // null = se cotiza por zona
-    total: fee === null ? null : Math.round((summary.subtotal + fee) * 100) / 100,
+    total: fee === null || summary.subtotal === null ? null : Math.round((summary.subtotal + fee) * 100) / 100,
     customer: { name: customer.name.trim(), phone: customer.phone.trim() },
     payment: payment ? { id: payment.id, label: payment.label } : null,
   }

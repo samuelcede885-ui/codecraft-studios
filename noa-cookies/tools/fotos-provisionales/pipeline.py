@@ -20,6 +20,10 @@ El JSON de la marca:
     widths    [1200, 800, 480, 160]
     crumbs    { familia: [id, cx, cy, tamaño, forma] }
               ventana de textura dentro del recorte (0–1) y forma: crumb, chunk o blob
+    circulo   true si el menú ya muestra cada foto dentro de un círculo: el paso
+              matte conserva el círculo en vez de recortar el producto
+    letreros  { id: [[x0, y0, x1, y1], …] }      opcional: cajas de la captura con
+              rótulos blancos escritos sobre el producto, que se borran
 """
 import argparse
 import io
@@ -63,7 +67,24 @@ def read_crop(pid):
     if icc:
         im = ImageCms.profileToProfile(im, ImageCms.ImageCmsProfile(io.BytesIO(icc)), ImageCms.createProfile("sRGB"),
                                        renderingIntent=ImageCms.Intent.RELATIVE_COLORIMETRIC, outputMode="RGB")
-    return np.asarray(im)[y0:y1, x0:x1]
+    img = np.asarray(im)[y0:y1, x0:x1]
+    boxes = CFG.get("letreros", {}).get(pid)
+    return remove_lettering(img, boxes, x0, y0) if boxes else img
+
+
+def remove_lettering(img, boxes, x0, y0):
+    """Borra rótulos blancos escritos sobre la foto (p. ej. el nombre del sabor en
+    una publicación). `boxes` son cajas en píxeles de la captura; dentro de ellas
+    se localizan los trazos blancos y se rellenan con la textura de alrededor."""
+    mask = np.zeros(img.shape[:2], np.uint8)
+    h, w = mask.shape
+    for bx0, by0, bx1, by1 in boxes:
+        ys, xs = slice(max(0, by0 - y0), min(h, by1 - y0)), slice(max(0, bx0 - x0), min(w, bx1 - x0))
+        region = img[ys, xs].astype(np.int16)
+        low, high = region.min(axis=2), region.max(axis=2)
+        mask[ys, xs] = ((low > 200) & (high - low < 36)).astype(np.uint8) * 255
+    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
+    return cv2.inpaint(np.ascontiguousarray(img), mask, 5, cv2.INPAINT_TELEA)
 
 
 # ---------------------------------------------------------------- recortes
@@ -120,9 +141,10 @@ def step_upscale():
 
 # ---------------------------------------------------------------- matte
 def step_matte():
-    from rembg import new_session, remove
+    if not CFG.get("circulo"):
+        from rembg import new_session, remove
 
-    sess = new_session("isnet-general-use")
+        sess = new_session("isnet-general-use")
 
     def clean(pid):
         img = Image.open(WORK / f"{pid}-x4.png").convert("RGB")
@@ -174,10 +196,27 @@ def step_matte():
         Image.fromarray(out, "RGBA").save(WORK / f"{pid}-cut.png")
         print(pid, out.shape, flush=True)
 
+    def circle(pid):
+        """Menús que ya presentan cada foto en un círculo: se conserva el círculo
+        entero (con su fondo) y solo se vuelve transparente lo de fuera."""
+        img = Image.open(WORK / f"{pid}-x4.png").convert("RGB")
+        w, h = img.size
+        ss = 4
+        r = min(w, h) / 2 - 10  # unos píxeles hacia dentro: fuera queda el blanco del menú
+        m = Image.new("L", (w * ss, h * ss), 0)
+        ImageDraw.Draw(m).ellipse([(w / 2 - r) * ss, (h / 2 - r) * ss, (w / 2 + r) * ss, (h / 2 + r) * ss], fill=255)
+        m = m.resize((w, h), Image.LANCZOS)
+        out = img.copy()
+        out.putalpha(m)
+        box = (round(w / 2 - r) - 2, round(h / 2 - r) - 2, round(w / 2 + r) + 2, round(h / 2 + r) + 2)
+        out = out.crop(box)
+        out.save(WORK / f"{pid}-cut.png")
+        print(pid, out.size, "(círculo)", flush=True)
+
     for pid in CFG["products"]:
         if only and pid not in only:
             continue
-        clean(pid)
+        circle(pid) if CFG.get("circulo") else clean(pid)
 
 
 # ---------------------------------------------------------------- export

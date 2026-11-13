@@ -26,7 +26,8 @@ const check = (suite, name, pass, detail = '') => {
 }
 const text = async (locator) => (await locator.textContent())?.trim() ?? ''
 const squash = (s) => s.replace(/\s/g, '')
-const money = (value) => `${site.currency.symbol}${value.toFixed(2).replace('.', site.currency.decimal ?? '.')}`
+// Sin precio publicado la web dice "Por confirmar" (sin espacios, como lo compara squash).
+const money = (value) => (value === null ? 'Porconfirmar' : `${site.currency.symbol}${value.toFixed(2).replace('.', site.currency.decimal ?? '.')}`)
 const rgb = (hex) => {
   const n = parseInt(hex.slice(1), 16)
   return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`
@@ -61,7 +62,8 @@ async function run(browser, suite, options) {
   // --- Hero
   const first = heroProducts[0]
   check(suite, 'El hero abre con el primer sabor de la marca', (await text(page.locator('.hero-name'))) === first.name, await text(page.locator('.hero-name')))
-  check(suite, 'El precio del hero usa su moneda', squash(await text(page.locator('.hero-sticker'))) === money(first.price), await text(page.locator('.hero-sticker')))
+  if (first.price === null) check(suite, 'Sin precio publicado, el hero no muestra una cifra', (await page.locator('.hero-sticker').count()) === 0)
+  else check(suite, 'El precio del hero usa su moneda', squash(await text(page.locator('.hero-sticker'))) === money(first.price), await text(page.locator('.hero-sticker')))
   check(suite, 'Hay una miniatura por sabor del hero', (await page.locator('.hero-thumb').count()) === heroProducts.length)
   const bg = await page.evaluate(() => getComputedStyle(document.querySelector('.hero')).backgroundColor)
   check(suite, 'La escena usa el color de la marca', bg === rgb(heroThemes[first.hero.theme].bg), bg)
@@ -104,7 +106,7 @@ async function run(browser, suite, options) {
   await page.locator('[data-cart-target]:visible').last().click()
   await page.waitForTimeout(800)
   const dialog = page.locator('dialog.sheet--side')
-  const subtotal = a.id === b.id ? a.price * 2 : a.price + b.price
+  const subtotal = a.price === null || b.price === null ? null : a.id === b.id ? a.price * 2 : a.price + b.price
   check(suite, 'El subtotal suma en su moneda', squash(await text(dialog.getByTestId('cart-subtotal'))) === money(subtotal), await text(dialog.getByTestId('cart-subtotal')))
   await dialog.getByTestId('checkout').click()
   await page.waitForTimeout(600)

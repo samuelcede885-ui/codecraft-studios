@@ -1,0 +1,143 @@
+{
+  "crops": {
+    "salted-caramel": [
+      "sabores.png",
+      118,
+      866,
+      478,
+      1186
+    ],
+    "m-and-m": [
+      "sabores.png",
+      408,
+      1030,
+      788,
+      1356
+    ],
+    "red-velvet": [
+      "sabores.png",
+      764,
+      1128,
+      1106,
+      1452
+    ],
+    "chocolate": [
+      "sabores.png",
+      0,
+      1130,
+      338,
+      1492
+    ],
+    "pirulin": [
+      "sabores.png",
+      278,
+      1330,
+      602,
+      1618
+    ],
+    "oreo": [
+      "sabores.png",
+      588,
+      1444,
+      908,
+      1782
+    ],
+    "ying-yang": [
+      "sabores.png",
+      122,
+      1612,
+      468,
+      1952
+    ],
+    "chocolate-chip": [
+      "sabores.png",
+      0,
+      1918,
+      298,
+      2270
+    ],
+    "galleton-pirulin": [
+      "galleton.png",
+      170,
+      1595,
+      805,
+      2165
+    ]
+  },
+  "letreros": {
+    "salted-caramel": [
+      [
+        150,
+        1025,
+        435,
+        1155
+      ]
+    ],
+    "m-and-m": [
+      [
+        545,
+        1265,
+        685,
+        1335
+      ]
+    ],
+    "red-velvet": [
+      [
+        828,
+        1498,
+        1056,
+        1612
+      ]
+    ],
+    "chocolate": [
+      [
+        76,
+        1345,
+        296,
+        1436
+      ]
+    ],
+    "pirulin": [
+      [
+        386,
+        1526,
+        540,
+        1594
+      ]
+    ],
+    "oreo": [
+      [
+        696,
+        1686,
+        814,
+        1748
+      ]
+    ],
+    "ying-yang": [
+      [
+        200,
+        1826,
+        426,
+        1918
+      ]
+    ]
+  },
+  "products": [
+    "salted-caramel",
+    "m-and-m",
+    "red-velvet",
+    "chocolate",
+    "pirulin",
+    "oreo",
+    "ying-yang",
+    "chocolate-chip",
+    "galleton-pirulin"
+  ],
+  "widths": [
+    1200,
+    800,
+    480,
+    160
+  ],
+  "crumbs": {}
+}

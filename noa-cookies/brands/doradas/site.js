@@ -35,6 +35,8 @@ export const site = {
   /** Siempre en modo demostración: aviso fijo, sin WhatsApp y sin envío de pedidos. */
   demo: true,
   provisionalPhotos: true,
+  /** De dónde salen las fotos provisionales (texto del pie). */
+  photosSource: 'de las publicaciones públicas',
 
   location: {
     area: null,

@@ -97,7 +97,7 @@ export function Footer() {
       {(site.preview || site.provisionalPhotos) && (
         <div className="wrap footer-legal">
           {site.preview && <p>{`Propuesta de diseño: sitio no oficial, pendiente de aprobación de ${site.name}.`}</p>}
-          {site.provisionalPhotos && <p>{`Fotos provisionales tomadas del menú público de ${social[0].handle}; se sustituyen por las originales.`}</p>}
+          {site.provisionalPhotos && <p>{`Fotos provisionales tomadas ${site.photosSource ?? 'del menú público'} de ${social[0].handle}; se sustituyen por las originales.`}</p>}
         </div>
       )}
     </footer>

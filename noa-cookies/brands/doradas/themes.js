@@ -64,7 +64,7 @@ export const heroThemes = {
     stickerBg: dorado, stickerFg: chocolate,
   },
   arena: {
-    bg: arena, title: crema, fg: chocolate, logo: chocolate,
+    bg: arena, title: chocolate, fg: chocolate, logo: chocolate,
     labelBg: chocolate, labelFg: crema,
     ctaBg: chocolate, ctaFg: crema,
     stickerBg: crema, stickerFg: chocolate,

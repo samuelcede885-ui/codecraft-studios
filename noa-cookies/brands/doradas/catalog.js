@@ -28,7 +28,7 @@ const raw = [
     name: 'Classique',
     description: 'Nuestra icónica galleta estilo Nueva York de 130 g. Gruesa, crujiente por fuera y suave por dentro.',
     info: { fromMenu: ['Estilo Nueva York (NYC style), 130 g', 'Chunks de chocolate', 'Trozos de nueces tostadas'] },
-    hero: scene(1, 'chocolate', ['Classique'], ['golden', 'dark']),
+    hero: scene(2, 'dorado', ['Classique'], ['golden', 'dark']),
   },
   {
     id: 'la-dore',
@@ -36,7 +36,7 @@ const raw = [
     name: 'La Doré',
     description: 'Más delgada y crujiente, con nuestra exclusiva mantequilla avellanada y notas a caramelo tostado.',
     info: { fromMenu: ['Mantequilla avellanada', 'Topping de chocolate oscuro', 'Caramelo hecho en casa', 'Terminada con sal marina'] },
-    hero: scene(2, 'dorado', ['La', 'Doré'], ['caramel', 'dark']),
+    hero: scene(1, 'chocolate', ['La', 'Doré'], ['caramel', 'golden']),
   },
   {
     id: 'red-velvet',
@@ -102,12 +102,12 @@ export const productsById = Object.fromEntries(products.map((p) => [p.id, p]))
 export const heroProducts = heroOrder(products)
 
 /**
- * Producto destacado: la Classique, "nuestra icónica galleta" según su menú.
+ * Producto destacado: La Doré, la galleta que lleva el nombre de la casa.
  * Doradas no tiene sabor del mes, así que no hay `monthly` ni `monthlyCopy`.
  */
 export const featured = {
-  productId: 'classique',
-  headline: 'Nuestra icónica galleta estilo Nueva York',
+  productId: 'la-dore',
+  headline: 'Creada con nuestra exclusiva mantequilla avellanada',
   monthly: null,
   monthlyCopy: null,
 }

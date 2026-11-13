@@ -24,7 +24,7 @@
   --font-brand: "Archivo Black", "Arial Black", "Helvetica Neue", Arial, sans-serif;
   --font-sans: "Crimson Pro Variable", "Crimson Pro", Georgia, "Times New Roman", serif;
 
-  /* Primera escena del hero (Classique sobre chocolate), antes de que arranque el JS. */
+  /* Primera escena del hero (La Doré sobre chocolate), antes de que arranque el JS. */
   --h-bg: var(--dr-chocolate);
   --h-fg: var(--dr-crema);
   --h-logo: var(--dr-dorado);
@@ -66,31 +66,6 @@ body {
   .site-brand-mark {
     width: auto;
     height: 46px;
-  }
-}
-
-/* Sus fotos vienen en círculo (así las presenta su menú): se respeta el círculo
-   y se enmarca con un aro del color de la etiqueta de cada escena. */
-.hero-cookie-float img {
-  /* Un disco opaco tapa más titular que una galleta recortada: algo más pequeño
-     y apoyado abajo, para que el nombre se lea entero en el móvil. */
-  scale: 0.8;
-  transform-origin: 50% 100%;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 clamp(5px, 0.9cqw, 9px) var(--h-label-bg),
-    0 30px 50px -18px rgb(0 0 0 / 0.45);
-  transition: box-shadow var(--h-swap);
-}
-
-.hero-cookie-shadow {
-  display: none;
-}
-
-@media (min-width: 860px) {
-  .hero-cookie-float img {
-    scale: 0.84;
-    transform-origin: 50% 50%;
   }
 }
 

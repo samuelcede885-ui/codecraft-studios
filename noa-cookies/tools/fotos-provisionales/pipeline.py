@@ -78,13 +78,15 @@ def remove_lettering(img, boxes, x0, y0):
     se localizan los trazos blancos y se rellenan con la textura de alrededor."""
     mask = np.zeros(img.shape[:2], np.uint8)
     h, w = mask.shape
+    gray = cv2.cvtColor(np.ascontiguousarray(img), cv2.COLOR_RGB2GRAY).astype(np.int16)
+    # Trazo de letra: claro y bastante más claro que su entorno inmediato.
+    local = cv2.medianBlur(gray.astype(np.uint8), 21).astype(np.int16)
+    letter = ((gray > 165) & (gray - local > 34)).astype(np.uint8) * 255
     for bx0, by0, bx1, by1 in boxes:
         ys, xs = slice(max(0, by0 - y0), min(h, by1 - y0)), slice(max(0, bx0 - x0), min(w, bx1 - x0))
-        region = img[ys, xs].astype(np.int16)
-        low, high = region.min(axis=2), region.max(axis=2)
-        mask[ys, xs] = ((low > 200) & (high - low < 36)).astype(np.uint8) * 255
-    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))
-    return cv2.inpaint(np.ascontiguousarray(img), mask, 5, cv2.INPAINT_TELEA)
+        mask[ys, xs] = letter[ys, xs]
+    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+    return cv2.inpaint(np.ascontiguousarray(img), mask, 6, cv2.INPAINT_TELEA)
 
 
 # ---------------------------------------------------------------- recortes
@@ -172,6 +174,20 @@ def step_matte():
                 keep[lab2 == i] = 1
         a = np.where(keep == 1, a, 0)
         a = np.maximum(a, cv2.erode(keep.astype(np.float32), np.ones((3, 3), np.uint8)))
+
+        # Galleta pegada a otras: el recorte se come un lado. Se ajusta una elipse
+        # al contorno bueno (a la derecha de `elipse[pid]` del ancho) y esa elipse
+        # pasa a ser la silueta.
+        if pid in CFG.get("elipse", {}):
+            cs, _ = cv2.findContours(keep, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            pts = max(cs, key=cv2.contourArea).reshape(-1, 2)
+            pts = pts[pts[:, 0] > CFG["elipse"][pid] * w]
+            ell = cv2.fitEllipse(pts.astype(np.float32))
+            em = np.zeros_like(keep)
+            (cx, cy), (ax, ay), ang = ell
+            cv2.ellipse(em, ((cx, cy), (ax * 0.985, ay * 0.985), ang), 1, -1, cv2.LINE_AA)
+            keep = em
+            a = em.astype(np.float32)
 
         # 2) contraer ~3 px (a escala x4) para eliminar el halo del fondo y suavizar
         a = cv2.erode(a, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7)))

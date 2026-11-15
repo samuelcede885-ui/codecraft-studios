@@ -11,6 +11,11 @@ python3 -m http.server 8080
 # abre http://localhost:8080
 ```
 
+### Versión de un solo archivo
+```bash
+node scripts/build.mjs   # genera dist/quanta-ai.html (se abre con doble clic, sin servidor)
+```
+
 ## Estructura
 ```
 index.html               Contenedor de la app
@@ -23,12 +28,14 @@ src/services/ai.js       Motor de IA (simulado): resolución y guías
 src/components/          UI compartida (iconos, hoja inferior, toast) y barra de navegación
 src/screens/             Inicio, Materias, Mis Tareas, Exámenes, Perfil y hojas modales
 docs/ARQUITECTURA.md     Arquitectura del sistema y API prevista
+scripts/build.mjs        Empaquetador sin dependencias → dist/quanta-ai.html
 ```
 
 ## Pantallas
 - **Inicio**: saludo, sugerencia de estudio (tarjeta oscura), banner azul de tareas pendientes, métricas.
 - **Mis Tareas**: filtros `Todas / Pendientes / Resueltas IA / Para Examen`, resolución simulada con IA.
 - **Perfil**: métricas académicas, barra de preparación y configuración.
+- Modo claro y oscuro automático según el sistema.
 - Extra: **Materias**, **Exámenes** y botón central **+** para añadir tareas.
 
 > La IA y Quanta están simulados en esta versión. Los borradores deben revisarse antes de entregarse.

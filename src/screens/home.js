@@ -21,7 +21,7 @@ export function renderHome() {
     <p class="label">Sugerencia de estudio hoy</p>
     <section class="card dark suggest">
       <div>
-        <span class="tag" style="color:#60A5FA">${esc(subjectOf(exam.subjectId).name)} · en ${exam.inDays} días</span>
+        <span class="tag light">${esc(subjectOf(exam.subjectId).name)} · en ${exam.inDays} días</span>
         <h2 class="h2" style="margin-top:4px">${esc(exam.title)}</h2>
       </div>
       <ul class="route">

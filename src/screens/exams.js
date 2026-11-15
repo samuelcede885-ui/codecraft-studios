@@ -12,7 +12,7 @@ export function renderExams() {
       <article class="card ${i === 0 ? 'dark' : ''} task">
         <div class="row between top">
           <div>
-            <span class="tag" ${i === 0 ? 'style="color:#60A5FA"' : ''}>${esc(subjectOf(e.subjectId).name)}</span>
+            <span class="tag ${i === 0 ? 'light' : ''}">${esc(subjectOf(e.subjectId).name)}</span>
             <h3>${esc(e.title)}</h3>
           </div>
           <span class="pct">${e.inDays} días</span>

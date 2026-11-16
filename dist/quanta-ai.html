@@ -292,6 +292,10 @@ button.card { display: block; width: 100%; }
 .chip.ok { background: var(--ok-bg); color: var(--ok-ink); }
 .chip.bad { background: var(--bad-bg); color: var(--bad-ink); }
 
+/* Asistente de agenda */
+.answer { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+.answer h2 { text-wrap: balance; }
+
 </style>
 <div class="phone">
     <main id="screen" class="screen"></main>
@@ -1082,7 +1086,7 @@ const TABS = [
 ];
 
 // "Mis Tareas" cuelga de Materias en la navegación.
-const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen === 'agent' ? 'home' : screen);
+const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen === 'agent' || screen === 'agenda' ? 'home' : screen);
 
 function renderNav(screen) {
   return TABS.map((tab) => {
@@ -1263,6 +1267,11 @@ function renderHome() {
       <h1 class="display">${greeting()},<br>${esc(student.name.split(' ')[0])}</h1>
       <button class="avatar" data-action="go" data-screen="profile" aria-label="Ver perfil">${esc(initials(student.name))}</button>
     </header>
+
+    <button class="card outline row between" data-action="go-agenda" style="display:flex;margin-bottom:2px">
+      <div><span class="tag">Asistente de agenda</span><div class="label" style="margin-top:2px">Pregúntame qué tienes esta semana</div></div>
+      <span class="circle" style="background:var(--dark)">${icon.arrow}</span>
+    </button>
 
     <p class="label">Sugerencia de estudio hoy</p>
     ${suggestion()}
@@ -1694,6 +1703,7 @@ function renderProfile() {
     ${setting('sync', icon.link, 'Conexión con Quanta', state.importedAt
       ? `Importado el ${esc(fetched(state.importedAt))}`
       : state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))} · sincronización desactivada` : 'Importa tus tareas desde un archivo')}
+    ${setting('go-agenda', icon.clock, 'Asistente de agenda', 'Qué tienes esta semana, mañana, 15% o más')}
     ${setting('go-agent', icon.sync, 'Agente de estudio diario', 'Prepara borradores para revisar y entregar tú')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Estudiante Pro: reglas y autoría')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
@@ -1768,6 +1778,190 @@ function renderAgent() {
 }
 
 return { renderAgent };
+})();
+
+// src/services/agenda.js
+__m["src/services/agenda.js"] = (() => {
+// Asistente de agenda escolar (determinista, sin inventar datos).
+// Responde preguntas fijas sobre evaluaciones y tareas usando las fechas ya guardadas.
+// Zona horaria America/Caracas. Semana: lunes a domingo. No marca nada como entregado.
+const { state, subjectOf } = __m["src/state/store.js"];
+
+const TZ = 'America/Caracas';
+const MAX = 7;
+
+const ymdOf = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+const todayYmd = () => ymdOf(new Date());
+const addDays = (ymd, n) => { const d = new Date(ymd + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const dow = (ymd) => new Date(ymd + 'T12:00:00Z').getUTCDay(); // 0 domingo … 6 sábado
+function weekBounds(ymd) { const mon = addDays(ymd, -((dow(ymd) + 6) % 7)); return [mon, addDays(mon, 6)]; }
+const between = (ymd, a, b) => ymd >= a && ymd <= b;
+const dueYmd = (iso) => (iso ? ymdOf(new Date(iso)) : null);
+const human = (ymd) => new Date(ymd + 'T12:00:00Z').toLocaleDateString('es-VE', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+
+// Fuente: correo de Quanta si estuviera conectado; aquí, la exportación histórica.
+function sourceInfo() {
+  const date = state.importedAt || state.fetchedAt;
+  return { kind: 'exportación', date: date ? date.slice(0, 10) : null };
+}
+
+function evalItem(e) {
+  const ymd = dueYmd(e.due);
+  const today = todayYmd();
+  const hours = ymd ? (new Date(ymd + 'T00:00:00-04:00') - new Date(today + 'T00:00:00-04:00')) / 36e5 : null;
+  return {
+    ymd,
+    name: e.title,
+    subject: subjectOf(e.subjectId).name,
+    weight: e.weight,
+    teacher: e.teacher,
+    category: e.category,
+    type: 'evaluación',
+    high: e.weight != null && e.weight >= 15,
+    soon: hours != null && hours >= 0 && hours <= 48,
+  };
+}
+
+const futureEvals = () => state.exams.map(evalItem).filter((x) => x.ymd && x.ymd >= todayYmd());
+
+// Orden por prioridad: vence en 48 h, luego ≥15 %, luego por fecha.
+const byPriority = (a, b) => (b.soon - a.soon) || (b.high - a.high) || a.ymd.localeCompare(b.ymd);
+
+function pack(items) {
+  const sorted = [...items].sort(byPriority);
+  return { items: sorted.slice(0, MAX), more: Math.max(0, sorted.length - MAX), total: sorted.length };
+}
+
+function recommend(items) {
+  if (!items.length) return 'No hay evaluaciones en ese periodo: aprovecha para adelantar prácticas y repasar lo más reciente.';
+  const first = [...items].sort(byPriority)[0];
+  const why = first.soon ? 'vence en menos de 48 horas' : first.high ? `vale ${first.weight}% de la nota` : 'es lo más próximo';
+  return `Empieza por «${first.name}» de ${first.subject} (${human(first.ymd)}): ${why}.`;
+}
+
+// ---- Preguntas predeterminadas ----
+const QUESTIONS = [
+  ['semana', '¿Qué tengo esta semana?'],
+  ['manana', '¿Qué tengo mañana?'],
+  ['altas', '¿Cuáles valen 15% o más?'],
+  ['tareas', '¿Qué tareas debo hacer?'],
+  ['prioridad', '¿Qué materias debo priorizar?'],
+];
+
+function answer(id, { all = false } = {}) {
+  const today = todayYmd();
+  const src = sourceInfo();
+
+  if (id === 'semana' || id === 'proxima') {
+    const [mon, sun] = weekBounds(id === 'proxima' ? addDays(today, 7) : today);
+    const found = futureEvals().filter((x) => between(x.ymd, mon, sun));
+    const p = all ? { items: [...found].sort(byPriority), more: 0, total: found.length } : pack(found);
+    return { headline: `Tienes ${found.length} ${found.length === 1 ? 'evaluación confirmada' : 'evaluaciones confirmadas'} para esta semana (${human(mon)} a ${human(sun)})`, ...p, recommendation: recommend(found), src };
+  }
+  if (id === 'manana') {
+    const t = addDays(today, 1);
+    const found = futureEvals().filter((x) => x.ymd === t);
+    return { headline: `Para mañana (${human(t)}) tienes ${found.length} ${found.length === 1 ? 'evaluación' : 'evaluaciones'}`, ...pack(found), recommendation: recommend(found), src };
+  }
+  if (id === 'hoy') {
+    const found = futureEvals().filter((x) => x.ymd === today);
+    return { headline: `Hoy (${human(today)}) tienes ${found.length} ${found.length === 1 ? 'evaluación' : 'evaluaciones'}`, ...pack(found), recommendation: recommend(found), src };
+  }
+  if (id === 'altas') {
+    const found = futureEvals().filter((x) => x.high);
+    const p = all ? { items: [...found].sort(byPriority), more: 0, total: found.length } : pack(found);
+    return { headline: `Tienes ${found.length} ${found.length === 1 ? 'evaluación' : 'evaluaciones'} que valen 15% o más próximamente`, ...p, recommendation: recommend(found), src };
+  }
+  if (id === 'tareas') {
+    const items = state.tasks.filter((t) => t.status === 'pendiente' && t.kind !== 'evaluacion')
+      .map((t) => ({ ymd: dueYmd(t.due), name: t.title, subject: subjectOf(t.subjectId).name, type: 'práctica', weight: t.weight, high: false, soon: false }));
+    const withDate = items.filter((x) => x.ymd).sort((a, b) => a.ymd.localeCompare(b.ymd));
+    const noDate = items.filter((x) => !x.ymd);
+    const shown = all ? [...withDate, ...noDate] : [...withDate, ...noDate].slice(0, MAX);
+    return {
+      headline: `Tienes ${items.length} tareas pendientes (${withDate.length} con fecha, ${noDate.length} prácticas sin plazo)`,
+      items: shown, more: all ? 0 : Math.max(0, items.length - shown.length), total: items.length,
+      recommendation: withDate.length ? `Haz primero «${withDate[0].name}» de ${withDate[0].subject} (${human(withDate[0].ymd)}).` : 'Ninguna tiene fecha: avanza las prácticas de las materias con evaluación próxima.',
+      src,
+    };
+  }
+  if (id === 'prioridad') {
+    const evs = futureEvals();
+    const score = {};
+    for (const e of evs) {
+      const s = subjectOf(state.exams.find((x) => x.title === e.name && subjectOf(x.subjectId).name === e.subject)?.subjectId || '').name || e.subject;
+      score[s] = score[s] || { subject: s, count: 0, nearest: e.ymd, high: 0 };
+      score[s].count++;
+      score[s].nearest = e.ymd < score[s].nearest ? e.ymd : score[s].nearest;
+      if (e.high) score[s].high++;
+    }
+    const ranked = Object.values(score).sort((a, b) => (b.high - a.high) || a.nearest.localeCompare(b.nearest)).slice(0, 5);
+    return {
+      headline: `Materias a priorizar por evaluaciones próximas`,
+      subjects: ranked.map((r) => ({ subject: r.subject, detail: `${r.count} evaluación${r.count === 1 ? '' : 'es'}, la más próxima ${human(r.nearest)}${r.high ? ` · ${r.high} de peso alto` : ''}` })),
+      recommendation: ranked.length ? `Dedica más tiempo a ${ranked[0].subject}: tiene la evaluación de más peso o más cercana.` : 'No hay evaluaciones próximas registradas.',
+      src,
+    };
+  }
+  return { headline: 'No reconocí esa pregunta.', items: [], recommendation: '', src };
+}
+
+return { todayYmd, sourceInfo, QUESTIONS, answer };
+})();
+
+// src/screens/agenda.js
+__m["src/screens/agenda.js"] = (() => {
+const { esc, icon } = __m["src/components/ui.js"];
+const { QUESTIONS, answer, sourceInfo } = __m["src/services/agenda.js"];
+
+function itemRow(it) {
+  const flags = [it.soon ? '⚑ 48 h' : '', it.high ? `${it.weight}%` : (it.weight != null ? `${it.weight}%` : '')].filter(Boolean);
+  return `
+    <article class="card task">
+      <div class="row between top">
+        <div style="min-width:0">
+          <span class="tag">${esc(it.subject)}${it.type === 'práctica' ? ' · práctica' : it.category ? ` · ${esc(it.category)}` : ''}</span>
+          <h3>${esc(it.name)}</h3>
+        </div>
+        ${flags.length ? `<span class="chip ${it.soon ? 'bad' : it.high ? 'blue' : ''}">${flags.join(' · ')}</span>` : ''}
+      </div>
+      <span class="meta">${it.ymd ? esc(new Date(it.ymd + 'T12:00:00Z').toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) : 'Sin fecha'}${it.teacher ? ` · ${esc(it.teacher)}` : ''}</span>
+    </article>`;
+}
+
+function renderAnswer(res) {
+  const body = res.subjects
+    ? res.subjects.map((s) => `<article class="card task"><h3>${esc(s.subject)}</h3><span class="meta">${esc(s.detail)}</span></article>`).join('')
+    : (res.items?.length ? res.items.map(itemRow).join('') : '<p class="empty">Nada en este periodo.</p>');
+  const more = res.more ? `<button class="btn ghost block" data-action="agenda-all" data-q="${esc(res.id)}">Ver las ${res.total} (hay ${res.more} más)</button>` : '';
+  const footer = `Última fuente disponible: ${esc(res.src.kind)}${res.src.date ? ` del ${esc(res.src.date)}` : ''}; revisa Quanta para confirmar cambios.`;
+  return `
+    <div class="answer">
+      <h2 class="h2">${esc(res.headline)}</h2>
+      ${body}
+      ${more}
+      <p class="note" style="display:block"><b>Recomendación:</b> ${esc(res.recommendation)}</p>
+      <p class="meta">${footer} · [fuente: ${esc(res.src.kind)}]</p>
+    </div>`;
+}
+
+function renderAgenda(current = 'semana', all = false) {
+  const res = { ...answer(current, { all }), id: current };
+  const src = sourceInfo();
+  return `
+    <header>
+      <h1 class="title">Asistente</h1>
+      <p class="sub" style="margin-top:8px">Tu agenda escolar · responde al instante y sin inventar</p>
+    </header>
+    ${!src.date ? '<p class="note warn" style="display:block">La cuenta de Gmail que recibe Quanta no está conectada. Respondo con la exportación guardada.</p>'
+      : '<p class="note" style="display:block">Gmail de Quanta no conectado todavía: respondo con la exportación guardada. Conéctalo para novedades automáticas.</p>'}
+    <div class="pills" role="tablist">
+      ${QUESTIONS.map(([id, label]) => `<button class="pill ${id === current ? 'on' : ''}" data-action="agenda-q" data-q="${id}">${esc(label)}</button>`).join('')}
+    </div>
+    ${renderAnswer({ ...res, id: current })}`;
+}
+
+return { renderAnswer, renderAgenda };
 })();
 
 // src/screens/sheets.js
@@ -1912,6 +2106,7 @@ const { renderSubjects } = __m["src/screens/subjects.js"];
 const { renderExams } = __m["src/screens/exams.js"];
 const { renderProfile } = __m["src/screens/profile.js"];
 const { renderAgent } = __m["src/screens/agent.js"];
+const { renderAgenda } = __m["src/screens/agenda.js"];
 const agent = __m["src/services/agent.js"];
 const { buildPlan } = __m["src/services/estudiante-pro.js"];
 const { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } = __m["src/screens/sheets.js"];
@@ -1919,7 +2114,7 @@ const { renderLock, pinSheet, wipeSheet, tipsSheet } = __m["src/screens/lock.js"
 const guard = __m["src/services/lock.js"];
 
 // Estado de navegación (no se persiste)
-const view = { screen: 'home', filter: 'todas', subjectId: null };
+const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana' };
 let solveRun = 0; // invalida una resolución en curso si se cierra la hoja
 
 const SCREENS = {
@@ -1929,6 +2124,7 @@ const SCREENS = {
   exams: renderExams,
   profile: renderProfile,
   agent: renderAgent,
+  agenda: () => renderAgenda(view.agendaQ || 'semana', false),
 };
 
 let pinEntry = '';
@@ -1995,6 +2191,9 @@ const actions = {
   },
   'security-tips': () => openSheet(tipsSheet()),
 
+  'go-agenda': () => go('agenda', { agendaQ: 'semana' }),
+  'agenda-q'({ q }) { view.agendaQ = q; document.getElementById('screen').innerHTML = renderAgenda(q, false); },
+  'agenda-all'({ q }) { document.getElementById('screen').innerHTML = renderAgenda(q, true); },
   'go-agent': () => go('agent'),
   'agent-run'() {
     const r = agent.runDaily({ force: true });

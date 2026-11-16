@@ -10,6 +10,7 @@ import { renderSubjects } from './screens/subjects.js';
 import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
 import { renderAgent } from './screens/agent.js';
+import { renderAgenda } from './screens/agenda.js';
 import * as agent from './services/agent.js';
 import { buildPlan } from './services/estudiante-pro.js';
 import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } from './screens/sheets.js';
@@ -17,7 +18,7 @@ import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
 import * as guard from './services/lock.js';
 
 // Estado de navegación (no se persiste)
-const view = { screen: 'home', filter: 'todas', subjectId: null };
+const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana' };
 let solveRun = 0; // invalida una resolución en curso si se cierra la hoja
 
 const SCREENS = {
@@ -27,6 +28,7 @@ const SCREENS = {
   exams: renderExams,
   profile: renderProfile,
   agent: renderAgent,
+  agenda: () => renderAgenda(view.agendaQ || 'semana', false),
 };
 
 let pinEntry = '';
@@ -93,6 +95,9 @@ const actions = {
   },
   'security-tips': () => openSheet(tipsSheet()),
 
+  'go-agenda': () => go('agenda', { agendaQ: 'semana' }),
+  'agenda-q'({ q }) { view.agendaQ = q; document.getElementById('screen').innerHTML = renderAgenda(q, false); },
+  'agenda-all'({ q }) { document.getElementById('screen').innerHTML = renderAgenda(q, true); },
   'go-agent': () => go('agent'),
   'agent-run'() {
     const r = agent.runDaily({ force: true });

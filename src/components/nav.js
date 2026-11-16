@@ -9,7 +9,7 @@ const TABS = [
 ];
 
 // "Mis Tareas" cuelga de Materias en la navegación.
-const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen === 'agent' ? 'home' : screen);
+const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen === 'agent' || screen === 'agenda' ? 'home' : screen);
 
 export function renderNav(screen) {
   return TABS.map((tab) => {

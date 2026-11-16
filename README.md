@@ -70,3 +70,10 @@ Implementa la skill `quanta-agente-diario` dentro de la app (`src/services/agent
 Prepara borradores de apoyo con Estudiante Pro una vez al día para que el estudiante los revise, copie y
 entregue en persona. No entrega nada ni se conecta a Quanta. Detalles y límites en `docs/AGENTE_DIARIO.md`.
 Pruebas: `node scripts/build.mjs && node tests/agent.test.cjs`.
+
+## Asistente de agenda
+Miniagente bajo demanda (`src/services/agenda.js`, `src/screens/agenda.js`) que responde preguntas fijas
+(«¿qué tengo esta semana?», «¿qué vale 15% o más?», «¿qué materias priorizar?») de forma determinista,
+en hora de Caracas, sin inventar. Fuente 1: correo de Quanta en Gmail cuando la cuenta correcta esté
+conectada; fuente 2: exportación histórica. Instrucciones en `docs/ASISTENTE_AGENDA.md`.
+Pruebas: `node scripts/build.mjs && node tests/agenda.test.cjs`.

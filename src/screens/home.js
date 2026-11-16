@@ -42,6 +42,11 @@ export function renderHome() {
       <button class="avatar" data-action="go" data-screen="profile" aria-label="Ver perfil">${esc(initials(student.name))}</button>
     </header>
 
+    <button class="card outline row between" data-action="go-agenda" style="display:flex;margin-bottom:2px">
+      <div><span class="tag">Asistente de agenda</span><div class="label" style="margin-top:2px">Pregúntame qué tienes esta semana</div></div>
+      <span class="circle" style="background:var(--dark)">${icon.arrow}</span>
+    </button>
+
     <p class="label">Sugerencia de estudio hoy</p>
     ${suggestion()}
 

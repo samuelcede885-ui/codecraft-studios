@@ -284,3 +284,7 @@ button.card { display: block; width: 100%; }
 .chip.on { background: var(--dark); color: #fff; }
 .chip.ok { background: var(--ok-bg); color: var(--ok-ink); }
 .chip.bad { background: var(--bad-bg); color: var(--bad-ink); }
+
+/* Asistente de agenda */
+.answer { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+.answer h2 { text-wrap: balance; }

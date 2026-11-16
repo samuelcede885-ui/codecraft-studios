@@ -1,5 +1,10 @@
 # Asistente de agenda escolar (instrucciones del proyecto)
 
+Ahora acepta **preguntas escritas libres** además de los botones (skill `quanta-consultor-escolar`):
+el motor detecta la intención por palabras (tiempo, materia, tipo, estado, 15%) y responde con filtros
+locales, sin IA, sin Gmail y sin entrar a Quanta. Ej.: «checkpoints de biología esta semana que valen 15%».
+
+
 Miniagente bajo demanda que responde preguntas de agenda. Implementado en `src/services/agenda.js`
 (motor determinista, sin IA ni invención) y `src/screens/agenda.js` (vista). Zona horaria America/Caracas,
 semana lunes a domingo.

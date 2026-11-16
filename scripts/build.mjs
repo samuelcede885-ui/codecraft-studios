@@ -30,7 +30,8 @@ const modules = order.map((file) => {
   const exported = [];
   src = src.replace(/^import\s*\{([^}]*)\}\s*from\s*['"](.+?)['"];?$/gm, (_, names, rel) => {
     const dep = resolve(dirname(file), rel).slice(root.length + 1);
-    return `const {${names}} = __m[${JSON.stringify(dep)}];`;
+    const destructured = names.replace(/\s+as\s+/g, ': ');
+    return `const {${destructured}} = __m[${JSON.stringify(dep)}];`;
   });
   src = src.replace(/^import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"](.+?)['"];?$/gm, (_, ns, rel) => {
     const dep = resolve(dirname(file), rel).slice(root.length + 1);

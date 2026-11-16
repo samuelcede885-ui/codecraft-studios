@@ -121,3 +121,103 @@ export function answer(id, { all = false } = {}) {
   }
   return { headline: 'No reconocí esa pregunta.', items: [], recommendation: '', src };
 }
+
+
+// ===== Consultas en lenguaje natural (deterministas, sin IA ni Gmail) =====
+const norm = (t) => (t || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function classifyEval(e) {
+  const t = norm(`${e.title} ${e.category || ''}`);
+  if (/checkpoint/.test(t)) return 'checkpoint';
+  if (/proyecto|portafolio|portfolio/.test(t)) return 'proyecto';
+  if (/prueba|examen|test|oral|writing|escrit|mixta|quiz/.test(t)) return 'examen';
+  return 'evaluacion';
+}
+
+// Lista unificada: evaluaciones calificadas + prácticas, con procedencia.
+function allItems() {
+  const today = todayYmd();
+  const evals = state.exams.map((e) => {
+    const it = evalItem(e);
+    return { ...it, subjectId: e.subjectId, type: classifyEval(e), graded: true, status: 'pendiente' };
+  });
+  const practices = state.tasks.filter((t) => t.kind !== 'evaluacion').map((t) => ({
+    ymd: dueYmd(t.due), name: t.title, subject: subjectOf(t.subjectId).name, subjectId: t.subjectId,
+    weight: t.weight, type: 'practica', graded: false, status: t.status, high: false,
+    soon: false, teacher: '', category: '',
+  }));
+  void today;
+  return [...evals, ...practices];
+}
+
+// Empareja una materia por su nombre o un alias escrito por el usuario.
+function matchSubject(ntext) {
+  for (const sub of state.subjects) { if (ntext.includes(norm(sub.name))) return sub; }
+  for (const sub of state.subjects) {
+    const first = norm(sub.name).split(' ')[0];
+    if (first.length >= 4 && new RegExp(`\\b${first}`).test(ntext)) return sub;
+  }
+  if (/\bmate\b/.test(ntext)) return state.subjects.find((s) => /matematic/.test(norm(s.name)));
+  if (/\bbio\b/.test(ntext)) return state.subjects.find((s) => /biolog/.test(norm(s.name)));
+  return null;
+}
+
+const GRADED_TYPES = ['examen', 'checkpoint', 'proyecto', 'evaluacion'];
+
+export function parseQuery(text) {
+  const n = norm(text);
+  const q = { raw: text, time: null, types: null, subject: null, pending: false, high: false, recognized: false, criteria: [] };
+
+  if (/\bmanana\b/.test(n)) { q.time = 'manana'; q.recognized = true; q.criteria.push('mañana'); }
+  else if (/\bhoy\b/.test(n)) { q.time = 'hoy'; q.recognized = true; q.criteria.push('hoy'); }
+  else if (/proxima semana|semana que viene/.test(n)) { q.time = 'proxima'; q.recognized = true; q.criteria.push('próxima semana'); }
+  else if (/semana/.test(n)) { q.time = 'semana'; q.recognized = true; q.criteria.push('esta semana'); }
+
+  const wantExam = /examen|prueba|evaluaci|\btest\b/.test(n);
+  const wantCheck = /checkpoint/.test(n);
+  if (wantExam || wantCheck) { q.types = wantCheck && !wantExam ? ['checkpoint'] : GRADED_TYPES; q.recognized = true; q.criteria.push(wantCheck && !wantExam ? 'checkpoints' : 'evaluaciones'); }
+  if (/\btarea|tareas|practica|practicas|pendiente/.test(n) && !wantExam && !wantCheck) { q.types = ['practica']; q.recognized = true; q.criteria.push('tareas'); }
+
+  if (/pendiente/.test(n)) { q.pending = true; q.recognized = true; }
+  if (/\b15\b|15\s*%|importante|mayor.*peso|valen|ponderaci/.test(n)) { q.high = true; q.recognized = true; q.criteria.push('15% o más'); }
+
+  const sub = matchSubject(n);
+  if (sub) { q.subject = sub.id; q.recognized = true; q.criteria.push(sub.name); }
+  return q;
+}
+
+export function answerText(text, { all = false } = {}) {
+  const q = parseQuery(text);
+  const src = sourceInfo();
+  if (!q.recognized) {
+    return { headline: 'No entendí la pregunta. Prueba con algo como estas:', suggestions: QUESTIONS.map((x) => x[1]), items: [], recommendation: 'Puedes preguntar por semana, mañana, materia, 15% o checkpoints.', src, query: text };
+  }
+
+  let items = allItems();
+  // Solo próximos (fecha de hoy en adelante) o sin fecha.
+  const today = todayYmd();
+  items = items.filter((x) => !x.ymd || x.ymd >= today);
+  if (q.time === 'manana') { const t = addDays(today, 1); items = items.filter((x) => x.ymd === t); }
+  else if (q.time === 'hoy') items = items.filter((x) => x.ymd === today);
+  else if (q.time === 'semana' || q.time === 'proxima') {
+    const [a, b] = weekBounds(q.time === 'proxima' ? addDays(today, 7) : today);
+    items = items.filter((x) => x.ymd && between(x.ymd, a, b));
+  }
+  if (q.types) items = items.filter((x) => q.types.includes(x.type));
+  if (q.subject) items = items.filter((x) => x.subjectId === q.subject);
+  if (q.pending) items = items.filter((x) => x.status === 'pendiente');
+  if (q.high) items = items.filter((x) => x.weight != null && x.weight >= 15);
+
+  const sorted = items.sort((a, b) => {
+    if (!a.ymd && !b.ymd) return 0;
+    if (!a.ymd) return 1;
+    if (!b.ymd) return -1;
+    return byPriority(a, b);
+  });
+  const shown = all ? sorted : sorted.slice(0, MAX);
+  const noun = q.types && q.types.length === 1 && q.types[0] === 'practica' ? 'tareas' : 'evaluaciones';
+  const headline = sorted.length
+    ? `Encontré ${sorted.length} ${sorted.length === 1 ? noun.replace(/es$/, 'ción').replace('tareas', 'tarea') : noun}${q.criteria.length ? ` · ${q.criteria.join(' · ')}` : ''}`
+    : `No encuentro ${noun} en los datos disponibles${q.criteria.length ? ` para: ${q.criteria.join(', ')}` : ''}`;
+  return { headline, items: shown, more: Math.max(0, sorted.length - shown.length), total: sorted.length, recommendation: recommend(sorted.filter((x) => x.ymd)), src, query: text };
+}

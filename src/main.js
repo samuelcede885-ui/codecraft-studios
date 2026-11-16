@@ -11,6 +11,8 @@ import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
 import { renderAgent } from './screens/agent.js';
 import { renderAgenda } from './screens/agenda.js';
+import { answer as agendaAnswer, answerText as agendaAnswerText } from './services/agenda.js';
+import { renderAnswer as renderAgendaAnswer } from './screens/agenda.js';
 import * as agent from './services/agent.js';
 import { buildPlan } from './services/estudiante-pro.js';
 import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } from './screens/sheets.js';
@@ -18,7 +20,7 @@ import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
 import * as guard from './services/lock.js';
 
 // Estado de navegación (no se persiste)
-const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana' };
+const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana', agendaText: '' };
 let solveRun = 0; // invalida una resolución en curso si se cierra la hoja
 
 const SCREENS = {
@@ -28,7 +30,7 @@ const SCREENS = {
   exams: renderExams,
   profile: renderProfile,
   agent: renderAgent,
-  agenda: () => renderAgenda(view.agendaQ || 'semana', false),
+  agenda: () => renderAgenda(view.agendaQ || 'semana', view.agendaText || ''),
 };
 
 let pinEntry = '';
@@ -95,9 +97,27 @@ const actions = {
   },
   'security-tips': () => openSheet(tipsSheet()),
 
-  'go-agenda': () => go('agenda', { agendaQ: 'semana' }),
-  'agenda-q'({ q }) { view.agendaQ = q; document.getElementById('screen').innerHTML = renderAgenda(q, false); },
-  'agenda-all'({ q }) { document.getElementById('screen').innerHTML = renderAgenda(q, true); },
+  'go-agenda': () => go('agenda', { agendaQ: 'semana', agendaText: '' }),
+  setAgendaAnswer(res) { const el = document.getElementById('agenda-answer'); if (el) el.innerHTML = renderAgendaAnswer(res); },
+  'agenda-q'({ q }, el) {
+    view.agendaQ = q; view.agendaText = '';
+    const inp = document.getElementById('agenda-input'); if (inp) inp.value = '';
+    document.querySelectorAll('#screen .pills .pill').forEach((b) => b.classList.toggle('on', b.dataset.q === q));
+    actions.setAgendaAnswer({ ...agendaAnswer(q), id: q });
+  },
+  'agenda-all'({ q }) { actions.setAgendaAnswer({ ...agendaAnswer(q, { all: true }), id: q }); },
+  'agenda-ask'() {
+    const text = (document.getElementById('agenda-input')?.value || '').trim();
+    if (!text) return;
+    view.agendaText = text;
+    document.querySelectorAll('#screen .pills .pill').forEach((b) => b.classList.remove('on'));
+    actions.setAgendaAnswer({ ...agendaAnswerText(text), query: text });
+  },
+  'agenda-ask-all'() {
+    const text = view.agendaText || '';
+    actions.setAgendaAnswer({ ...agendaAnswerText(text, { all: true }), query: text });
+  },
+  'agenda-fill'({ q }) { const inp = document.getElementById('agenda-input'); if (inp) { inp.value = q; } view.agendaText = q; actions.setAgendaAnswer({ ...agendaAnswerText(q), query: q }); },
   'go-agent': () => go('agent'),
   'agent-run'() {
     const r = agent.runDaily({ force: true });
@@ -201,6 +221,7 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'agenda-form') { e.preventDefault(); actions['agenda-ask'](); return; }
   if (e.target.id === 'import-form') {
     e.preventDefault();
     const err = document.getElementById('import-error');

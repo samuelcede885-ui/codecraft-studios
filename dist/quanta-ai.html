@@ -1906,59 +1906,181 @@ function answer(id, { all = false } = {}) {
   return { headline: 'No reconocí esa pregunta.', items: [], recommendation: '', src };
 }
 
-return { todayYmd, sourceInfo, QUESTIONS, answer };
+
+// ===== Consultas en lenguaje natural (deterministas, sin IA ni Gmail) =====
+const norm = (t) => (t || '').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function classifyEval(e) {
+  const t = norm(`${e.title} ${e.category || ''}`);
+  if (/checkpoint/.test(t)) return 'checkpoint';
+  if (/proyecto|portafolio|portfolio/.test(t)) return 'proyecto';
+  if (/prueba|examen|test|oral|writing|escrit|mixta|quiz/.test(t)) return 'examen';
+  return 'evaluacion';
+}
+
+// Lista unificada: evaluaciones calificadas + prácticas, con procedencia.
+function allItems() {
+  const today = todayYmd();
+  const evals = state.exams.map((e) => {
+    const it = evalItem(e);
+    return { ...it, subjectId: e.subjectId, type: classifyEval(e), graded: true, status: 'pendiente' };
+  });
+  const practices = state.tasks.filter((t) => t.kind !== 'evaluacion').map((t) => ({
+    ymd: dueYmd(t.due), name: t.title, subject: subjectOf(t.subjectId).name, subjectId: t.subjectId,
+    weight: t.weight, type: 'practica', graded: false, status: t.status, high: false,
+    soon: false, teacher: '', category: '',
+  }));
+  void today;
+  return [...evals, ...practices];
+}
+
+// Empareja una materia por su nombre o un alias escrito por el usuario.
+function matchSubject(ntext) {
+  for (const sub of state.subjects) { if (ntext.includes(norm(sub.name))) return sub; }
+  for (const sub of state.subjects) {
+    const first = norm(sub.name).split(' ')[0];
+    if (first.length >= 4 && new RegExp(`\\b${first}`).test(ntext)) return sub;
+  }
+  if (/\bmate\b/.test(ntext)) return state.subjects.find((s) => /matematic/.test(norm(s.name)));
+  if (/\bbio\b/.test(ntext)) return state.subjects.find((s) => /biolog/.test(norm(s.name)));
+  return null;
+}
+
+const GRADED_TYPES = ['examen', 'checkpoint', 'proyecto', 'evaluacion'];
+
+function parseQuery(text) {
+  const n = norm(text);
+  const q = { raw: text, time: null, types: null, subject: null, pending: false, high: false, recognized: false, criteria: [] };
+
+  if (/\bmanana\b/.test(n)) { q.time = 'manana'; q.recognized = true; q.criteria.push('mañana'); }
+  else if (/\bhoy\b/.test(n)) { q.time = 'hoy'; q.recognized = true; q.criteria.push('hoy'); }
+  else if (/proxima semana|semana que viene/.test(n)) { q.time = 'proxima'; q.recognized = true; q.criteria.push('próxima semana'); }
+  else if (/semana/.test(n)) { q.time = 'semana'; q.recognized = true; q.criteria.push('esta semana'); }
+
+  const wantExam = /examen|prueba|evaluaci|\btest\b/.test(n);
+  const wantCheck = /checkpoint/.test(n);
+  if (wantExam || wantCheck) { q.types = wantCheck && !wantExam ? ['checkpoint'] : GRADED_TYPES; q.recognized = true; q.criteria.push(wantCheck && !wantExam ? 'checkpoints' : 'evaluaciones'); }
+  if (/\btarea|tareas|practica|practicas|pendiente/.test(n) && !wantExam && !wantCheck) { q.types = ['practica']; q.recognized = true; q.criteria.push('tareas'); }
+
+  if (/pendiente/.test(n)) { q.pending = true; q.recognized = true; }
+  if (/\b15\b|15\s*%|importante|mayor.*peso|valen|ponderaci/.test(n)) { q.high = true; q.recognized = true; q.criteria.push('15% o más'); }
+
+  const sub = matchSubject(n);
+  if (sub) { q.subject = sub.id; q.recognized = true; q.criteria.push(sub.name); }
+  return q;
+}
+
+function answerText(text, { all = false } = {}) {
+  const q = parseQuery(text);
+  const src = sourceInfo();
+  if (!q.recognized) {
+    return { headline: 'No entendí la pregunta. Prueba con algo como estas:', suggestions: QUESTIONS.map((x) => x[1]), items: [], recommendation: 'Puedes preguntar por semana, mañana, materia, 15% o checkpoints.', src, query: text };
+  }
+
+  let items = allItems();
+  // Solo próximos (fecha de hoy en adelante) o sin fecha.
+  const today = todayYmd();
+  items = items.filter((x) => !x.ymd || x.ymd >= today);
+  if (q.time === 'manana') { const t = addDays(today, 1); items = items.filter((x) => x.ymd === t); }
+  else if (q.time === 'hoy') items = items.filter((x) => x.ymd === today);
+  else if (q.time === 'semana' || q.time === 'proxima') {
+    const [a, b] = weekBounds(q.time === 'proxima' ? addDays(today, 7) : today);
+    items = items.filter((x) => x.ymd && between(x.ymd, a, b));
+  }
+  if (q.types) items = items.filter((x) => q.types.includes(x.type));
+  if (q.subject) items = items.filter((x) => x.subjectId === q.subject);
+  if (q.pending) items = items.filter((x) => x.status === 'pendiente');
+  if (q.high) items = items.filter((x) => x.weight != null && x.weight >= 15);
+
+  const sorted = items.sort((a, b) => {
+    if (!a.ymd && !b.ymd) return 0;
+    if (!a.ymd) return 1;
+    if (!b.ymd) return -1;
+    return byPriority(a, b);
+  });
+  const shown = all ? sorted : sorted.slice(0, MAX);
+  const noun = q.types && q.types.length === 1 && q.types[0] === 'practica' ? 'tareas' : 'evaluaciones';
+  const headline = sorted.length
+    ? `Encontré ${sorted.length} ${sorted.length === 1 ? noun.replace(/es$/, 'ción').replace('tareas', 'tarea') : noun}${q.criteria.length ? ` · ${q.criteria.join(' · ')}` : ''}`
+    : `No encuentro ${noun} en los datos disponibles${q.criteria.length ? ` para: ${q.criteria.join(', ')}` : ''}`;
+  return { headline, items: shown, more: Math.max(0, sorted.length - shown.length), total: sorted.length, recommendation: recommend(sorted.filter((x) => x.ymd)), src, query: text };
+}
+
+return { todayYmd, sourceInfo, QUESTIONS, answer, parseQuery, answerText };
 })();
 
 // src/screens/agenda.js
 __m["src/screens/agenda.js"] = (() => {
 const { esc, icon } = __m["src/components/ui.js"];
-const { QUESTIONS, answer, sourceInfo } = __m["src/services/agenda.js"];
+const { QUESTIONS, answer, answerText, sourceInfo } = __m["src/services/agenda.js"];
 
 function itemRow(it) {
-  const flags = [it.soon ? '⚑ 48 h' : '', it.high ? `${it.weight}%` : (it.weight != null ? `${it.weight}%` : '')].filter(Boolean);
+  const flags = [it.soon ? '⚑ 48 h' : '', it.weight != null ? `${it.weight}%` : ''].filter(Boolean);
+  const date = it.ymd
+    ? new Date(it.ymd + 'T12:00:00Z').toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+    : 'Sin fecha';
+  const pond = it.weight == null && it.graded ? ' · Ponderación no especificada' : '';
   return `
     <article class="card task">
       <div class="row between top">
         <div style="min-width:0">
-          <span class="tag">${esc(it.subject)}${it.type === 'práctica' ? ' · práctica' : it.category ? ` · ${esc(it.category)}` : ''}</span>
+          <span class="tag">${esc(it.subject)}${it.type === 'practica' ? ' · práctica' : it.category ? ` · ${esc(it.category)}` : it.type ? ` · ${esc(it.type)}` : ''}</span>
           <h3>${esc(it.name)}</h3>
         </div>
-        ${flags.length ? `<span class="chip ${it.soon ? 'bad' : it.high ? 'blue' : ''}">${flags.join(' · ')}</span>` : ''}
+        ${flags.length ? `<span class="chip ${it.soon ? 'bad' : (it.weight >= 15 ? 'blue' : '')}">${esc(flags.join(' · '))}</span>` : ''}
       </div>
-      <span class="meta">${it.ymd ? esc(new Date(it.ymd + 'T12:00:00Z').toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) : 'Sin fecha'}${it.teacher ? ` · ${esc(it.teacher)}` : ''}</span>
+      <span class="meta">${esc(date)}${esc(pond)}${it.teacher ? ` · ${esc(it.teacher)}` : ''}</span>
     </article>`;
 }
 
 function renderAnswer(res) {
+  if (res.suggestions) {
+    return `
+      <div class="answer">
+        <h2 class="h2">${esc(res.headline)}</h2>
+        <div class="pills" style="flex-wrap:wrap">${res.suggestions.map((q) => `<button class="pill" data-action="agenda-fill" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+        <p class="meta">[fuente: ${esc(res.src.kind)}]</p>
+      </div>`;
+  }
   const body = res.subjects
     ? res.subjects.map((s) => `<article class="card task"><h3>${esc(s.subject)}</h3><span class="meta">${esc(s.detail)}</span></article>`).join('')
-    : (res.items?.length ? res.items.map(itemRow).join('') : '<p class="empty">Nada en este periodo.</p>');
-  const more = res.more ? `<button class="btn ghost block" data-action="agenda-all" data-q="${esc(res.id)}">Ver las ${res.total} (hay ${res.more} más)</button>` : '';
+    : (res.items?.length ? res.items.map(itemRow).join('') : '<p class="empty">Nada en los datos disponibles.</p>');
+  const more = res.more
+    ? (res.query != null
+        ? `<button class="btn ghost block" data-action="agenda-ask-all">Ver las ${res.total} (hay ${res.more} más)</button>`
+        : `<button class="btn ghost block" data-action="agenda-all" data-q="${esc(res.id)}">Ver las ${res.total} (hay ${res.more} más)</button>`)
+    : '';
   const footer = `Última fuente disponible: ${esc(res.src.kind)}${res.src.date ? ` del ${esc(res.src.date)}` : ''}; revisa Quanta para confirmar cambios.`;
   return `
     <div class="answer">
       <h2 class="h2">${esc(res.headline)}</h2>
       ${body}
       ${more}
-      <p class="note" style="display:block"><b>Recomendación:</b> ${esc(res.recommendation)}</p>
-      <p class="meta">${footer} · [fuente: ${esc(res.src.kind)}]</p>
+      ${res.recommendation ? `<p class="note" style="display:block"><b>Recomendación:</b> ${esc(res.recommendation)}</p>` : ''}
+      <p class="meta">${esc(footer)} · [fuente: ${esc(res.src.kind)}]</p>
     </div>`;
 }
 
-function renderAgenda(current = 'semana', all = false) {
-  const res = { ...answer(current, { all }), id: current };
+function renderAgenda(initial = '', text = '') {
   const src = sourceInfo();
+  const res = text ? { ...answerText(text) } : { ...answer(initial || 'semana'), id: initial || 'semana' };
   return `
     <header>
-      <h1 class="title">Asistente</h1>
+      <h1 class="title">Pregúntale a Quanta AI</h1>
       <p class="sub" style="margin-top:8px">Tu agenda escolar · responde al instante y sin inventar</p>
     </header>
-    ${!src.date ? '<p class="note warn" style="display:block">La cuenta de Gmail que recibe Quanta no está conectada. Respondo con la exportación guardada.</p>'
-      : '<p class="note" style="display:block">Gmail de Quanta no conectado todavía: respondo con la exportación guardada. Conéctalo para novedades automáticas.</p>'}
+    ${src.date
+      ? '<p class="note" style="display:block">Respondo con la exportación guardada. Gmail de Quanta no conectado; conéctalo para novedades automáticas.</p>'
+      : '<p class="note warn" style="display:block">Sin fuente conectada: respondo con los datos de ejemplo.</p>'}
+    <form id="agenda-form" class="row" style="gap:8px">
+      <input id="agenda-input" name="q" placeholder="Escribe una pregunta sobre tus tareas o evaluaciones…" autocomplete="off" value="${esc(text)}"
+        style="flex:1;min-width:0;font-size:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--gray);color:var(--ink)">
+      <button class="btn blue" type="submit" aria-label="Preguntar">${icon.arrow}</button>
+    </form>
     <div class="pills" role="tablist">
-      ${QUESTIONS.map(([id, label]) => `<button class="pill ${id === current ? 'on' : ''}" data-action="agenda-q" data-q="${id}">${esc(label)}</button>`).join('')}
+      ${QUESTIONS.map(([id, label]) => `<button class="pill ${!text && (initial || 'semana') === id ? 'on' : ''}" data-action="agenda-q" data-q="${id}">${esc(label)}</button>`).join('')}
     </div>
-    ${renderAnswer({ ...res, id: current })}`;
+    <div id="agenda-answer">${renderAnswer(text ? { ...res, query: text } : { ...res, id: initial || 'semana' })}</div>`;
 }
 
 return { renderAnswer, renderAgenda };
@@ -2107,6 +2229,8 @@ const { renderExams } = __m["src/screens/exams.js"];
 const { renderProfile } = __m["src/screens/profile.js"];
 const { renderAgent } = __m["src/screens/agent.js"];
 const { renderAgenda } = __m["src/screens/agenda.js"];
+const { answer: agendaAnswer, answerText: agendaAnswerText } = __m["src/services/agenda.js"];
+const { renderAnswer: renderAgendaAnswer } = __m["src/screens/agenda.js"];
 const agent = __m["src/services/agent.js"];
 const { buildPlan } = __m["src/services/estudiante-pro.js"];
 const { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } = __m["src/screens/sheets.js"];
@@ -2114,7 +2238,7 @@ const { renderLock, pinSheet, wipeSheet, tipsSheet } = __m["src/screens/lock.js"
 const guard = __m["src/services/lock.js"];
 
 // Estado de navegación (no se persiste)
-const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana' };
+const view = { screen: 'home', filter: 'todas', subjectId: null, agendaQ: 'semana', agendaText: '' };
 let solveRun = 0; // invalida una resolución en curso si se cierra la hoja
 
 const SCREENS = {
@@ -2124,7 +2248,7 @@ const SCREENS = {
   exams: renderExams,
   profile: renderProfile,
   agent: renderAgent,
-  agenda: () => renderAgenda(view.agendaQ || 'semana', false),
+  agenda: () => renderAgenda(view.agendaQ || 'semana', view.agendaText || ''),
 };
 
 let pinEntry = '';
@@ -2191,9 +2315,27 @@ const actions = {
   },
   'security-tips': () => openSheet(tipsSheet()),
 
-  'go-agenda': () => go('agenda', { agendaQ: 'semana' }),
-  'agenda-q'({ q }) { view.agendaQ = q; document.getElementById('screen').innerHTML = renderAgenda(q, false); },
-  'agenda-all'({ q }) { document.getElementById('screen').innerHTML = renderAgenda(q, true); },
+  'go-agenda': () => go('agenda', { agendaQ: 'semana', agendaText: '' }),
+  setAgendaAnswer(res) { const el = document.getElementById('agenda-answer'); if (el) el.innerHTML = renderAgendaAnswer(res); },
+  'agenda-q'({ q }, el) {
+    view.agendaQ = q; view.agendaText = '';
+    const inp = document.getElementById('agenda-input'); if (inp) inp.value = '';
+    document.querySelectorAll('#screen .pills .pill').forEach((b) => b.classList.toggle('on', b.dataset.q === q));
+    actions.setAgendaAnswer({ ...agendaAnswer(q), id: q });
+  },
+  'agenda-all'({ q }) { actions.setAgendaAnswer({ ...agendaAnswer(q, { all: true }), id: q }); },
+  'agenda-ask'() {
+    const text = (document.getElementById('agenda-input')?.value || '').trim();
+    if (!text) return;
+    view.agendaText = text;
+    document.querySelectorAll('#screen .pills .pill').forEach((b) => b.classList.remove('on'));
+    actions.setAgendaAnswer({ ...agendaAnswerText(text), query: text });
+  },
+  'agenda-ask-all'() {
+    const text = view.agendaText || '';
+    actions.setAgendaAnswer({ ...agendaAnswerText(text, { all: true }), query: text });
+  },
+  'agenda-fill'({ q }) { const inp = document.getElementById('agenda-input'); if (inp) { inp.value = q; } view.agendaText = q; actions.setAgendaAnswer({ ...agendaAnswerText(q), query: q }); },
   'go-agent': () => go('agent'),
   'agent-run'() {
     const r = agent.runDaily({ force: true });
@@ -2297,6 +2439,7 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'agenda-form') { e.preventDefault(); actions['agenda-ask'](); return; }
   if (e.target.id === 'import-form') {
     e.preventDefault();
     const err = document.getElementById('import-error');

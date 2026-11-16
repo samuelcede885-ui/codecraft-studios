@@ -18,7 +18,7 @@ const file = process.env.QUANTA_HTML || 'dist/quanta-ai.html';
   const errs = []; p.on('pageerror', (e) => errs.push(e.message));
   await p.goto(`${base}/${file}`);
   await p.click('[data-action="go-agenda"]');
-  ok('Asistente: se abre desde Inicio', (await p.innerText('#screen')).includes('Asistente'));
+  ok('Asistente: se abre desde Inicio', (await p.innerText('#screen')).includes('Quanta AI'));
 
   // Cada pregunta responde con el encabezado correcto
   const expect = { semana: 'esta semana', manana: 'mañana', altas: '15%', tareas: 'tareas pendientes', prioridad: 'priorizar' };

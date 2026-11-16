@@ -41,7 +41,7 @@ export function renderProfile() {
 
     <h2 class="h2" style="margin-top:8px">Configuración</h2>
     ${setting('sync', icon.link, 'Conexión con Quanta', state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))}` : state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
-    ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Guías, resúmenes y simulacros')}
+    ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Estudiante Pro: reglas y autoría')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
     ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}
     ${securitySettings(setting, shield)}`;

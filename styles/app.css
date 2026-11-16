@@ -266,3 +266,14 @@ button.card { display: block; width: 100%; }
 .key:active { background: var(--blue); color: var(--on); }
 .ghostkey { background: none; }
 .phone.locked .nav { display: none; }
+
+/* Estudiante Pro */
+.sheet ol { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.sheet ol li { font-size: 14px; line-height: 1.55; color: var(--body); }
+.note.warn { background: var(--bad-bg); color: var(--bad-ink) !important; }
+.prompt { width: 100%; font: 13px/1.5 ui-monospace, "SF Mono", Menlo, monospace; color: var(--ink); background: var(--gray); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; resize: vertical; }
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 14px; background: var(--gray); font-size: 14px; line-height: 1.4; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--blue); flex: none; }
+.sheet .panel > * { flex-shrink: 0; }
+.prompt { min-height: 180px; }

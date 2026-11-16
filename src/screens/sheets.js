@@ -1,6 +1,7 @@
 // Contenido de las hojas inferiores: resolver tarea, guía de estudio y nueva tarea.
 import { state, subjectOf } from '../state/store.js';
 import { SOLVE_STEPS } from '../services/ai.js';
+import { CHECKLIST, EVIDENCE, PRINCIPLES } from '../services/estudiante-pro.js';
 import { esc, sheetHeader } from '../components/ui.js';
 
 export function solvingSheet(task, step) {
@@ -15,7 +16,45 @@ export function solvingSheet(task, step) {
     </ul>`;
 }
 
+const list = (items, tag = 'ul') => `<${tag}>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</${tag}>`;
+
+function proSheet(task, plan) {
+  const checks = state.checks?.[task.id] || [];
+  const done = checks.filter(Boolean).length;
+  return `
+    ${sheetHeader(`Estudiante Pro · ${plan.format}`, task.title)}
+    <p class="meta">${esc(plan.intro)}</p>
+    <p class="note">Plan para hacer el trabajo tú, con ayuda. No inventa datos, experiencias ni fuentes. Marcarla como lista solo cambia esta app, no Quanta.</p>
+    ${plan.warn ? `<p class="note warn">${esc(plan.warn)}</p>` : ''}
+    <h3 class="h2">Supuestos</h3>${list(plan.assumptions)}
+    <h3 class="h2">Estructura</h3>${list(plan.structure, 'ol')}
+    <h3 class="h2">Qué debes personalizar</h3>${list(plan.personalize)}
+    <h3 class="h2">Preguntas que podrían hacerte</h3>${list(plan.questions)}
+    <h3 class="h2">Pídele el borrador a Claude</h3>
+    <textarea class="prompt" id="pro-prompt" readonly rows="8" aria-label="Petición para Claude">${esc(plan.prompt)}</textarea>
+    <button class="btn black block" data-action="copy-prompt">Copiar petición</button>
+    <h3 class="h2">Revisión de calidad · ${done}/${CHECKLIST.length}</h3>
+    <div class="checklist">
+      ${CHECKLIST.map((c, i) => `
+        <label class="check"><input type="checkbox" data-action="check" data-id="${task.id}" data-i="${i}" ${checks[i] ? 'checked' : ''}><span>${esc(c)}</span></label>`).join('')}
+    </div>
+    <h3 class="h2">Protege tu autoría</h3>${list(EVIDENCE)}
+    <button class="btn blue block" data-action="approve" data-id="${task.id}">Marcar como lista</button>
+    <button class="btn ghost block" data-action="close-sheet">Cerrar</button>`;
+}
+
+export function principlesSheet() {
+  return `
+    ${sheetHeader('Preferencias de Estudio IA', 'Estudiante Pro')}
+    <p>La app ayuda a planificar, investigar y revisar tus trabajos con estas reglas:</p>
+    ${list(PRINCIPLES, 'ol')}
+    <h3 class="h2">Si te acusan por un detector de IA</h3>
+    <p>Un detector da una probabilidad, no una prueba. Conserva tus borradores, apuntes y fuentes, y pide una revisión humana con esa evidencia.</p>
+    <button class="btn black block" data-action="close-sheet">Entendido</button>`;
+}
+
 export function draftSheet(task, draft) {
+  if (draft.kind === 'pro') return proSheet(task, draft);
   return `
     ${sheetHeader(subjectOf(task.subjectId).name, draft.kind === 'plan' ? 'Plan de trabajo' : 'Borrador listo para revisar')}
     <p class="note">${draft.kind === 'plan'

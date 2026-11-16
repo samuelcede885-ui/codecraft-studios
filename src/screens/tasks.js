@@ -26,7 +26,7 @@ function taskCard(task) {
       <span class="meta ${urgent ? 'urgent' : ''}">${urgent ? 'Urgente · ' : ''}${esc(dueLabel(task))}</span>
       ${done
         ? `<button class="link" data-action="guide" data-subject="${task.subjectId}">Ver guía de estudio generada ${icon.chev}</button>`
-        : `<button class="btn black" data-action="solve" data-id="${task.id}">Resolver con IA</button>`}
+        : `<button class="btn black" data-action="solve" data-id="${task.id}">Resolver con Estudiante Pro</button>`}
     </article>`;
 }
 

@@ -55,3 +55,9 @@ scripts/build.mjs        Empaquetador sin dependencias → dist/quanta-ai.html
 - **Borrado del dispositivo**: elimina marcas, ajustes y PIN guardados en el navegador.
 - **Credenciales de Quanta**: `quanta-sync.cjs` pide la contraseña oculta y no la escribe en archivos; los datos personales quedan en `private/`, fuera de git.
 - El bloqueo protege la pantalla; el enlace publicado de la app es privado.
+
+## Estudiante Pro
+Skill en `.claude/skills/estudiante-pro/` (Claude la usa al trabajar en este proyecto) e integrada en la app (`src/services/estudiante-pro.js`):
+cada tarea recibe el formato escolar que corresponde (ensayo, laboratorio, prueba, oral, proyecto, portafolio, problemas…),
+supuestos, estructura, qué personalizar, preguntas de defensa, lista de revisión de calidad y una petición lista para copiar en Claude.
+No inventa datos, experiencias ni fuentes, y no promete evadir detectores de IA.

@@ -9,7 +9,7 @@ import { renderTasks } from './screens/tasks.js';
 import { renderSubjects } from './screens/subjects.js';
 import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
-import { solvingSheet, draftSheet, guideSheet, newTaskSheet } from './screens/sheets.js';
+import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet } from './screens/sheets.js';
 import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
 import * as guard from './services/lock.js';
 
@@ -141,7 +141,23 @@ const actions = {
     render();
     toast(fetchedAt ? `${total} tareas de Quanta · pide a Claude actualizar los datos` : `Quanta sincronizado · ${total} tareas`);
   },
-  prefs: () => toast('Preferencias de IA: próximamente'),
+  prefs: () => openSheet(principlesSheet()),
+  check({ id, i }, el) {
+    state.checks = state.checks || {};
+    const list = state.checks[id] || [];
+    list[Number(i)] = el.checked;
+    state.checks[id] = list;
+    save();
+    const h = [...document.querySelectorAll('#sheet h3')].find((x) => x.textContent.startsWith('Revisión de calidad'));
+    if (h) h.textContent = `Revisión de calidad · ${list.filter(Boolean).length}/7`;
+  },
+  'copy-prompt'() {
+    const box = document.getElementById('pro-prompt');
+    const fallback = () => { box.focus(); box.select(); toast('Selecciona y copia el texto'); };
+    try {
+      navigator.clipboard.writeText(box.value).then(() => toast('Petición copiada · pégala en Claude'), fallback);
+    } catch { fallback(); }
+  },
   'toggle-exam': () => {
     state.examMode = !state.examMode; save(); render();
     toast(state.examMode ? 'Modo Examen activado' : 'Modo Examen desactivado');

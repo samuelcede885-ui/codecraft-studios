@@ -3,14 +3,15 @@
 // lecciones reales de la unidad. La resolución con un modelo de lenguaje real
 // necesita el backend descrito en docs/ARQUITECTURA.md (la clave nunca va en el frontend).
 import { subjectOf } from '../state/store.js';
+import { buildPlan } from './estudiante-pro.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export const SOLVE_STEPS = [
   'Leyendo la actividad de Quanta',
+  'Eligiendo el formato escolar',
   'Buscando las lecciones de la unidad',
-  'Armando el plan de trabajo',
-  'Preparando la guía de estudio',
+  'Armando el plan de Estudiante Pro',
 ];
 
 const unitOf = (subject, task) =>
@@ -23,6 +24,11 @@ export async function solveTask(task, onStep = () => {}) {
     await wait(650);
   }
   onStep(SOLVE_STEPS.length);
+  return buildPlan(task);
+}
+
+/** Versión anterior (borrador simulado / plan simple). Se conserva como referencia. */
+export function legacyDraft(task) {
   const subject = subjectOf(task.subjectId);
 
   if (subject.outline) {

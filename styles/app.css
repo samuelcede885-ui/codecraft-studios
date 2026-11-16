@@ -277,3 +277,10 @@ button.card { display: block; width: 100%; }
 .check input { width: 20px; height: 20px; margin: 0; accent-color: var(--blue); flex: none; }
 .sheet .panel > * { flex-shrink: 0; }
 .prompt { min-height: 180px; }
+
+/* Agente diario */
+.chip { flex: none; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; background: var(--gray); }
+.chip.blue { background: var(--blue); color: #fff; }
+.chip.on { background: var(--dark); color: #fff; }
+.chip.ok { background: var(--ok-bg); color: var(--ok-ink); }
+.chip.bad { background: var(--bad-bg); color: var(--bad-ink); }

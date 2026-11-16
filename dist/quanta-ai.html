@@ -285,6 +285,13 @@ button.card { display: block; width: 100%; }
 .sheet .panel > * { flex-shrink: 0; }
 .prompt { min-height: 180px; }
 
+/* Agente diario */
+.chip { flex: none; padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; background: var(--gray); }
+.chip.blue { background: var(--blue); color: #fff; }
+.chip.on { background: var(--dark); color: #fff; }
+.chip.ok { background: var(--ok-bg); color: var(--ok-ink); }
+.chip.bad { background: var(--bad-bg); color: var(--bad-ink); }
+
 </style>
 <div class="phone">
     <main id="screen" class="screen"></main>
@@ -514,6 +521,7 @@ function sanitize(raw) {
   const st = s.student || {};
   const checks = {};
   for (const [k, v] of Object.entries(s.checks || {})) if (isId(k)) checks[k] = arr(v, 10).map(bool);
+  const agent = sanitizeAgent(s.agent);
   return {
     source: oneOf(s.source, ['demo', 'quanta', 'importado'], 'demo'),
     version: str(s.version, 60) || '1',
@@ -540,7 +548,35 @@ function sanitize(raw) {
     exams: arr(s.exams, 500).map((e) => exam(e, ids)).filter(Boolean),
     announcements: arr(s.announcements, 50).map((n) => ({ title: str(n?.title, 200), message: str(n?.message, 2000), date: date(n?.date) })),
     checks,
+    agent,
   };
+}
+
+function sanitizeAgent(a) {
+  const out = { lastRunDay: null, drafts: {} };
+  if (!a || typeof a !== 'object') return out;
+  out.lastRunDay = typeof a.lastRunDay === 'string' ? a.lastRunDay.slice(0, 20) : null;
+  const drafts = a.drafts && typeof a.drafts === 'object' ? a.drafts : {};
+  let n = 0;
+  for (const [k, d] of Object.entries(drafts)) {
+    if (!isId(k) || !d || typeof d !== 'object' || n >= 500) continue;
+    n++;
+    out.drafts[k] = {
+      taskId: isId(d.taskId) ? d.taskId : k,
+      title: str(d.title, 200),
+      subject: str(d.subject, 120),
+      kind: oneOf(d.kind, ['practica', 'evaluacion', 'manual', 'importada'], 'manual'),
+      isAssessment: bool(d.isAssessment),
+      status: oneOf(d.status, ['new', 'drafting', 'ready_for_review', 'needs_input', 'failed', 'reviewed'], 'ready_for_review'),
+      hash: str(d.hash, 40),
+      body: str(d.body, 8000),
+      prompt: str(d.prompt, 4000),
+      needsInput: arr(d.needsInput, 20).map((x) => str(x, 200)),
+      createdAt: date(d.createdAt),
+      reviewedAt: date(d.reviewedAt),
+    };
+  }
+  return out;
 }
 
 return { isId, sanitize };
@@ -1046,7 +1082,7 @@ const TABS = [
 ];
 
 // "Mis Tareas" cuelga de Materias en la navegación.
-const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen);
+const tabOf = (screen) => (screen === 'tasks' ? 'subjects' : screen === 'agent' ? 'home' : screen);
 
 function renderNav(screen) {
   return TABS.map((tab) => {
@@ -1060,10 +1096,133 @@ function renderNav(screen) {
 return { renderNav };
 })();
 
+// src/services/agent.js
+__m["src/services/agent.js"] = (() => {
+// Agente de estudio diario (local, dentro del teléfono).
+// Una vez al día, al abrir la app, prepara material de estudio y borradores de
+// apoyo con Estudiante Pro para cada tarea importada, y avisa cuando están listos.
+// NO entrega nada, NO se conecta a Quanta y NO marca tareas como entregadas.
+// Para pruebas supervisadas prepara guía de estudio, nunca respuestas de examen.
+const { state, save, subjectOf } = __m["src/state/store.js"];
+const { buildPlan } = __m["src/services/estudiante-pro.js"];
+
+const MAX_PER_RUN = 30;
+
+// Día local en la zona del colegio (America/Caracas).
+const localDay = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Caracas' });
+
+// Hash estable del contenido de una tarea; si el profesor cambia la consigna, cambia el hash.
+function contentHash(task) {
+  const raw = `${task.id}|${task.title}|${task.instructions || ''}|${task.unit || ''}|${task.status}`;
+  let h = 5381;
+  for (let i = 0; i < raw.length; i++) h = ((h << 5) + h + raw.charCodeAt(i)) & 0xffffffff;
+  return (h >>> 0).toString(16);
+}
+
+const isAssessment = (task) => task.forExam || task.kind === 'evaluacion';
+
+function ensure() {
+  if (!state.agent || typeof state.agent !== 'object') state.agent = { lastRunDay: null, drafts: {} };
+  if (!state.agent.drafts) state.agent.drafts = {};
+  return state.agent;
+}
+
+/** Texto del material preparado, para copiar. Es lo que el estudiante revisa, no el prompt. */
+function draftToText(draft) {
+  const lines = [draft.title, '', draft.body];
+  return lines.join('\n');
+}
+
+function planToText(plan) {
+  const bullet = (arr) => arr.map((x) => `• ${x}`).join('\n');
+  return [
+    plan.intro,
+    `Formato: ${plan.format}`,
+    plan.warn ? `Aviso: ${plan.warn}` : '',
+    '',
+    'Estructura sugerida:',
+    bullet(plan.structure),
+    '',
+    'Qué debes aportar tú (no lo inventa la IA):',
+    bullet(plan.personalize),
+    '',
+    'Para poder defenderlo, prepárate estas preguntas:',
+    bullet(plan.questions),
+  ].filter((l) => l !== '' || true).join('\n');
+}
+
+function pendingTasks() {
+  return state.tasks.filter((t) => t.status === 'pendiente');
+}
+
+/** Cuántos borradores están listos y sin revisar. */
+function readyCount() {
+  const d = ensure().drafts;
+  return Object.values(d).filter((x) => x.status === 'ready_for_review' || x.status === 'needs_input').length;
+}
+
+const lastRun = () => ensure().lastRunDay;
+const allDrafts = () => Object.values(ensure().drafts).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+/**
+ * Prepara borradores para las tareas pendientes nuevas o modificadas.
+ * force=true ignora que ya se haya ejecutado hoy. Devuelve un resumen.
+ * Idempotente: no reprepara una tarea cuyo contenido no cambió.
+ */
+function runDaily({ force = false } = {}) {
+  const agent = ensure();
+  const today = localDay();
+  if (!force && agent.lastRunDay === today) return { ran: false, prepared: [], reason: 'ya-ejecutado-hoy' };
+
+  const prepared = [];
+  for (const task of pendingTasks()) {
+    const hash = contentHash(task);
+    const existing = agent.drafts[task.id];
+    // Idempotencia: si ya hay borrador del mismo contenido, no se rehace ni se reavisa.
+    if (existing && existing.hash === hash && existing.status !== 'failed') continue;
+
+    try {
+      const plan = buildPlan(task);
+      agent.drafts[task.id] = {
+        taskId: task.id,
+        title: task.title,
+        subject: subjectOf(task.subjectId).name,
+        kind: task.kind,
+        isAssessment: isAssessment(task),
+        status: (plan.personalize || []).length ? 'needs_input' : 'ready_for_review',
+        hash,
+        body: planToText(plan),
+        prompt: plan.prompt,
+        needsInput: plan.personalize || [],
+        createdAt: new Date().toISOString(),
+        reviewedAt: existing?.reviewedAt || null,
+        revisionOf: existing ? existing.hash : null,
+      };
+      prepared.push(agent.drafts[task.id]);
+      if (prepared.length >= MAX_PER_RUN) break;
+    } catch {
+      agent.drafts[task.id] = { ...(existing || { taskId: task.id, title: task.title, subject: subjectOf(task.subjectId).name }), status: 'failed', hash, createdAt: new Date().toISOString() };
+    }
+  }
+
+  agent.lastRunDay = today;
+  save();
+  return { ran: true, prepared, total: pendingTasks().length };
+}
+
+function markReviewed(taskId) {
+  const d = ensure().drafts[taskId];
+  if (d) { d.status = 'reviewed'; d.reviewedAt = new Date().toISOString(); save(); }
+}
+
+return { MAX_PER_RUN, localDay, draftToText, pendingTasks, readyCount, lastRun, allDrafts, runDaily, markReviewed };
+})();
+
 // src/screens/home.js
 __m["src/screens/home.js"] = (() => {
 const { state, pending, resolved, nextExam, subjectOf, topicsFor, prepFor, dayLabel } = __m["src/state/store.js"];
 const { esc, icon, initials } = __m["src/components/ui.js"];
+const { readyCount } = __m["src/services/agent.js"];
 
 function greeting() {
   const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Caracas' }));
@@ -1107,6 +1266,12 @@ function renderHome() {
 
     <p class="label">Sugerencia de estudio hoy</p>
     ${suggestion()}
+
+    ${(() => { const r = readyCount(); return r ? `
+    <button class="card outline row between" data-action="go" data-screen="agent" style="display:flex">
+      <div><span class="tag">Agente diario</span><div class="label" style="margin-top:2px">${r} borrador${r === 1 ? '' : 'es'} por revisar</div></div>
+      <span class="circle" style="background:var(--blue)">${icon.arrow}</span>
+    </button>` : ''; })()}
 
     <button class="banner" data-action="go-pending">
       <div>
@@ -1529,6 +1694,7 @@ function renderProfile() {
     ${setting('sync', icon.link, 'Conexión con Quanta', state.importedAt
       ? `Importado el ${esc(fetched(state.importedAt))}`
       : state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))} · sincronización desactivada` : 'Importa tus tareas desde un archivo')}
+    ${setting('go-agent', icon.sync, 'Agente de estudio diario', 'Prepara borradores para revisar y entregar tú')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Estudiante Pro: reglas y autoría')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
     ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}
@@ -1536,6 +1702,72 @@ function renderProfile() {
 }
 
 return { renderProfile };
+})();
+
+// src/screens/agent.js
+__m["src/screens/agent.js"] = (() => {
+const { esc, icon } = __m["src/components/ui.js"];
+const { allDrafts, readyCount, lastRun, pendingTasks } = __m["src/services/agent.js"];
+
+const STATE_LABEL = {
+  ready_for_review: ['Listo para revisar', 'blue'],
+  needs_input: ['Requiere tus datos', 'on'],
+  reviewed: ['Revisado', 'ok'],
+  failed: ['No se pudo preparar', 'bad'],
+};
+
+function draftCard(d) {
+  const [label, tone] = STATE_LABEL[d.status] || STATE_LABEL.ready_for_review;
+  return `
+    <article class="card task">
+      <div class="row between top">
+        <div style="min-width:0">
+          <span class="tag">${esc(d.subject)}${d.isAssessment ? ' · guía de estudio' : ''}</span>
+          <h3>${esc(d.title)}</h3>
+        </div>
+        <span class="chip ${tone}">${label}</span>
+      </div>
+      ${d.needsInput?.length ? `<span class="meta">Tú aportas: ${esc(d.needsInput.slice(0, 2).join(' · '))}${d.needsInput.length > 2 ? '…' : ''}</span>` : ''}
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button class="btn black" data-action="agent-view" data-id="${esc(d.taskId)}">Ver y copiar</button>
+        ${d.status === 'reviewed'
+          ? '<span class="meta">Revisado · cópialo y entrégalo tú en Quanta</span>'
+          : `<button class="btn ghost" data-action="agent-review" data-id="${esc(d.taskId)}">Marcar revisado</button>`}
+      </div>
+    </article>`;
+}
+
+function renderAgent() {
+  const drafts = allDrafts();
+  const ready = readyCount();
+  const run = lastRun();
+  return `
+    <header>
+      <h1 class="title">Agente diario</h1>
+      <p class="sub" style="margin-top:8px">Prepara tus tareas para que tú las revises y entregues</p>
+    </header>
+
+    <section class="card dark suggest">
+      <div class="row between top">
+        <div>
+          <span class="tag light">Agente de estudio</span>
+          <h2 class="h2" style="margin-top:4px">${ready ? `${ready} borrador${ready === 1 ? '' : 'es'} por revisar` : 'Todo revisado'}</h2>
+        </div>
+        ${icon.sync}
+      </div>
+      <span class="meta">${run ? `Última preparación: ${esc(run)}` : 'Aún no se ha preparado nada'} · ${pendingTasks().length} tareas pendientes</span>
+      <div class="row" style="gap:8px">
+        <button class="btn white" data-action="agent-run">Preparar ahora</button>
+        <button class="btn ghost" data-action="agent-notifs" style="color:#fff;background:#ffffff22">Activar avisos</button>
+      </div>
+    </section>
+
+    <p class="note" style="display:block">El agente no entrega nada ni se conecta a Quanta. Prepara material con Estudiante Pro desde tus tareas importadas; tú revisas, copias y entregas en persona. Para pruebas prepara guía de estudio, no respuestas de examen.</p>
+
+    ${drafts.length ? drafts.map(draftCard).join('') : '<p class="empty">Aún no hay borradores. Importa tus tareas y toca «Preparar ahora».</p>'}`;
+}
+
+return { renderAgent };
 })();
 
 // src/screens/sheets.js
@@ -1679,6 +1911,9 @@ const { renderTasks } = __m["src/screens/tasks.js"];
 const { renderSubjects } = __m["src/screens/subjects.js"];
 const { renderExams } = __m["src/screens/exams.js"];
 const { renderProfile } = __m["src/screens/profile.js"];
+const { renderAgent } = __m["src/screens/agent.js"];
+const agent = __m["src/services/agent.js"];
+const { buildPlan } = __m["src/services/estudiante-pro.js"];
 const { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } = __m["src/screens/sheets.js"];
 const { renderLock, pinSheet, wipeSheet, tipsSheet } = __m["src/screens/lock.js"];
 const guard = __m["src/services/lock.js"];
@@ -1693,6 +1928,7 @@ const SCREENS = {
   subjects: renderSubjects,
   exams: renderExams,
   profile: renderProfile,
+  agent: renderAgent,
 };
 
 let pinEntry = '';
@@ -1727,7 +1963,7 @@ async function tryUnlock() {
   pinEntry = '';
   pinMsg = r.ok ? '' : r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'PIN incorrecto';
   render();
-  if (r.ok) toast('Desbloqueada');
+  if (r.ok) { toast('Desbloqueada'); runAgentOnce(); }
 }
 
 function go(screen, patch = {}) {
@@ -1758,6 +1994,27 @@ const actions = {
     toast('Datos de este dispositivo borrados');
   },
   'security-tips': () => openSheet(tipsSheet()),
+
+  'go-agent': () => go('agent'),
+  'agent-run'() {
+    const r = agent.runDaily({ force: true });
+    render();
+    notifyDrafts(r.prepared);
+    toast(r.prepared.length ? `${r.prepared.length} borrador(es) preparado(s)` : 'No hay tareas nuevas que preparar');
+  },
+  'agent-review'({ id }) { agent.markReviewed(id); render(); toast('Marcado como revisado'); },
+  'agent-view'({ id }) {
+    const task = taskById(id);
+    if (!task) return;
+    openSheet(draftSheet(task, buildPlan(task)));
+  },
+  async 'agent-notifs'() {
+    try {
+      if (!globalThis.Notification) return toast('Este navegador no permite avisos');
+      const perm = await Notification.requestPermission();
+      toast(perm === 'granted' ? 'Avisos activados en este dispositivo' : 'Avisos no activados');
+    } catch { toast('No se pudieron activar los avisos aquí'); }
+  },
 
   go: ({ screen }) => go(screen),
   'go-pending': () => go('tasks', { filter: 'pendientes', subjectId: null }),
@@ -1905,6 +2162,27 @@ document.addEventListener('visibilitychange', () => {
 });
 setInterval(() => { if (guard.idleTooLong()) lockNow(); }, 15000);
 
+// Avisos del navegador (solo si el estudiante los activa; no funcionan con la app cerrada).
+function notifyDrafts(prepared) {
+  if (!prepared.length) return;
+  const msg = prepared.length === 1
+    ? `Nueva tarea preparada: ${prepared[0].subject} — ${prepared[0].title}. Revísala y cópiala.`
+    : `${prepared.length} tareas preparadas para revisar en el Agente diario.`;
+  toast(msg);
+  try {
+    if (globalThis.Notification && Notification.permission === 'granted') {
+      new Notification('Quanta AI · Agente diario', { body: msg });
+    }
+  } catch { /* el entorno no permite notificaciones */ }
+}
+
+// Preparación diaria: una vez por día local, al abrir la app y estar desbloqueada.
+function runAgentOnce() {
+  if (guard.isLocked()) return;
+  const r = agent.runDaily();
+  if (r.ran && r.prepared.length) { notifyDrafts(r.prepared); if (view.screen === 'home' || view.screen === 'agent') render(); }
+}
+
 document.addEventListener('keydown', (e) => {
   guard.touch();
   if (guard.isLocked() && /^\d$/.test(e.key)) return actions['pin-key']({ k: e.key });
@@ -1914,6 +2192,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 render();
+runAgentOnce();
 
 return {  };
 })();

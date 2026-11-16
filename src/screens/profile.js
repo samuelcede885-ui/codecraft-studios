@@ -43,6 +43,7 @@ export function renderProfile() {
     ${setting('sync', icon.link, 'Conexión con Quanta', state.importedAt
       ? `Importado el ${esc(fetched(state.importedAt))}`
       : state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))} · sincronización desactivada` : 'Importa tus tareas desde un archivo')}
+    ${setting('go-agent', icon.sync, 'Agente de estudio diario', 'Prepara borradores para revisar y entregar tú')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Estudiante Pro: reglas y autoría')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
     ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}

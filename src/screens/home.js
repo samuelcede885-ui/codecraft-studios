@@ -1,5 +1,6 @@
 import { state, pending, resolved, nextExam, subjectOf, topicsFor, prepFor, dayLabel } from '../state/store.js';
 import { esc, icon, initials } from '../components/ui.js';
+import { readyCount } from '../services/agent.js';
 
 function greeting() {
   const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Caracas' }));
@@ -43,6 +44,12 @@ export function renderHome() {
 
     <p class="label">Sugerencia de estudio hoy</p>
     ${suggestion()}
+
+    ${(() => { const r = readyCount(); return r ? `
+    <button class="card outline row between" data-action="go" data-screen="agent" style="display:flex">
+      <div><span class="tag">Agente diario</span><div class="label" style="margin-top:2px">${r} borrador${r === 1 ? '' : 'es'} por revisar</div></div>
+      <span class="circle" style="background:var(--blue)">${icon.arrow}</span>
+    </button>` : ''; })()}
 
     <button class="banner" data-action="go-pending">
       <div>

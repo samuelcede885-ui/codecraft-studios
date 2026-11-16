@@ -9,6 +9,9 @@ import { renderTasks } from './screens/tasks.js';
 import { renderSubjects } from './screens/subjects.js';
 import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
+import { renderAgent } from './screens/agent.js';
+import * as agent from './services/agent.js';
+import { buildPlan } from './services/estudiante-pro.js';
 import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } from './screens/sheets.js';
 import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
 import * as guard from './services/lock.js';
@@ -23,6 +26,7 @@ const SCREENS = {
   subjects: renderSubjects,
   exams: renderExams,
   profile: renderProfile,
+  agent: renderAgent,
 };
 
 let pinEntry = '';
@@ -57,7 +61,7 @@ async function tryUnlock() {
   pinEntry = '';
   pinMsg = r.ok ? '' : r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'PIN incorrecto';
   render();
-  if (r.ok) toast('Desbloqueada');
+  if (r.ok) { toast('Desbloqueada'); runAgentOnce(); }
 }
 
 function go(screen, patch = {}) {
@@ -88,6 +92,27 @@ const actions = {
     toast('Datos de este dispositivo borrados');
   },
   'security-tips': () => openSheet(tipsSheet()),
+
+  'go-agent': () => go('agent'),
+  'agent-run'() {
+    const r = agent.runDaily({ force: true });
+    render();
+    notifyDrafts(r.prepared);
+    toast(r.prepared.length ? `${r.prepared.length} borrador(es) preparado(s)` : 'No hay tareas nuevas que preparar');
+  },
+  'agent-review'({ id }) { agent.markReviewed(id); render(); toast('Marcado como revisado'); },
+  'agent-view'({ id }) {
+    const task = taskById(id);
+    if (!task) return;
+    openSheet(draftSheet(task, buildPlan(task)));
+  },
+  async 'agent-notifs'() {
+    try {
+      if (!globalThis.Notification) return toast('Este navegador no permite avisos');
+      const perm = await Notification.requestPermission();
+      toast(perm === 'granted' ? 'Avisos activados en este dispositivo' : 'Avisos no activados');
+    } catch { toast('No se pudieron activar los avisos aquí'); }
+  },
 
   go: ({ screen }) => go(screen),
   'go-pending': () => go('tasks', { filter: 'pendientes', subjectId: null }),
@@ -235,6 +260,27 @@ document.addEventListener('visibilitychange', () => {
 });
 setInterval(() => { if (guard.idleTooLong()) lockNow(); }, 15000);
 
+// Avisos del navegador (solo si el estudiante los activa; no funcionan con la app cerrada).
+function notifyDrafts(prepared) {
+  if (!prepared.length) return;
+  const msg = prepared.length === 1
+    ? `Nueva tarea preparada: ${prepared[0].subject} — ${prepared[0].title}. Revísala y cópiala.`
+    : `${prepared.length} tareas preparadas para revisar en el Agente diario.`;
+  toast(msg);
+  try {
+    if (globalThis.Notification && Notification.permission === 'granted') {
+      new Notification('Quanta AI · Agente diario', { body: msg });
+    }
+  } catch { /* el entorno no permite notificaciones */ }
+}
+
+// Preparación diaria: una vez por día local, al abrir la app y estar desbloqueada.
+function runAgentOnce() {
+  if (guard.isLocked()) return;
+  const r = agent.runDaily();
+  if (r.ran && r.prepared.length) { notifyDrafts(r.prepared); if (view.screen === 'home' || view.screen === 'agent') render(); }
+}
+
 document.addEventListener('keydown', (e) => {
   guard.touch();
   if (guard.isLocked() && /^\d$/.test(e.key)) return actions['pin-key']({ k: e.key });
@@ -244,3 +290,4 @@ document.addEventListener('keydown', (e) => {
 });
 
 render();
+runAgentOnce();

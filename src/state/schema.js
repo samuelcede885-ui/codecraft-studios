@@ -84,6 +84,7 @@ export function sanitize(raw) {
   const st = s.student || {};
   const checks = {};
   for (const [k, v] of Object.entries(s.checks || {})) if (isId(k)) checks[k] = arr(v, 10).map(bool);
+  const agent = sanitizeAgent(s.agent);
   return {
     source: oneOf(s.source, ['demo', 'quanta', 'importado'], 'demo'),
     version: str(s.version, 60) || '1',
@@ -110,5 +111,33 @@ export function sanitize(raw) {
     exams: arr(s.exams, 500).map((e) => exam(e, ids)).filter(Boolean),
     announcements: arr(s.announcements, 50).map((n) => ({ title: str(n?.title, 200), message: str(n?.message, 2000), date: date(n?.date) })),
     checks,
+    agent,
   };
+}
+
+function sanitizeAgent(a) {
+  const out = { lastRunDay: null, drafts: {} };
+  if (!a || typeof a !== 'object') return out;
+  out.lastRunDay = typeof a.lastRunDay === 'string' ? a.lastRunDay.slice(0, 20) : null;
+  const drafts = a.drafts && typeof a.drafts === 'object' ? a.drafts : {};
+  let n = 0;
+  for (const [k, d] of Object.entries(drafts)) {
+    if (!isId(k) || !d || typeof d !== 'object' || n >= 500) continue;
+    n++;
+    out.drafts[k] = {
+      taskId: isId(d.taskId) ? d.taskId : k,
+      title: str(d.title, 200),
+      subject: str(d.subject, 120),
+      kind: oneOf(d.kind, ['practica', 'evaluacion', 'manual', 'importada'], 'manual'),
+      isAssessment: bool(d.isAssessment),
+      status: oneOf(d.status, ['new', 'drafting', 'ready_for_review', 'needs_input', 'failed', 'reviewed'], 'ready_for_review'),
+      hash: str(d.hash, 40),
+      body: str(d.body, 8000),
+      prompt: str(d.prompt, 4000),
+      needsInput: arr(d.needsInput, 20).map((x) => str(x, 200)),
+      createdAt: date(d.createdAt),
+      reviewedAt: date(d.reviewedAt),
+    };
+  }
+  return out;
 }

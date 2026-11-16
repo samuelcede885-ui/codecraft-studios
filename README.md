@@ -64,3 +64,9 @@ Skill en `.claude/skills/estudiante-pro/` (Claude la usa al trabajar en este pro
 cada tarea recibe el formato escolar que corresponde (ensayo, laboratorio, prueba, oral, proyecto, portafolio, problemas…),
 supuestos, estructura, qué personalizar, preguntas de defensa, lista de revisión de calidad y una petición lista para copiar en Claude.
 No inventa datos, experiencias ni fuentes, y no promete evadir detectores de IA.
+
+## Agente diario de estudio
+Implementa la skill `quanta-agente-diario` dentro de la app (`src/services/agent.js`, `src/screens/agent.js`).
+Prepara borradores de apoyo con Estudiante Pro una vez al día para que el estudiante los revise, copie y
+entregue en persona. No entrega nada ni se conecta a Quanta. Detalles y límites en `docs/AGENTE_DIARIO.md`.
+Pruebas: `node scripts/build.mjs && node tests/agent.test.cjs`.

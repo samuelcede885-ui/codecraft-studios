@@ -47,3 +47,11 @@ scripts/build.mjs        Empaquetador sin dependencias → dist/quanta-ai.html
 - Extra: **Materias**, **Exámenes** y botón central **+** para añadir tareas.
 
 > La IA y Quanta están simulados en esta versión. Los borradores deben revisarse antes de entregarse.
+
+## Seguridad
+- **Bloqueo con PIN** (Perfil → Seguridad): el PIN no se guarda, solo un hash PBKDF2-SHA256 con sal aleatoria.
+- **Bloqueo automático** al salir de la app y tras 2 minutos sin uso; los datos no se muestran mientras está bloqueada.
+- **Límite de intentos**: tras 3 fallos espera 30 s, y el tiempo se duplica con cada fallo extra (persiste al recargar).
+- **Borrado del dispositivo**: elimina marcas, ajustes y PIN guardados en el navegador.
+- **Credenciales de Quanta**: `quanta-sync.cjs` pide la contraseña oculta y no la escribe en archivos; los datos personales quedan en `private/`, fuera de git.
+- El bloqueo protege la pantalla; el enlace publicado de la app es privado.

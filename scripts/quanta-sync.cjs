@@ -1,6 +1,6 @@
 // Recolector de solo lectura del portal de estudiantes de Quanta.
-// Uso: Q_USER=correo Q_PASS=contraseña node scripts/quanta-sync.cjs
-// Las credenciales se leen solo de variables de entorno y nunca se guardan.
+// Uso: Q_USER=correo node scripts/quanta-sync.cjs   (pide la contraseña sin mostrarla)
+// También acepta Q_PASS. Las credenciales nunca se escriben en archivos ni en registros.
 // Los datos se escriben en private/ (excluida de git): contienen datos personales.
 const { chromium } = require('playwright');
 const fs = require('fs');
@@ -10,9 +10,34 @@ const BASE = 'https://student.somosquanta.com';
 const OUT = path.join(__dirname, '..', 'private');
 const MAX_PAGES = 60;
 
+// Pide la contraseña en la terminal sin mostrar lo que se escribe.
+function askHidden(question) {
+  return new Promise((resolve, reject) => {
+    if (!process.stdin.isTTY) return reject(new Error('Falta Q_PASS (no hay terminal para pedirla)'));
+    process.stdout.write(question);
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+    let value = '';
+    const onData = (buf) => {
+      for (const ch of buf.toString('utf8')) {
+        if (ch === '\r' || ch === '\n') {
+          process.stdin.setRawMode(false); process.stdin.pause(); process.stdin.off('data', onData);
+          process.stdout.write('\n');
+          return resolve(value);
+        }
+        if (ch === '\u0003') process.exit(130);
+        value = ch === '\u007f' ? value.slice(0, -1) : value + ch;
+      }
+    };
+    process.stdin.on('data', onData);
+  });
+}
+
 (async () => {
-  const { Q_USER, Q_PASS } = process.env;
-  if (!Q_USER || !Q_PASS) throw new Error('Faltan Q_USER y Q_PASS');
+  const Q_USER = process.env.Q_USER;
+  if (!Q_USER) throw new Error('Falta Q_USER (tu correo de Quanta)');
+  const Q_PASS = process.env.Q_PASS || await askHidden('Contraseña de Quanta: ');
+  delete process.env.Q_PASS;
   fs.mkdirSync(OUT, { recursive: true });
 
   const browser = await chromium.launch();

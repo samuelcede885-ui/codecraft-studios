@@ -1,5 +1,8 @@
 import { state, resolved, upcomingExams, prepFor, nextExam } from '../state/store.js';
 import { esc, icon, initials } from '../components/ui.js';
+import { securitySettings } from './lock.js';
+
+const shield = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
 
 const setting = (action, svg, title, detail) => `
   <button class="setting" data-action="${action}">
@@ -40,5 +43,6 @@ export function renderProfile() {
     ${setting('sync', icon.link, 'Conexión con Quanta', state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))}` : state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Guías, resúmenes y simulacros')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
-    ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}`;
+    ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}
+    ${securitySettings(setting, shield)}`;
 }

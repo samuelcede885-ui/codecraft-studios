@@ -32,17 +32,23 @@ const modules = order.map((file) => {
     const dep = resolve(dirname(file), rel).slice(root.length + 1);
     return `const {${names}} = __m[${JSON.stringify(dep)}];`;
   });
+  src = src.replace(/^import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"](.+?)['"];?$/gm, (_, ns, rel) => {
+    const dep = resolve(dirname(file), rel).slice(root.length + 1);
+    return `const ${ns} = __m[${JSON.stringify(dep)}];`;
+  });
   src = src.replace(/^export\s+(async\s+function|function|const|let)\s+([A-Za-z_$][\w$]*)/gm, (_, kind, id) => {
     exported.push(id);
     return `${kind} ${id}`;
   });
+  if (/^\s*(import|export)\s/m.test(src)) throw new Error(`Sintaxis de módulo no soportada en ${name}`);
   return `// ${name}\n__m[${JSON.stringify(name)}] = (() => {\n${src}\nreturn { ${exported.join(', ')} };\n})();`;
 });
 
 const css = readFileSync(join(root, 'styles/app.css'), 'utf8');
 const body = readFileSync(join(root, 'index.html'), 'utf8').match(/<body>([\s\S]*?)<script/)[1].trim();
 
-const html = `<title>Quanta AI</title>
+const html = `<meta charset="utf-8">
+<title>Quanta AI</title>
 <meta name="theme-color" content="#2563EB">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

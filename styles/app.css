@@ -254,3 +254,15 @@ button.card { display: block; width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation-duration: 0s !important; }
 }
+
+/* Bloqueo con PIN */
+.lock { min-height: calc(100dvh - 80px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.dots { display: flex; gap: 14px; margin: 8px 0 0; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line2); }
+.dots i.on { background: var(--blue); border-color: var(--blue); }
+.lock-msg { min-height: 20px; color: var(--bad); font-size: 13px; font-weight: 600; }
+.pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px; }
+.key { width: 72px; height: 72px; border-radius: 50%; background: var(--gray); font-size: 26px; font-weight: 600; display: grid; place-items: center; text-align: center; }
+.key:active { background: var(--blue); color: var(--on); }
+.ghostkey { background: none; }
+.phone.locked .nav { display: none; }

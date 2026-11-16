@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Quanta AI</title>
 <meta name="theme-color" content="#2563EB">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -260,6 +261,18 @@ button.card { display: block; width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation-duration: 0s !important; }
 }
+
+/* Bloqueo con PIN */
+.lock { min-height: calc(100dvh - 80px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.dots { display: flex; gap: 14px; margin: 8px 0 0; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line2); }
+.dots i.on { background: var(--blue); border-color: var(--blue); }
+.lock-msg { min-height: 20px; color: var(--bad); font-size: 13px; font-weight: 600; }
+.pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px; }
+.key { width: 72px; height: 72px; border-radius: 50%; background: var(--gray); font-size: 26px; font-weight: 600; display: grid; place-items: center; text-align: center; }
+.key:active { background: var(--blue); color: var(--on); }
+.ghostkey { background: none; }
+.phone.locked .nav { display: none; }
 
 </style>
 <div class="phone">
@@ -896,10 +909,186 @@ function renderExams() {
 return { renderExams };
 })();
 
+// src/services/lock.js
+__m["src/services/lock.js"] = (() => {
+// Bloqueo con PIN de la app en este dispositivo.
+// El PIN nunca se guarda: solo un hash PBKDF2 (SHA-256, 150 000 iteraciones) con sal aleatoria.
+// Protege la pantalla frente a quien tome el teléfono; el enlace de la app ya es privado.
+
+const KEY = 'quanta-ai-lock';
+const ITER = 150000;
+const AUTO_MS = 2 * 60 * 1000; // bloqueo por inactividad
+
+const read = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+const write = (v) => { try { localStorage.setItem(KEY, JSON.stringify(v)); return true; } catch { return false; } };
+
+let cfg = read();
+let locked = Boolean(cfg.hash);
+let lastActive = Date.now();
+
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+const unhex = (s) => new Uint8Array(s.match(/../g).map((h) => parseInt(h, 16)));
+
+async function derive(pin, salt) {
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+  return hex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: ITER }, base, 256));
+}
+
+// Comparación en tiempo constante
+const same = (a, b) => a.length === b.length && [...a].reduce((d, c, i) => d | (c.charCodeAt(0) ^ b.charCodeAt(i)), 0) === 0;
+
+const supported = () => Boolean(globalThis.crypto?.subtle);
+const hasPin = () => Boolean(cfg.hash);
+const isLocked = () => locked && hasPin();
+const autoLockOn = () => cfg.autoLock !== false;
+const validPin = (pin) => /^\d{4,8}$/.test(pin);
+
+function lock() { if (hasPin()) locked = true; }
+function touch() { lastActive = Date.now(); }
+const idleTooLong = () => hasPin() && !locked && Date.now() - lastActive > AUTO_MS;
+
+/** Segundos que faltan para poder intentar de nuevo tras varios fallos. */
+function waitSeconds() {
+  return Math.max(0, Math.ceil(((cfg.until || 0) - Date.now()) / 1000));
+}
+
+async function setPin(pin) {
+  if (!supported()) throw new Error('Este navegador no permite cifrar el PIN.');
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  cfg = { ...cfg, salt: hex(salt), hash: await derive(pin, salt), fails: 0, until: 0 };
+  if (!write(cfg)) { cfg = read(); throw new Error('Este navegador no deja guardar el PIN (modo privado o datos bloqueados).'); }
+  locked = false;
+}
+
+/** Comprueba el PIN. Tras 3 fallos espera 30 s, y el tiempo se duplica con cada fallo extra. */
+async function unlock(pin) {
+  if (waitSeconds() > 0) return { ok: false, wait: waitSeconds() };
+  const ok = same(await derive(pin, unhex(cfg.salt)), cfg.hash);
+  if (ok) {
+    cfg = { ...cfg, fails: 0, until: 0 };
+    locked = false;
+    touch();
+  } else {
+    const fails = (cfg.fails || 0) + 1;
+    cfg = { ...cfg, fails, until: fails >= 3 ? Date.now() + 30000 * 2 ** (fails - 3) : 0 };
+  }
+  write(cfg);
+  return { ok, wait: waitSeconds(), fails: cfg.fails };
+}
+
+async function removePin(pin) {
+  const r = await unlock(pin);
+  if (!r.ok) return r;
+  cfg = { autoLock: cfg.autoLock };
+  write(cfg);
+  return r;
+}
+
+function setAutoLock(on) { cfg = { ...cfg, autoLock: on }; write(cfg); }
+
+/** Borra de este dispositivo todo lo que guarda la app, PIN incluido. */
+function wipeDevice() {
+  try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith('quanta-ai')) localStorage.removeItem(k);
+    sessionStorage.clear();
+  } catch { /* sin almacenamiento */ }
+  cfg = {};
+  locked = false;
+}
+
+return { supported, hasPin, isLocked, autoLockOn, validPin, lock, touch, idleTooLong, waitSeconds, setPin, unlock, removePin, setAutoLock, wipeDevice };
+})();
+
+// src/screens/lock.js
+__m["src/screens/lock.js"] = (() => {
+const { state } = __m["src/state/store.js"];
+const { esc, icon, initials, sheetHeader } = __m["src/components/ui.js"];
+const { hasPin, autoLockOn } = __m["src/services/lock.js"];
+
+function renderLock(entered = '', message = '') {
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
+  return `
+    <section class="lock">
+      <span class="avatar">${esc(initials(state.student.name))}</span>
+      <h1 class="title" style="font-size:28px">App bloqueada</h1>
+      <p class="sub">Escribe tu PIN para ver tus tareas</p>
+      <div class="dots" aria-label="${entered.length} dígitos escritos">
+        ${Array.from({ length: Math.max(4, entered.length) }, (_, i) => `<i class="${i < entered.length ? 'on' : ''}"></i>`).join('')}
+      </div>
+      <p class="lock-msg" role="alert">${esc(message)}</p>
+      <div class="pad">
+        ${keys.map((k) => k === ''
+          ? '<span></span>'
+          : k === 'del'
+            ? `<button class="key ghostkey" data-action="pin-key" data-k="del" aria-label="Borrar">${icon.x}</button>`
+            : `<button class="key" data-action="pin-key" data-k="${k}">${k}</button>`).join('')}
+      </div>
+      <button class="btn ghost" data-action="pin-ok">Desbloquear</button>
+      <button class="link" data-action="forgot-pin">Olvidé mi PIN</button>
+    </section>`;
+}
+
+function securitySettings(setting, iconSvg) {
+  return `
+    <h2 class="h2" style="margin-top:8px">Seguridad</h2>
+    ${setting('pin-setup', iconSvg, 'Bloqueo con PIN', hasPin() ? 'Activado · toca para cambiar o quitar' : 'Desactivado · toca para activarlo')}
+    ${hasPin() ? setting('toggle-autolock', icon.clock, 'Bloquear al salir de la app', autoLockOn() ? 'Activado · y tras 2 min sin uso' : 'Solo tras 2 min sin uso') : ''}
+    ${setting('wipe', icon.x, 'Borrar mis datos de este dispositivo', 'Quita marcas, ajustes y PIN guardados')}
+    ${setting('security-tips', icon.sync, 'Revisión de seguridad', 'Contraseña, sesiones y privacidad')}`;
+}
+
+function pinSheet() {
+  const field = (name, label) => `
+    <label class="field">${label}
+      <input name="${name}" id="${name}" type="password" inputmode="numeric" autocomplete="off" pattern="\\d{4,8}" maxlength="8" required>
+    </label>`;
+  return `
+    ${sheetHeader('Seguridad', hasPin() ? 'Cambiar o quitar el PIN' : 'Activar bloqueo con PIN')}
+    <p>El PIN protege la app en este dispositivo. No se guarda: solo una huella cifrada que no permite recuperarlo.</p>
+    <form id="pin-form" style="display:flex;flex-direction:column;gap:14px">
+      ${hasPin() ? field('pin-current', 'PIN actual') : ''}
+      ${field('pin-new', hasPin() ? 'PIN nuevo (4 a 8 números)' : 'PIN (4 a 8 números)')}
+      ${field('pin-repeat', 'Repite el PIN')}
+      <p class="lock-msg" id="pin-error" role="alert"></p>
+      <button class="btn blue block" type="submit">Guardar PIN</button>
+    </form>
+    ${hasPin() ? `
+      <form id="pin-remove-form" style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn ghost block" type="submit">Quitar el PIN (usa el PIN actual de arriba)</button>
+      </form>` : ''}`;
+}
+
+function wipeSheet() {
+  return `
+    ${sheetHeader('Seguridad', '¿Borrar los datos de este dispositivo?')}
+    <p>Se borran las tareas marcadas como listas, tus ajustes y el PIN guardados en este navegador. Tus datos en Quanta no cambian.</p>
+    <button class="btn blue block" data-action="wipe-confirm">Sí, borrar todo</button>
+    <button class="btn ghost block" data-action="close-sheet">Cancelar</button>`;
+}
+
+function tipsSheet() {
+  return `
+    ${sheetHeader('Seguridad', 'Revisión de seguridad')}
+    <ul>
+      <li><b>Contraseña de Quanta:</b> cámbiala si alguna vez la escribiste en un chat o la anotaste en papel. Usa una que no uses en otro sitio.</li>
+      <li><b>Enlace de la app:</b> es privado. Solo tú puedes abrirlo mientras no lo compartas.</li>
+      <li><b>Teléfono:</b> activa el bloqueo de pantalla del teléfono y el PIN de esta app.</li>
+      <li><b>Sincronización:</b> la contraseña se pide solo en el momento y no se guarda en archivos ni en el repositorio.</li>
+      <li><b>Equipos compartidos:</b> si abriste la app en un equipo ajeno, usa «Borrar mis datos de este dispositivo».</li>
+    </ul>
+    <button class="btn black block" data-action="close-sheet">Entendido</button>`;
+}
+
+return { renderLock, securitySettings, pinSheet, wipeSheet, tipsSheet };
+})();
+
 // src/screens/profile.js
 __m["src/screens/profile.js"] = (() => {
 const { state, resolved, upcomingExams, prepFor, nextExam } = __m["src/state/store.js"];
 const { esc, icon, initials } = __m["src/components/ui.js"];
+const { securitySettings } = __m["src/screens/lock.js"];
+
+const shield = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>';
 
 const setting = (action, svg, title, detail) => `
   <button class="setting" data-action="${action}">
@@ -940,7 +1129,8 @@ function renderProfile() {
     ${setting('sync', icon.link, 'Conexión con Quanta', state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))}` : state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Guías, resúmenes y simulacros')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
-    ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}`;
+    ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}
+    ${securitySettings(setting, shield)}`;
 }
 
 return { renderProfile };
@@ -1033,6 +1223,8 @@ const { renderSubjects } = __m["src/screens/subjects.js"];
 const { renderExams } = __m["src/screens/exams.js"];
 const { renderProfile } = __m["src/screens/profile.js"];
 const { solvingSheet, draftSheet, guideSheet, newTaskSheet } = __m["src/screens/sheets.js"];
+const { renderLock, pinSheet, wipeSheet, tipsSheet } = __m["src/screens/lock.js"];
+const guard = __m["src/services/lock.js"];
 
 // Estado de navegación (no se persiste)
 const view = { screen: 'home', filter: 'todas', subjectId: null };
@@ -1046,9 +1238,39 @@ const SCREENS = {
   profile: renderProfile,
 };
 
+let pinEntry = '';
+let pinMsg = '';
+
 function render() {
+  const phone = document.querySelector('.phone');
+  if (guard.isLocked()) {
+    phone.classList.add('locked');
+    document.getElementById('screen').innerHTML = renderLock(pinEntry, pinMsg);
+    document.getElementById('nav').innerHTML = '';
+    return;
+  }
+  phone.classList.remove('locked');
   document.getElementById('screen').innerHTML = SCREENS[view.screen]();
   document.getElementById('nav').innerHTML = renderNav(view.screen);
+}
+
+function lockNow() {
+  if (!guard.hasPin() || guard.isLocked()) return;
+  guard.lock();
+  solveRun++;
+  closeSheet();
+  pinEntry = '';
+  pinMsg = '';
+  render();
+}
+
+async function tryUnlock() {
+  if (pinEntry.length < 4) { pinMsg = 'El PIN tiene al menos 4 números'; return render(); }
+  const r = await guard.unlock(pinEntry);
+  pinEntry = '';
+  pinMsg = r.ok ? '' : r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'PIN incorrecto';
+  render();
+  if (r.ok) toast('Desbloqueada');
 }
 
 function go(screen, patch = {}) {
@@ -1058,6 +1280,28 @@ function go(screen, patch = {}) {
 }
 
 const actions = {
+  'pin-key'({ k }) {
+    if (k === 'del') pinEntry = pinEntry.slice(0, -1);
+    else if (pinEntry.length < 8) pinEntry += k;
+    pinMsg = '';
+    render();
+    if (pinEntry.length >= 4 && guard.waitSeconds() === 0 && pinEntry.length === 8) tryUnlock();
+  },
+  'pin-ok': () => tryUnlock(),
+  'forgot-pin': () => { pinMsg = 'Para recuperarla, borra los datos de este dispositivo'; openSheet(wipeSheet()); },
+  'pin-setup': () => openSheet(pinSheet()),
+  'toggle-autolock': () => { guard.setAutoLock(!guard.autoLockOn()); render(); },
+  wipe: () => openSheet(wipeSheet()),
+  'wipe-confirm': () => {
+    reset();
+    guard.wipeDevice();
+    pinEntry = ''; pinMsg = '';
+    closeSheet();
+    go('home');
+    toast('Datos de este dispositivo borrados');
+  },
+  'security-tips': () => openSheet(tipsSheet()),
+
   go: ({ screen }) => go(screen),
   'go-pending': () => go('tasks', { filter: 'pendientes', subjectId: null }),
   'go-all': () => go('tasks', { filter: 'todas', subjectId: null }),
@@ -1119,12 +1363,39 @@ const actions = {
   reset: () => { reset(); render(); toast('Datos restaurados'); },
 };
 
+const LOCKED_OK = new Set(['pin-key', 'pin-ok', 'forgot-pin', 'wipe-confirm', 'close-sheet']);
+
 document.addEventListener('click', (e) => {
+  guard.touch();
   const el = e.target.closest('[data-action]');
+  if (el && guard.isLocked() && !LOCKED_OK.has(el.dataset.action)) return;
   if (el) actions[el.dataset.action]?.(el.dataset, el);
 });
 
-document.addEventListener('submit', (e) => {
+document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'pin-form' || e.target.id === 'pin-remove-form') {
+    e.preventDefault();
+    const val = (id) => document.getElementById(id)?.value.trim() || '';
+    const error = (msg) => { document.getElementById('pin-error').textContent = msg; };
+    const current = val('pin-current');
+    if (guard.hasPin()) {
+      if (guard.waitSeconds()) return error(`Demasiados intentos. Espera ${guard.waitSeconds()} s`);
+      if (e.target.id === 'pin-remove-form') {
+        const r = await guard.removePin(current);
+        if (!r.ok) return error(r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'El PIN actual no es correcto');
+        closeSheet(); render(); return toast('PIN quitado');
+      }
+      const r = await guard.unlock(current);
+      if (!r.ok) return error(r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'El PIN actual no es correcto');
+    }
+    const pin = val('pin-new');
+    if (!guard.validPin(pin)) return error('Usa de 4 a 8 números');
+    if (/^(\d)\1+$/.test(pin) || '0123456789012345678'.includes(pin) || '9876543210987654321'.includes(pin)) return error('Evita PIN fáciles como 1111 o 1234');
+    if (pin !== val('pin-repeat')) return error('Los dos PIN no coinciden');
+    try { await guard.setPin(pin); } catch (err) { return error(err.message); }
+    closeSheet(); render(); toast('PIN activado');
+    return;
+  }
   if (e.target.id !== 'new-task-form') return;
   e.preventDefault();
   const form = new FormData(e.target);
@@ -1147,7 +1418,17 @@ document.addEventListener('submit', (e) => {
   toast('Tarea añadida');
 });
 
+// Bloqueo automático: al salir de la app y tras 2 minutos sin uso.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && guard.autoLockOn()) lockNow();
+});
+setInterval(() => { if (guard.idleTooLong()) lockNow(); }, 15000);
+
 document.addEventListener('keydown', (e) => {
+  guard.touch();
+  if (guard.isLocked() && /^\d$/.test(e.key)) return actions['pin-key']({ k: e.key });
+  if (guard.isLocked() && e.key === 'Backspace') return actions['pin-key']({ k: 'del' });
+  if (guard.isLocked() && e.key === 'Enter') return tryUnlock();
   if (e.key === 'Escape' && sheetIsOpen()) actions['close-sheet']();
 });
 

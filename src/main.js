@@ -10,6 +10,8 @@ import { renderSubjects } from './screens/subjects.js';
 import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
 import { solvingSheet, draftSheet, guideSheet, newTaskSheet } from './screens/sheets.js';
+import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
+import * as guard from './services/lock.js';
 
 // Estado de navegación (no se persiste)
 const view = { screen: 'home', filter: 'todas', subjectId: null };
@@ -23,9 +25,39 @@ const SCREENS = {
   profile: renderProfile,
 };
 
+let pinEntry = '';
+let pinMsg = '';
+
 function render() {
+  const phone = document.querySelector('.phone');
+  if (guard.isLocked()) {
+    phone.classList.add('locked');
+    document.getElementById('screen').innerHTML = renderLock(pinEntry, pinMsg);
+    document.getElementById('nav').innerHTML = '';
+    return;
+  }
+  phone.classList.remove('locked');
   document.getElementById('screen').innerHTML = SCREENS[view.screen]();
   document.getElementById('nav').innerHTML = renderNav(view.screen);
+}
+
+function lockNow() {
+  if (!guard.hasPin() || guard.isLocked()) return;
+  guard.lock();
+  solveRun++;
+  closeSheet();
+  pinEntry = '';
+  pinMsg = '';
+  render();
+}
+
+async function tryUnlock() {
+  if (pinEntry.length < 4) { pinMsg = 'El PIN tiene al menos 4 números'; return render(); }
+  const r = await guard.unlock(pinEntry);
+  pinEntry = '';
+  pinMsg = r.ok ? '' : r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'PIN incorrecto';
+  render();
+  if (r.ok) toast('Desbloqueada');
 }
 
 function go(screen, patch = {}) {
@@ -35,6 +67,28 @@ function go(screen, patch = {}) {
 }
 
 const actions = {
+  'pin-key'({ k }) {
+    if (k === 'del') pinEntry = pinEntry.slice(0, -1);
+    else if (pinEntry.length < 8) pinEntry += k;
+    pinMsg = '';
+    render();
+    if (pinEntry.length >= 4 && guard.waitSeconds() === 0 && pinEntry.length === 8) tryUnlock();
+  },
+  'pin-ok': () => tryUnlock(),
+  'forgot-pin': () => { pinMsg = 'Para recuperarla, borra los datos de este dispositivo'; openSheet(wipeSheet()); },
+  'pin-setup': () => openSheet(pinSheet()),
+  'toggle-autolock': () => { guard.setAutoLock(!guard.autoLockOn()); render(); },
+  wipe: () => openSheet(wipeSheet()),
+  'wipe-confirm': () => {
+    reset();
+    guard.wipeDevice();
+    pinEntry = ''; pinMsg = '';
+    closeSheet();
+    go('home');
+    toast('Datos de este dispositivo borrados');
+  },
+  'security-tips': () => openSheet(tipsSheet()),
+
   go: ({ screen }) => go(screen),
   'go-pending': () => go('tasks', { filter: 'pendientes', subjectId: null }),
   'go-all': () => go('tasks', { filter: 'todas', subjectId: null }),
@@ -96,12 +150,39 @@ const actions = {
   reset: () => { reset(); render(); toast('Datos restaurados'); },
 };
 
+const LOCKED_OK = new Set(['pin-key', 'pin-ok', 'forgot-pin', 'wipe-confirm', 'close-sheet']);
+
 document.addEventListener('click', (e) => {
+  guard.touch();
   const el = e.target.closest('[data-action]');
+  if (el && guard.isLocked() && !LOCKED_OK.has(el.dataset.action)) return;
   if (el) actions[el.dataset.action]?.(el.dataset, el);
 });
 
-document.addEventListener('submit', (e) => {
+document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'pin-form' || e.target.id === 'pin-remove-form') {
+    e.preventDefault();
+    const val = (id) => document.getElementById(id)?.value.trim() || '';
+    const error = (msg) => { document.getElementById('pin-error').textContent = msg; };
+    const current = val('pin-current');
+    if (guard.hasPin()) {
+      if (guard.waitSeconds()) return error(`Demasiados intentos. Espera ${guard.waitSeconds()} s`);
+      if (e.target.id === 'pin-remove-form') {
+        const r = await guard.removePin(current);
+        if (!r.ok) return error(r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'El PIN actual no es correcto');
+        closeSheet(); render(); return toast('PIN quitado');
+      }
+      const r = await guard.unlock(current);
+      if (!r.ok) return error(r.wait ? `Demasiados intentos. Espera ${r.wait} s` : 'El PIN actual no es correcto');
+    }
+    const pin = val('pin-new');
+    if (!guard.validPin(pin)) return error('Usa de 4 a 8 números');
+    if (/^(\d)\1+$/.test(pin) || '0123456789012345678'.includes(pin) || '9876543210987654321'.includes(pin)) return error('Evita PIN fáciles como 1111 o 1234');
+    if (pin !== val('pin-repeat')) return error('Los dos PIN no coinciden');
+    try { await guard.setPin(pin); } catch (err) { return error(err.message); }
+    closeSheet(); render(); toast('PIN activado');
+    return;
+  }
   if (e.target.id !== 'new-task-form') return;
   e.preventDefault();
   const form = new FormData(e.target);
@@ -124,7 +205,17 @@ document.addEventListener('submit', (e) => {
   toast('Tarea añadida');
 });
 
+// Bloqueo automático: al salir de la app y tras 2 minutos sin uso.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && guard.autoLockOn()) lockNow();
+});
+setInterval(() => { if (guard.idleTooLong()) lockNow(); }, 15000);
+
 document.addEventListener('keydown', (e) => {
+  guard.touch();
+  if (guard.isLocked() && /^\d$/.test(e.key)) return actions['pin-key']({ k: e.key });
+  if (guard.isLocked() && e.key === 'Backspace') return actions['pin-key']({ k: 'del' });
+  if (guard.isLocked() && e.key === 'Enter') return tryUnlock();
   if (e.key === 'Escape' && sheetIsOpen()) actions['close-sheet']();
 });
 

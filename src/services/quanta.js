@@ -1,14 +1,14 @@
-// Conector de Quanta (SIMULADO).
-// Punto único de entrada para todo lo que venga de la plataforma escolar.
-// Para conectar el backend real, sustituye el cuerpo de estas funciones por
-// llamadas a tu API (p. ej. GET /api/quanta/tasks) manteniendo las firmas.
-import { state, save } from '../state/store.js';
+// Conector de Quanta.
+// Los datos reales se obtienen con scripts/quanta-sync.cjs (solo lectura) y se
+// convierten con scripts/quanta-import.cjs. Desde el navegador no se puede
+// sincronizar: eso requiere un servidor que guarde la sesión de forma segura.
+import { state, save, dayLabel } from '../state/store.js';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Sincroniza tareas, fechas y adjuntos. Devuelve cuántas tareas hay. */
 export async function syncQuanta() {
-  await wait(900);
+  await wait(700);
+  if (state.source === 'quanta') return { total: state.tasks.length, fetchedAt: state.fetchedAt };
   state.lastSync = Date.now();
   save();
   return { total: state.tasks.length };
@@ -16,16 +16,14 @@ export async function syncQuanta() {
 
 /** Clasificación por urgencia a partir de los días restantes. */
 export function urgency(task) {
-  if (task.status !== 'pendiente') return 'ninguna';
+  if (task.status !== 'pendiente' || task.dueIn == null || task.dueIn < 0) return 'ninguna';
   if (task.dueIn <= 1) return 'alta';
   if (task.dueIn <= 3) return 'media';
   return 'baja';
 }
 
 export function dueLabel(task) {
-  const d = task.dueIn;
-  if (d < 0) return `Entregada hace ${-d} día${d === -1 ? '' : 's'}`;
-  if (d === 0) return 'Entrega hoy';
-  if (d === 1) return 'Entrega mañana';
-  return `Entrega en ${d} días`;
+  if (task.dueIn == null) return [task.unit, task.minutes ? `${task.minutes} min` : ''].filter(Boolean).join(' · ') || 'Sin fecha límite';
+  if (task.dueIn < 0) return `${task.status === 'resuelta' ? 'Entregada' : 'Venció'} ${dayLabel(task.dueIn)}`;
+  return `Entrega ${dayLabel(task.dueIn)}`;
 }

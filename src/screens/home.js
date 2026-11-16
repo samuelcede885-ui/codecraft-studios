@@ -1,16 +1,39 @@
-import { state, pending, resolved, nextExam, subjectOf } from '../state/store.js';
+import { state, pending, resolved, nextExam, subjectOf, topicsFor, prepFor, dayLabel } from '../state/store.js';
 import { esc, icon, initials } from '../components/ui.js';
 
 function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Caracas' }));
+  return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+}
+
+function suggestion() {
+  const exam = nextExam();
+  if (!exam) return '<p class="empty">No hay evaluaciones próximas.</p>';
+  const topics = topicsFor(exam);
+  const prep = prepFor(exam.subjectId);
+  const doneTopics = Math.floor((prep / 100) * topics.length);
+  return `
+    <section class="card dark suggest">
+      <div>
+        <span class="tag light">${esc(subjectOf(exam.subjectId).name)} · ${dayLabel(exam.inDays)}${exam.weight != null ? ` · ${exam.weight}%` : ''}</span>
+        <h2 class="h2" style="margin-top:4px">${esc(exam.title)}</h2>
+      </div>
+      <ul class="route">
+        ${topics.map((topic, i) => `<li class="${i < doneTopics ? 'done' : ''}">${esc(topic)}</li>`).join('')}
+      </ul>
+      <div class="bar" role="progressbar" aria-valuenow="${prep}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prep}%"></i></div>
+      <div class="row between">
+        <span class="meta">Preparación: ${prep}%</span>
+        <button class="btn white" data-action="review" data-subject="${exam.subjectId}">Comenzar repaso</button>
+      </div>
+    </section>`;
 }
 
 export function renderHome() {
-  const { student, prep } = state;
-  const exam = nextExam();
-  const todo = pending().length;
-  const doneTopics = Math.floor((prep / 100) * exam.topics.length);
+  const { student } = state;
+  const todo = pending();
+  const evals = todo.filter((t) => t.kind === 'evaluacion').length;
+  const note = state.announcements?.[0];
 
   return `
     <header class="row between top">
@@ -19,25 +42,14 @@ export function renderHome() {
     </header>
 
     <p class="label">Sugerencia de estudio hoy</p>
-    <section class="card dark suggest">
-      <div>
-        <span class="tag light">${esc(subjectOf(exam.subjectId).name)} · en ${exam.inDays} días</span>
-        <h2 class="h2" style="margin-top:4px">${esc(exam.title)}</h2>
-      </div>
-      <ul class="route">
-        ${exam.topics.map((topic, i) => `<li class="${i < doneTopics ? 'done' : ''}">${esc(topic)}</li>`).join('')}
-      </ul>
-      <div class="bar" role="progressbar" aria-valuenow="${prep}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prep}%"></i></div>
-      <div class="row between">
-        <span class="meta">Preparación: ${prep}%</span>
-        <button class="btn white" data-action="review" data-subject="${exam.subjectId}">Comenzar repaso</button>
-      </div>
-    </section>
+    ${suggestion()}
 
     <button class="banner" data-action="go-pending">
       <div>
-        <strong>${todo ? 'Resolver tareas de Quanta' : 'Tareas de Quanta al día'}</strong>
-        <span>${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</span>
+        <strong>${todo.length ? 'Resolver tareas de Quanta' : 'Tareas de Quanta al día'}</strong>
+        <span>${todo.length
+          ? `${todo.length} pendiente${todo.length === 1 ? '' : 's'}${evals ? ` · ${evals} evaluaciones` : ''}`
+          : 'No tienes tareas pendientes'}</span>
       </div>
       <span class="circle">${icon.arrow}</span>
     </button>
@@ -48,8 +60,16 @@ export function renderHome() {
         <span class="meta">Tareas listas</span>
       </div>
       <div class="card dark stat" style="border-radius:var(--r-md)">
-        <span class="big">${icon.star}${student.performance}%</span>
-        <span class="meta">Rendimiento</span>
+        ${student.xp != null
+          ? `<span class="big">${icon.star}Nv. ${student.level}</span><span class="meta">${student.xp} XP en Quanta</span>`
+          : `<span class="big">${icon.star}${student.performance}%</span><span class="meta">Rendimiento</span>`}
       </div>
-    </div>`;
+    </div>
+
+    ${note ? `
+      <article class="card outline task">
+        <span class="tag">${esc(note.title.replace(/^Nuevo anuncio en /, ''))}</span>
+        <p class="sub" style="color:var(--ink);white-space:pre-line">${esc(note.message)}</p>
+        <span class="meta">Anuncio del profesor</span>
+      </article>` : ''}`;
 }

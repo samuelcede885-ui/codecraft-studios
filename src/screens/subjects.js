@@ -6,15 +6,18 @@ export function renderSubjects() {
     const tasks = state.tasks.filter((x) => x.subjectId === s.id);
     const done = tasks.filter((x) => x.status === 'resuelta').length;
     const todo = tasks.length - done;
-    const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+    const pct = s.progress ?? (tasks.length ? Math.round((done / tasks.length) * 100) : 0);
     return `
       <button class="card task" data-action="open-subject" data-subject="${s.id}">
-        <div class="row between">
-          <h3>${esc(s.name)}</h3>
-          <span class="meta">${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : 'Al día'}</span>
+        <div class="row between top">
+          <div style="min-width:0">
+            <h3>${esc(s.name)}</h3>
+            ${s.teacher ? `<span class="meta">${esc(s.teacher)}</span>` : ''}
+          </div>
+          <span class="meta" style="white-space:nowrap">${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : tasks.length ? 'Al día' : 'Sin contenido'}</span>
         </div>
         <div class="bar"><i style="width:${pct}%"></i></div>
-        <span class="meta">${done} de ${tasks.length} tareas listas</span>
+        <span class="meta">${s.totalItems != null ? `Avance en Quanta: ${pct}% · ${s.completedItems || 0} de ${s.totalItems} actividades` : `${done} de ${tasks.length} tareas listas`}</span>
       </button>`;
   }).join('');
 

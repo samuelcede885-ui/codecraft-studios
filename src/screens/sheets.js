@@ -17,8 +17,10 @@ export function solvingSheet(task, step) {
 
 export function draftSheet(task, draft) {
   return `
-    ${sheetHeader(subjectOf(task.subjectId).name, 'Borrador listo para revisar')}
-    <p class="note">Demo: este borrador es simulado. Revísalo y ajústalo antes de entregarlo en Quanta.</p>
+    ${sheetHeader(subjectOf(task.subjectId).name, draft.kind === 'plan' ? 'Plan de trabajo' : 'Borrador listo para revisar')}
+    <p class="note">${draft.kind === 'plan'
+      ? 'Plan armado con las lecciones reales de Quanta, no una respuesta. Marcarla como lista solo cambia esta app, no Quanta.'
+      : 'Demo: este borrador es simulado. Revísalo y ajústalo antes de entregarlo en Quanta.'}</p>
     <div class="draft">
       <p>${esc(draft.intro)}</p>
       ${draft.sections.map((s) => `<h4>${esc(s.heading)}</h4><p>${esc(s.body)}</p>`).join('')}
@@ -31,9 +33,10 @@ export function guideSheet(guide) {
   return `
     ${sheetHeader(guide.subject, 'Guía de estudio')}
     <p>${esc(guide.summary)}</p>
-    <h3 class="h2">Conceptos clave</h3>
-    <ul>${guide.concepts.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+    ${guide.concepts.length ? `<h3 class="h2">${esc(guide.conceptsTitle || 'Conceptos clave')}</h3>
+    <ul>${guide.concepts.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
     <h3 class="h2">Simulacro</h3>
+    ${guide.quiz.length ? '' : '<p class="note">Los simulacros con preguntas se generarán cuando se conecte el modelo de IA. Por ahora, repasa estas lecciones y haz los puntos de práctica en Quanta.</p>'}
     ${guide.quiz.map((item, qi) => `
       <div class="quiz">
         <p><b>${qi + 1}. ${esc(item.q)}</b></p>

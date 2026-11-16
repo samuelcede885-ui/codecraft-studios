@@ -16,6 +16,14 @@ python3 -m http.server 8080
 node scripts/build.mjs   # genera dist/quanta-ai.html (se abre con doble clic, sin servidor)
 ```
 
+### Datos reales de Quanta
+```bash
+Q_USER=correo Q_PASS=contraseña node scripts/quanta-sync.cjs   # lee el portal (solo lectura) → private/quanta-raw.json
+node scripts/quanta-import.cjs                                  # → private/quanta-data.js
+QUANTA_DATA=private/quanta-data.js node scripts/build.mjs       # → private/quanta-ai.html
+```
+`private/` está excluida de git porque contiene datos personales.
+
 ## Estructura
 ```
 index.html               Contenedor de la app

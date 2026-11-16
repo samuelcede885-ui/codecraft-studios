@@ -405,9 +405,10 @@ return { seed };
 // src/state/store.js
 __m["src/state/store.js"] = (() => {
 // Estado global de la app, persistido en localStorage.
+// Los datos vienen de src/data/mock.js (demo) o de Quanta (build con QUANTA_DATA).
 const { seed } = __m["src/data/mock.js"];
 
-const KEY = 'quanta-ai-v1';
+const KEY = `quanta-ai-${seed.source || 'demo'}-${seed.version || 1}`;
 
 function load() {
   try {
@@ -419,6 +420,16 @@ function load() {
 
 const state = load();
 
+// Días entre hoy y una fecha ISO, contados en la hora de Caracas.
+const dayOf = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Caracas' });
+const daysUntil = (iso) => Math.round((Date.parse(dayOf(iso)) - Date.parse(dayOf(Date.now()))) / 864e5);
+
+function refreshDates() {
+  for (const t of state.tasks) if (t.due) t.dueIn = daysUntil(t.due);
+  for (const e of state.exams) if (e.due) e.inDays = daysUntil(e.due);
+}
+refreshDates();
+
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* sin persistencia */ }
 }
@@ -426,38 +437,56 @@ function save() {
 function reset() {
   for (const k of Object.keys(state)) delete state[k];
   Object.assign(state, structuredClone(seed));
+  refreshDates();
   save();
 }
 
 // Selectores
-const subjectOf = (id) => state.subjects.find((s) => s.id === id);
+const far = (n) => (n == null ? 9999 : n);
+const subjectOf = (id) => state.subjects.find((s) => s.id === id) || { id, name: 'Materia', modules: [] };
 const taskById = (id) => state.tasks.find((x) => x.id === id);
-const pending = () => state.tasks.filter((x) => x.status === 'pendiente').sort((a, b) => a.dueIn - b.dueIn);
+const pending = () => state.tasks.filter((x) => x.status === 'pendiente').sort((a, b) => far(a.dueIn) - far(b.dueIn));
 const resolved = () => state.tasks.filter((x) => x.status === 'resuelta');
-const nextExam = () => [...state.exams].sort((a, b) => a.inDays - b.inDays)[0];
+const upcomingExams = () => state.exams.filter((e) => e.inDays >= 0).sort((a, b) => a.inDays - b.inDays);
+const nextExam = () => upcomingExams()[0] || [...state.exams].sort((a, b) => b.inDays - a.inDays)[0];
 
-// Las tareas valen el 15 % de la nota: se asegura en proporción a las entregadas.
-function securedGrade() {
-  const total = state.tasks.length;
-  return total ? Math.round((15 * resolved().length / total) * 10) / 10 : 0;
+/** Temas a repasar para un examen: los del examen o las lecciones de la última unidad de la materia. */
+function topicsFor(exam) {
+  if (exam.topics) return exam.topics;
+  const unit = subjectOf(exam.subjectId).modules?.at(-1);
+  return unit ? unit.lessons.filter((l) => !/vocabulario/i.test(l)).slice(0, 4) : [];
 }
 
-return { state, save, reset, subjectOf, taskById, pending, resolved, nextExam, securedGrade };
+/** Preparación (%) para una materia: valor de la demo o avance real del curso en Quanta. */
+function prepFor(subjectId) {
+  if (state.prep != null) return state.prep;
+  return subjectOf(subjectId).progress || 0;
+}
+
+function dayLabel(n) {
+  if (n == null) return 'Sin fecha';
+  if (n < 0) return `hace ${-n} día${n === -1 ? '' : 's'}`;
+  if (n === 0) return 'hoy';
+  if (n === 1) return 'mañana';
+  return `en ${n} días`;
+}
+
+return { state, daysUntil, save, reset, subjectOf, taskById, pending, resolved, upcomingExams, nextExam, topicsFor, prepFor, dayLabel };
 })();
 
 // src/services/quanta.js
 __m["src/services/quanta.js"] = (() => {
-// Conector de Quanta (SIMULADO).
-// Punto único de entrada para todo lo que venga de la plataforma escolar.
-// Para conectar el backend real, sustituye el cuerpo de estas funciones por
-// llamadas a tu API (p. ej. GET /api/quanta/tasks) manteniendo las firmas.
-const { state, save } = __m["src/state/store.js"];
+// Conector de Quanta.
+// Los datos reales se obtienen con scripts/quanta-sync.cjs (solo lectura) y se
+// convierten con scripts/quanta-import.cjs. Desde el navegador no se puede
+// sincronizar: eso requiere un servidor que guarde la sesión de forma segura.
+const { state, save, dayLabel } = __m["src/state/store.js"];
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Sincroniza tareas, fechas y adjuntos. Devuelve cuántas tareas hay. */
 async function syncQuanta() {
-  await wait(900);
+  await wait(700);
+  if (state.source === 'quanta') return { total: state.tasks.length, fetchedAt: state.fetchedAt };
   state.lastSync = Date.now();
   save();
   return { total: state.tasks.length };
@@ -465,18 +494,16 @@ async function syncQuanta() {
 
 /** Clasificación por urgencia a partir de los días restantes. */
 function urgency(task) {
-  if (task.status !== 'pendiente') return 'ninguna';
+  if (task.status !== 'pendiente' || task.dueIn == null || task.dueIn < 0) return 'ninguna';
   if (task.dueIn <= 1) return 'alta';
   if (task.dueIn <= 3) return 'media';
   return 'baja';
 }
 
 function dueLabel(task) {
-  const d = task.dueIn;
-  if (d < 0) return `Entregada hace ${-d} día${d === -1 ? '' : 's'}`;
-  if (d === 0) return 'Entrega hoy';
-  if (d === 1) return 'Entrega mañana';
-  return `Entrega en ${d} días`;
+  if (task.dueIn == null) return [task.unit, task.minutes ? `${task.minutes} min` : ''].filter(Boolean).join(' · ') || 'Sin fecha límite';
+  if (task.dueIn < 0) return `${task.status === 'resuelta' ? 'Entregada' : 'Venció'} ${dayLabel(task.dueIn)}`;
+  return `Entrega ${dayLabel(task.dueIn)}`;
 }
 
 return { syncQuanta, urgency, dueLabel };
@@ -485,38 +512,71 @@ return { syncQuanta, urgency, dueLabel };
 // src/services/ai.js
 __m["src/services/ai.js"] = (() => {
 // Motor de IA (SIMULADO).
-// En producción, solveTask y buildGuide llaman al backend, que a su vez
-// consulta el modelo de lenguaje con las instrucciones y adjuntos de Quanta.
-// La clave del modelo nunca debe estar en el frontend.
+// Con datos de Quanta no se inventan respuestas: se arma un plan de trabajo con las
+// lecciones reales de la unidad. La resolución con un modelo de lenguaje real
+// necesita el backend descrito en docs/ARQUITECTURA.md (la clave nunca va en el frontend).
 const { subjectOf } = __m["src/state/store.js"];
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const SOLVE_STEPS = [
-  'Leyendo instrucciones de Quanta',
-  'Analizando archivos adjuntos',
-  'Redactando borrador',
-  'Generando guía de estudio',
+  'Leyendo la actividad de Quanta',
+  'Buscando las lecciones de la unidad',
+  'Armando el plan de trabajo',
+  'Preparando la guía de estudio',
 ];
 
-/** Genera un borrador para la tarea. onStep(i) avisa del paso en curso. */
+const unitOf = (subject, task) =>
+  subject.modules?.find((m) => m.title === task.unit) || subject.modules?.at(-1);
+
+/** Devuelve { intro, sections } para revisar. onStep(i) avisa del paso en curso. */
 async function solveTask(task, onStep = () => {}) {
   for (let i = 0; i < SOLVE_STEPS.length; i++) {
     onStep(i);
-    await wait(750);
+    await wait(650);
   }
   onStep(SOLVE_STEPS.length);
   const subject = subjectOf(task.subjectId);
+
+  if (subject.outline) {
+    return {
+      kind: 'borrador',
+      intro: `Borrador para «${task.title}», siguiendo la instrucción del profesor: ${task.instructions}`,
+      sections: subject.outline.map(([heading, body]) => ({ heading, body })),
+    };
+  }
+
+  const unit = unitOf(subject, task);
+  const lessons = (unit?.lessons || []).filter((l) => !/vocabulario/i.test(l));
+  const sections = [
+    { heading: 'Qué repasar', body: lessons.length ? lessons.join(' · ') : 'Las lecciones más recientes del curso.' },
+    task.kind === 'evaluacion'
+      ? { heading: 'Cómo prepararla', body: `${task.instructions} Repasa una lección por día, haz los puntos de práctica de la unidad y anota tus dudas para ${subject.teacher || 'tu profesor'}.` }
+      : { heading: 'Cómo hacerlo', body: 'Abre primero la lección relacionada en Quanta, toma nota de los conceptos clave y luego responde el punto de práctica sin consultar, para medir lo que sabes.' },
+    { heading: 'Vocabulario', body: 'Repasa la lección «Vocabulario de la clase» de esta unidad antes de empezar.' },
+  ];
   return {
-    intro: `Borrador para «${task.title}», siguiendo la instrucción del profesor: ${task.instructions}`,
-    sections: subject.outline.map(([heading, body]) => ({ heading, body })),
+    kind: 'plan',
+    intro: `Plan para «${task.title}» de ${subject.name}${unit ? `, unidad «${unit.title}»` : ''}.`,
+    sections,
   };
 }
 
-/** Guía de estudio de una materia: resumen, conceptos clave y simulacro. */
+/** Guía de estudio de una materia: resumen, temas clave y simulacro (si existe). */
 function buildGuide(subjectId) {
-  const subject = subjectOf(subjectId);
-  return { subject: subject.name, ...subject.guide };
+  const s = subjectOf(subjectId);
+  if (s.guide) return { subject: s.name, ...s.guide };
+  const units = s.modules || [];
+  const last = units.at(-1);
+  return {
+    subject: s.name,
+    summary: units.length
+      ? `${s.name}${s.teacher ? ` con ${s.teacher}` : ''}. Unidades publicadas en Quanta: ${units.map((u) => u.title).join('; ')}.`
+      : `${s.name} todavía no tiene contenido publicado en Quanta.`,
+    concepts: last ? last.lessons.filter((l) => !/vocabulario/i.test(l)) : [],
+    conceptsTitle: last ? `Lecciones de «${last.title}»` : 'Temas clave',
+    quiz: [],
+  };
 }
 
 return { SOLVE_STEPS, solveTask, buildGuide };
@@ -624,19 +684,42 @@ return { renderNav };
 
 // src/screens/home.js
 __m["src/screens/home.js"] = (() => {
-const { state, pending, resolved, nextExam, subjectOf } = __m["src/state/store.js"];
+const { state, pending, resolved, nextExam, subjectOf, topicsFor, prepFor, dayLabel } = __m["src/state/store.js"];
 const { esc, icon, initials } = __m["src/components/ui.js"];
 
 function greeting() {
-  const h = new Date().getHours();
-  return h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const h = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Caracas' }));
+  return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+}
+
+function suggestion() {
+  const exam = nextExam();
+  if (!exam) return '<p class="empty">No hay evaluaciones próximas.</p>';
+  const topics = topicsFor(exam);
+  const prep = prepFor(exam.subjectId);
+  const doneTopics = Math.floor((prep / 100) * topics.length);
+  return `
+    <section class="card dark suggest">
+      <div>
+        <span class="tag light">${esc(subjectOf(exam.subjectId).name)} · ${dayLabel(exam.inDays)}${exam.weight != null ? ` · ${exam.weight}%` : ''}</span>
+        <h2 class="h2" style="margin-top:4px">${esc(exam.title)}</h2>
+      </div>
+      <ul class="route">
+        ${topics.map((topic, i) => `<li class="${i < doneTopics ? 'done' : ''}">${esc(topic)}</li>`).join('')}
+      </ul>
+      <div class="bar" role="progressbar" aria-valuenow="${prep}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prep}%"></i></div>
+      <div class="row between">
+        <span class="meta">Preparación: ${prep}%</span>
+        <button class="btn white" data-action="review" data-subject="${exam.subjectId}">Comenzar repaso</button>
+      </div>
+    </section>`;
 }
 
 function renderHome() {
-  const { student, prep } = state;
-  const exam = nextExam();
-  const todo = pending().length;
-  const doneTopics = Math.floor((prep / 100) * exam.topics.length);
+  const { student } = state;
+  const todo = pending();
+  const evals = todo.filter((t) => t.kind === 'evaluacion').length;
+  const note = state.announcements?.[0];
 
   return `
     <header class="row between top">
@@ -645,25 +728,14 @@ function renderHome() {
     </header>
 
     <p class="label">Sugerencia de estudio hoy</p>
-    <section class="card dark suggest">
-      <div>
-        <span class="tag light">${esc(subjectOf(exam.subjectId).name)} · en ${exam.inDays} días</span>
-        <h2 class="h2" style="margin-top:4px">${esc(exam.title)}</h2>
-      </div>
-      <ul class="route">
-        ${exam.topics.map((topic, i) => `<li class="${i < doneTopics ? 'done' : ''}">${esc(topic)}</li>`).join('')}
-      </ul>
-      <div class="bar" role="progressbar" aria-valuenow="${prep}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prep}%"></i></div>
-      <div class="row between">
-        <span class="meta">Preparación: ${prep}%</span>
-        <button class="btn white" data-action="review" data-subject="${exam.subjectId}">Comenzar repaso</button>
-      </div>
-    </section>
+    ${suggestion()}
 
     <button class="banner" data-action="go-pending">
       <div>
-        <strong>${todo ? 'Resolver tareas de Quanta' : 'Tareas de Quanta al día'}</strong>
-        <span>${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : 'No tienes tareas pendientes'}</span>
+        <strong>${todo.length ? 'Resolver tareas de Quanta' : 'Tareas de Quanta al día'}</strong>
+        <span>${todo.length
+          ? `${todo.length} pendiente${todo.length === 1 ? '' : 's'}${evals ? ` · ${evals} evaluaciones` : ''}`
+          : 'No tienes tareas pendientes'}</span>
       </div>
       <span class="circle">${icon.arrow}</span>
     </button>
@@ -674,10 +746,18 @@ function renderHome() {
         <span class="meta">Tareas listas</span>
       </div>
       <div class="card dark stat" style="border-radius:var(--r-md)">
-        <span class="big">${icon.star}${student.performance}%</span>
-        <span class="meta">Rendimiento</span>
+        ${student.xp != null
+          ? `<span class="big">${icon.star}Nv. ${student.level}</span><span class="meta">${student.xp} XP en Quanta</span>`
+          : `<span class="big">${icon.star}${student.performance}%</span><span class="meta">Rendimiento</span>`}
       </div>
-    </div>`;
+    </div>
+
+    ${note ? `
+      <article class="card outline task">
+        <span class="tag">${esc(note.title.replace(/^Nuevo anuncio en /, ''))}</span>
+        <p class="sub" style="color:var(--ink);white-space:pre-line">${esc(note.message)}</p>
+        <span class="meta">Anuncio del profesor</span>
+      </article>` : ''}`;
 }
 
 return { renderHome };
@@ -696,19 +776,21 @@ const FILTERS = [
   ['examen', 'Para Examen', (x) => x.forExam],
 ];
 
+const far = (n) => (n == null ? 9999 : Math.abs(n));
+
 function taskCard(task) {
   const done = task.status === 'resuelta';
   const urgent = urgency(task) === 'alta';
   return `
     <article class="card task">
       <div class="row between top">
-        <div>
+        <div style="min-width:0">
           <span class="tag">${esc(subjectOf(task.subjectId).name)}</span>
           <h3>${esc(task.title)} <span class="state ${done ? 'ok' : ''}">→ ${done ? 'Completado' : 'Pendiente'}</span></h3>
         </div>
-        <span class="pct">${task.weight}% Nota</span>
+        <span class="pct">${task.weight != null ? `${task.weight}% Nota` : 'Práctica'}</span>
       </div>
-      <span class="meta ${urgent ? 'urgent' : ''}">${urgent ? 'Urgente · ' : ''}${dueLabel(task)}</span>
+      <span class="meta ${urgent ? 'urgent' : ''}">${urgent ? 'Urgente · ' : ''}${esc(dueLabel(task))}</span>
       ${done
         ? `<button class="link" data-action="guide" data-subject="${task.subjectId}">Ver guía de estudio generada ${icon.chev}</button>`
         : `<button class="btn black" data-action="solve" data-id="${task.id}">Resolver con IA</button>`}
@@ -719,7 +801,7 @@ function renderTasks({ filter, subjectId }) {
   const match = FILTERS.find(([id]) => id === filter)[2];
   const bySubject = state.tasks.filter((x) => !subjectId || x.subjectId === subjectId);
   const list = bySubject.filter(match)
-    .sort((a, b) => (a.status === b.status ? Math.abs(a.dueIn) - Math.abs(b.dueIn) : a.status === 'pendiente' ? -1 : 1));
+    .sort((a, b) => (a.status === b.status ? far(a.dueIn) - far(b.dueIn) : a.status === 'pendiente' ? -1 : 1));
 
   return `
     <header>
@@ -747,15 +829,18 @@ function renderSubjects() {
     const tasks = state.tasks.filter((x) => x.subjectId === s.id);
     const done = tasks.filter((x) => x.status === 'resuelta').length;
     const todo = tasks.length - done;
-    const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+    const pct = s.progress ?? (tasks.length ? Math.round((done / tasks.length) * 100) : 0);
     return `
       <button class="card task" data-action="open-subject" data-subject="${s.id}">
-        <div class="row between">
-          <h3>${esc(s.name)}</h3>
-          <span class="meta">${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : 'Al día'}</span>
+        <div class="row between top">
+          <div style="min-width:0">
+            <h3>${esc(s.name)}</h3>
+            ${s.teacher ? `<span class="meta">${esc(s.teacher)}</span>` : ''}
+          </div>
+          <span class="meta" style="white-space:nowrap">${todo ? `${todo} pendiente${todo === 1 ? '' : 's'}` : tasks.length ? 'Al día' : 'Sin contenido'}</span>
         </div>
         <div class="bar"><i style="width:${pct}%"></i></div>
-        <span class="meta">${done} de ${tasks.length} tareas listas</span>
+        <span class="meta">${s.totalItems != null ? `Avance en Quanta: ${pct}% · ${s.completedItems || 0} de ${s.totalItems} actividades` : `${done} de ${tasks.length} tareas listas`}</span>
       </button>`;
   }).join('');
 
@@ -775,30 +860,37 @@ return { renderSubjects };
 
 // src/screens/exams.js
 __m["src/screens/exams.js"] = (() => {
-const { state, subjectOf } = __m["src/state/store.js"];
+const { state, subjectOf, topicsFor, dayLabel } = __m["src/state/store.js"];
 const { esc } = __m["src/components/ui.js"];
 
+const dateOf = (iso) => new Date(iso).toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'America/Caracas' });
+
 function renderExams() {
-  const exams = [...state.exams].sort((a, b) => a.inDays - b.inDays);
+  const exams = state.exams.filter((e) => e.inDays >= 0).sort((a, b) => a.inDays - b.inDays);
   return `
     <header>
       <h1 class="title">Exámenes</h1>
-      <p class="sub" style="margin-top:8px">${exams.length} exámenes próximos</p>
+      <p class="sub" style="margin-top:8px">${exams.length} evaluaciones próximas</p>
     </header>
-    ${exams.map((e, i) => `
+    ${exams.length ? '' : '<p class="empty">No hay evaluaciones próximas.</p>'}
+    ${exams.map((e, i) => {
+      const topics = topicsFor(e);
+      return `
       <article class="card ${i === 0 ? 'dark' : ''} task">
         <div class="row between top">
-          <div>
-            <span class="tag ${i === 0 ? 'light' : ''}">${esc(subjectOf(e.subjectId).name)}</span>
+          <div style="min-width:0">
+            <span class="tag ${i === 0 ? 'light' : ''}">${esc(subjectOf(e.subjectId).name)}${e.category ? ` · ${esc(e.category)}` : ''}</span>
             <h3>${esc(e.title)}</h3>
           </div>
-          <span class="pct">${e.inDays} días</span>
+          <span class="pct">${e.weight != null ? `${e.weight}%` : `${e.inDays} días`}</span>
         </div>
-        <span class="meta">${e.topics.map(esc).join(' · ')}</span>
+        <span class="meta">${e.due ? `${esc(dateOf(e.due))} · ${dayLabel(e.inDays)}` : dayLabel(e.inDays)}${e.teacher ? ` · ${esc(e.teacher)}` : ''}</span>
+        ${topics.length ? `<span class="meta">${topics.map(esc).join(' · ')}</span>` : ''}
         <div class="row">
-          <button class="btn ${i === 0 ? 'white' : 'black'}" data-action="guide" data-subject="${e.subjectId}">Guía y simulacro</button>
+          <button class="btn ${i === 0 ? 'white' : 'black'}" data-action="guide" data-subject="${e.subjectId}">Guía de estudio</button>
         </div>
-      </article>`).join('')}`;
+      </article>`;
+    }).join('')}`;
 }
 
 return { renderExams };
@@ -806,7 +898,7 @@ return { renderExams };
 
 // src/screens/profile.js
 __m["src/screens/profile.js"] = (() => {
-const { state, resolved, securedGrade } = __m["src/state/store.js"];
+const { state, resolved, upcomingExams, prepFor, nextExam } = __m["src/state/store.js"];
 const { esc, icon, initials } = __m["src/components/ui.js"];
 
 const setting = (action, svg, title, detail) => `
@@ -816,13 +908,18 @@ const setting = (action, svg, title, detail) => `
     <span class="chev">${icon.chev}</span>
   </button>`;
 
+const fetched = (iso) => new Date(iso).toLocaleString('es-VE', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/Caracas' });
+
 function renderProfile() {
-  const { student, prep, examMode, notifications } = state;
+  const { student, examMode, notifications } = state;
+  const exam = nextExam();
+  const prep = exam ? prepFor(exam.subjectId) : 0;
   return `
     <header style="display:flex;flex-direction:column;gap:6px">
       <span class="avatar lg">${esc(initials(student.name))}</span>
-      <h1 class="title" style="font-size:30px;margin-top:10px">${esc(student.name)}</h1>
+      <h1 class="title" style="font-size:30px;margin-top:10px">${esc(student.fullName || student.name)}</h1>
       <p class="sub">${esc(student.email)} · ${esc(student.studentId)}</p>
+      ${student.school ? `<p class="sub">${esc(student.school)}</p>` : ''}
     </header>
     <div class="row between">
       <span class="pill blue">${icon.sync} Quanta Sync Activo</span>
@@ -832,18 +929,18 @@ function renderProfile() {
     <section class="card dark metrics">
       <div class="cols">
         <div><span class="big">${resolved().length}</span><span class="meta">Tareas hechas</span></div>
-        <div><span class="big">${securedGrade()}%</span><span class="meta">Nota asegurada</span></div>
-        <div><span class="big blue">${student.average}</span><span class="meta">Promedio</span></div>
+        <div><span class="big">${upcomingExams().length}</span><span class="meta">Evaluaciones próximas</span></div>
+        <div><span class="big blue">${student.average ?? '—'}</span><span class="meta">${student.average != null ? 'Promedio' : 'Promedio (sin notas aún)'}</span></div>
       </div>
       <div class="bar" role="progressbar" aria-valuenow="${prep}" aria-valuemin="0" aria-valuemax="100"><i style="width:${prep}%"></i></div>
       <span class="meta" style="margin-top:-8px">Preparación examen: ${prep}%</span>
     </section>
 
     <h2 class="h2" style="margin-top:8px">Configuración</h2>
-    ${setting('sync', icon.link, 'Conexión con Quanta', state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
+    ${setting('sync', icon.link, 'Conexión con Quanta', state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))}` : state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Guías, resúmenes y simulacros')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
-    ${setting('reset', icon.refresh, 'Reiniciar demo', 'Restaura los datos de ejemplo')}`;
+    ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}`;
 }
 
 return { renderProfile };
@@ -870,8 +967,10 @@ function solvingSheet(task, step) {
 
 function draftSheet(task, draft) {
   return `
-    ${sheetHeader(subjectOf(task.subjectId).name, 'Borrador listo para revisar')}
-    <p class="note">Demo: este borrador es simulado. Revísalo y ajústalo antes de entregarlo en Quanta.</p>
+    ${sheetHeader(subjectOf(task.subjectId).name, draft.kind === 'plan' ? 'Plan de trabajo' : 'Borrador listo para revisar')}
+    <p class="note">${draft.kind === 'plan'
+      ? 'Plan armado con las lecciones reales de Quanta, no una respuesta. Marcarla como lista solo cambia esta app, no Quanta.'
+      : 'Demo: este borrador es simulado. Revísalo y ajústalo antes de entregarlo en Quanta.'}</p>
     <div class="draft">
       <p>${esc(draft.intro)}</p>
       ${draft.sections.map((s) => `<h4>${esc(s.heading)}</h4><p>${esc(s.body)}</p>`).join('')}
@@ -884,9 +983,10 @@ function guideSheet(guide) {
   return `
     ${sheetHeader(guide.subject, 'Guía de estudio')}
     <p>${esc(guide.summary)}</p>
-    <h3 class="h2">Conceptos clave</h3>
-    <ul>${guide.concepts.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+    ${guide.concepts.length ? `<h3 class="h2">${esc(guide.conceptsTitle || 'Conceptos clave')}</h3>
+    <ul>${guide.concepts.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
     <h3 class="h2">Simulacro</h3>
+    ${guide.quiz.length ? '' : '<p class="note">Los simulacros con preguntas se generarán cuando se conecte el modelo de IA. Por ahora, repasa estas lecciones y haz los puntos de práctica en Quanta.</p>'}
     ${guide.quiz.map((item, qi) => `
       <div class="quiz">
         <p><b>${qi + 1}. ${esc(item.q)}</b></p>
@@ -989,9 +1089,7 @@ const actions = {
   guide: ({ subject }) => openSheet(guideSheet(buildGuide(subject))),
 
   review({ subject }) {
-    state.prep = Math.min(100, state.prep + 5);
-    save();
-    render();
+    if (state.prep != null) { state.prep = Math.min(100, state.prep + 5); save(); render(); }
     openSheet(guideSheet(buildGuide(subject)));
   },
 
@@ -1008,9 +1106,9 @@ const actions = {
 
   async sync() {
     toast('Sincronizando con Quanta…');
-    const { total } = await syncQuanta();
+    const { total, fetchedAt } = await syncQuanta();
     render();
-    toast(`Quanta sincronizado · ${total} tareas`);
+    toast(fetchedAt ? `${total} tareas de Quanta · pide a Claude actualizar los datos` : `Quanta sincronizado · ${total} tareas`);
   },
   prefs: () => toast('Preferencias de IA: próximamente'),
   'toggle-exam': () => {
@@ -1018,7 +1116,7 @@ const actions = {
     toast(state.examMode ? 'Modo Examen activado' : 'Modo Examen desactivado');
   },
   'toggle-notif': () => { state.notifications = !state.notifications; save(); render(); },
-  reset: () => { reset(); render(); toast('Datos de ejemplo restaurados'); },
+  reset: () => { reset(); render(); toast('Datos restaurados'); },
 };
 
 document.addEventListener('click', (e) => {
@@ -1040,7 +1138,8 @@ document.addEventListener('submit', (e) => {
     status: 'pendiente',
     forExam: false,
     instructions: String(form.get('instructions')).trim() || 'Sin instrucciones adicionales.',
-    weight: 15,
+    weight: null,
+    kind: 'manual',
   });
   save();
   closeSheet();

@@ -66,9 +66,7 @@ const actions = {
   guide: ({ subject }) => openSheet(guideSheet(buildGuide(subject))),
 
   review({ subject }) {
-    state.prep = Math.min(100, state.prep + 5);
-    save();
-    render();
+    if (state.prep != null) { state.prep = Math.min(100, state.prep + 5); save(); render(); }
     openSheet(guideSheet(buildGuide(subject)));
   },
 
@@ -85,9 +83,9 @@ const actions = {
 
   async sync() {
     toast('Sincronizando con Quanta…');
-    const { total } = await syncQuanta();
+    const { total, fetchedAt } = await syncQuanta();
     render();
-    toast(`Quanta sincronizado · ${total} tareas`);
+    toast(fetchedAt ? `${total} tareas de Quanta · pide a Claude actualizar los datos` : `Quanta sincronizado · ${total} tareas`);
   },
   prefs: () => toast('Preferencias de IA: próximamente'),
   'toggle-exam': () => {
@@ -95,7 +93,7 @@ const actions = {
     toast(state.examMode ? 'Modo Examen activado' : 'Modo Examen desactivado');
   },
   'toggle-notif': () => { state.notifications = !state.notifications; save(); render(); },
-  reset: () => { reset(); render(); toast('Datos de ejemplo restaurados'); },
+  reset: () => { reset(); render(); toast('Datos restaurados'); },
 };
 
 document.addEventListener('click', (e) => {
@@ -117,7 +115,8 @@ document.addEventListener('submit', (e) => {
     status: 'pendiente',
     forExam: false,
     instructions: String(form.get('instructions')).trim() || 'Sin instrucciones adicionales.',
-    weight: 15,
+    weight: null,
+    kind: 'manual',
   });
   save();
   closeSheet();

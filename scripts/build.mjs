@@ -1,10 +1,15 @@
 // Empaqueta la app en un único HTML autónomo (dist/quanta-ai.html).
 // Uso: node scripts/build.mjs   (sin dependencias)
+// Con datos reales: QUANTA_DATA=private/quanta-data.js node scripts/build.mjs
+//   → private/quanta-ai.html (excluido de git, contiene datos personales)
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const MOCK = join(root, 'src/data/mock.js');
+const DATA = process.env.QUANTA_DATA ? resolve(root, process.env.QUANTA_DATA) : null;
+const read = (file) => readFileSync(file === MOCK && DATA ? DATA : file, 'utf8');
 const seen = new Set();
 const order = [];
 
@@ -12,7 +17,7 @@ const order = [];
 function visit(file) {
   if (seen.has(file)) return;
   seen.add(file);
-  const src = readFileSync(file, 'utf8');
+  const src = read(file);
   for (const [, rel] of src.matchAll(/^import[^'"]*['"](.+?)['"];?$/gm)) visit(resolve(dirname(file), rel));
   order.push(file);
 }
@@ -21,7 +26,7 @@ visit(join(root, 'src/main.js'));
 // Cada módulo va en su propio ámbito; sus exports se publican en un registro.
 const modules = order.map((file) => {
   const name = file.slice(root.length + 1);
-  let src = readFileSync(file, 'utf8');
+  let src = read(file);
   const exported = [];
   src = src.replace(/^import\s*\{([^}]*)\}\s*from\s*['"](.+?)['"];?$/gm, (_, names, rel) => {
     const dep = resolve(dirname(file), rel).slice(root.length + 1);
@@ -54,6 +59,7 @@ ${modules.join('\n\n')}
 </script>
 `;
 
-mkdirSync(join(root, 'dist'), { recursive: true });
-writeFileSync(join(root, 'dist/quanta-ai.html'), html);
-console.log(`dist/quanta-ai.html · ${order.length} módulos · ${(html.length / 1024).toFixed(1)} KB`);
+const out = DATA ? 'private/quanta-ai.html' : 'dist/quanta-ai.html';
+mkdirSync(dirname(join(root, out)), { recursive: true });
+writeFileSync(join(root, out), html);
+console.log(`${out} · ${order.length} módulos · ${(html.length / 1024).toFixed(1)} KB`);

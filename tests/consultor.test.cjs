@@ -23,20 +23,20 @@ const file = process.env.QUANTA_HTML || 'private/quanta-ai.html';
   const ask = async (q) => { await p.fill('#agenda-input', q); await p.click('#agenda-form button[type="submit"]'); await p.waitForTimeout(150); return p.innerText('#agenda-answer'); };
 
   let t = await ask('¿qué checkpoints valen 15%?');
-  ok('Consultor: «checkpoints 15%» filtra por tipo y peso', /15%|checkpoint/i.test(t) && /Encontré|No encuentro/.test(t), t.split('\n')[0]);
+  ok('Consultor: «checkpoints 15%» filtra por tipo y peso', /15%|checkpoint/i.test(t) && /Encontré|No figura/.test(t), t.split('\n')[0]);
   const bad149 = t.includes('14.9') || t.includes('14,9');
   ok('Consultor: excluye porcentajes menores a 15', !bad149);
 
   t = await ask('¿qué tengo esta semana?');
-  ok('Consultor: «esta semana» responde con rango', /esta semana|No encuentro/i.test(t), t.split('\n')[0]);
+  ok('Consultor: «esta semana» responde con rango', /esta semana|No figura/i.test(t), t.split('\n')[0]);
 
   t = await ask('¿qué tareas de química tengo pendientes?');
-  ok('Consultor: filtra por materia química', /[Qq]u[ií]mica|No encuentro/.test(t), t.split('\n')[0]);
+  ok('Consultor: filtra por materia química', /[Qq]u[ií]mica|No figura/.test(t), t.split('\n')[0]);
   const hasOther = /Matem[aá]ticas|Biolog[ií]a|Inglés/.test(t);
-  ok('Consultor: no mezcla otras materias al filtrar por una', !hasOther || /No encuentro/.test(t));
+  ok('Consultor: no mezcla otras materias al filtrar por una', !hasOther || /No figura/.test(t));
 
   t = await ask('¿qué exámenes tengo mañana?');
-  ok('Consultor: «mañana» usa el día siguiente', /mañana|No encuentro/i.test(t), t.split('\n')[0]);
+  ok('Consultor: «mañana» usa el día siguiente', /mañana|No figura/i.test(t), t.split('\n')[0]);
 
   t = await ask('¿tengo algo importante?');
   ok('Consultor: «importante» explica criterio (15% o 48h)', /15%|importante|48/i.test(t));

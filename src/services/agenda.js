@@ -59,6 +59,8 @@ function recommend(items) {
 export const QUESTIONS = [
   ['semana', '¿Qué tengo esta semana?'],
   ['manana', '¿Qué tengo mañana?'],
+  ['examenes', '¿Próximos exámenes?'],
+  ['checkpoints', 'Checkpoints 15%'],
   ['altas', '¿Cuáles valen 15% o más?'],
   ['tareas', '¿Qué tareas debo hacer?'],
   ['prioridad', '¿Qué materias debo priorizar?'],
@@ -82,6 +84,17 @@ export function answer(id, { all = false } = {}) {
   if (id === 'hoy') {
     const found = futureEvals().filter((x) => x.ymd === today);
     return { headline: `Hoy (${human(today)}) tienes ${found.length} ${found.length === 1 ? 'evaluación' : 'evaluaciones'}`, ...pack(found), recommendation: recommend(found), src };
+  }
+  if (id === 'examenes') {
+    const found = futureEvals();
+    const p = all ? { items: [...found].sort(byPriority), more: 0, total: found.length } : pack(found);
+    return { headline: `Tienes ${found.length} ${found.length === 1 ? 'evaluación próxima registrada' : 'evaluaciones próximas registradas'}`, ...p, recommendation: recommend(found), src };
+  }
+  if (id === 'checkpoints') {
+    const found = futureEvals().filter((x) => /checkpoint/i.test(x.name) && x.high);
+    const any = futureEvals().filter((x) => /checkpoint/i.test(x.name));
+    const p = all ? { items: [...found].sort(byPriority), more: 0, total: found.length } : pack(found);
+    return { headline: found.length ? `Tienes ${found.length} checkpoint(s) que valen 15% o más` : `No figura ningún checkpoint de 15% o más (sí ${any.length} checkpoint(s) de menor peso)`, ...p, recommendation: found.length ? recommend(found) : 'Los checkpoints registrados valen menos de 15%; aun así cuentan para la nota.', src };
   }
   if (id === 'altas') {
     const found = futureEvals().filter((x) => x.high);
@@ -218,6 +231,6 @@ export function answerText(text, { all = false } = {}) {
   const noun = q.types && q.types.length === 1 && q.types[0] === 'practica' ? 'tareas' : 'evaluaciones';
   const headline = sorted.length
     ? `Encontré ${sorted.length} ${sorted.length === 1 ? noun.replace(/es$/, 'ción').replace('tareas', 'tarea') : noun}${q.criteria.length ? ` · ${q.criteria.join(' · ')}` : ''}`
-    : `No encuentro ${noun} en los datos disponibles${q.criteria.length ? ` para: ${q.criteria.join(', ')}` : ''}`;
+    : `No figura ${noun} en la información consultada${q.criteria.length ? ` para: ${q.criteria.join(', ')}` : ''}`;
   return { headline, items: shown, more: Math.max(0, sorted.length - shown.length), total: sorted.length, recommendation: recommend(sorted.filter((x) => x.ymd)), src, query: text };
 }

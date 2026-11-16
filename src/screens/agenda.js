@@ -37,7 +37,7 @@ export function renderAnswer(res) {
         ? `<button class="btn ghost block" data-action="agenda-ask-all">Ver las ${res.total} (hay ${res.more} más)</button>`
         : `<button class="btn ghost block" data-action="agenda-all" data-q="${esc(res.id)}">Ver las ${res.total} (hay ${res.more} más)</button>`)
     : '';
-  const footer = `Última fuente disponible: ${esc(res.src.kind)}${res.src.date ? ` del ${esc(res.src.date)}` : ''}; revisa Quanta para confirmar cambios.`;
+  const footer = `Fuente: datos importados${res.src.date ? ` · Comprobado: ${esc(res.src.date)}` : ' · no verificado en vivo'}. Última fuente disponible${res.src.date ? ` del ${esc(res.src.date)}` : ''}; revisa Quanta para confirmar cambios.`;
   return `
     <div class="answer">
       <h2 class="h2">${esc(res.headline)}</h2>

@@ -1,15 +1,18 @@
 // Estado global de la app, persistido en localStorage.
 // Los datos vienen de src/data/mock.js (demo) o de Quanta (build con QUANTA_DATA).
 import { seed } from '../data/mock.js';
+import { sanitize } from './schema.js';
 
 const KEY = `quanta-ai-${seed.source || 'demo'}-${seed.version || 1}`;
 
+// Los datos guardados en el navegador se validan igual que los de origen:
+// un localStorage manipulado no puede inyectar HTML ni romper la app.
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* almacenamiento no disponible: se usa la semilla */ }
-  return structuredClone(seed);
+    if (raw) return sanitize(JSON.parse(raw));
+  } catch { /* almacenamiento no disponible o dañado: se usa la semilla */ }
+  return sanitize(structuredClone(seed));
 }
 
 export const state = load();
@@ -24,13 +27,21 @@ function refreshDates() {
 }
 refreshDates();
 
+/** Sustituye todo el estado por datos nuevos ya importados (se validan). */
+export function replaceState(next) {
+  for (const k of Object.keys(state)) delete state[k];
+  Object.assign(state, sanitize(next));
+  refreshDates();
+  save();
+}
+
 export function save() {
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* sin persistencia */ }
 }
 
 export function reset() {
   for (const k of Object.keys(state)) delete state[k];
-  Object.assign(state, structuredClone(seed));
+  Object.assign(state, sanitize(structuredClone(seed)));
   refreshDates();
   save();
 }

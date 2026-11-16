@@ -16,13 +16,15 @@ python3 -m http.server 8080
 node scripts/build.mjs   # genera dist/quanta-ai.html (se abre con doble clic, sin servidor)
 ```
 
-### Datos reales de Quanta
+### Datos de Quanta
+La sincronización automática está **desactivada** (ver `SECURITY.md`, SEC-002): Quanta no ofrece una API oficial para terceros.
+Para actualizar tus tareas usa **Perfil → Conexión con Quanta → Importar** con un calendario `.ics` o una copia `.json`, o añádelas con el botón +.
+Los datos ya importados se empaquetan con `QUANTA_DATA=private/quanta-data.js node scripts/build.mjs` (`private/` está fuera de git).
+
+### Pruebas
 ```bash
-Q_USER=correo Q_PASS=contraseña node scripts/quanta-sync.cjs   # lee el portal (solo lectura) → private/quanta-raw.json
-node scripts/quanta-import.cjs                                  # → private/quanta-data.js
-QUANTA_DATA=private/quanta-data.js node scripts/build.mjs       # → private/quanta-ai.html
+node scripts/build.mjs && node tests/security.test.cjs
 ```
-`private/` está excluida de git porque contiene datos personales.
 
 ## Estructura
 ```
@@ -53,7 +55,8 @@ scripts/build.mjs        Empaquetador sin dependencias → dist/quanta-ai.html
 - **Bloqueo automático** al salir de la app y tras 2 minutos sin uso; los datos no se muestran mientras está bloqueada.
 - **Límite de intentos**: tras 3 fallos espera 30 s, y el tiempo se duplica con cada fallo extra (persiste al recargar).
 - **Borrado del dispositivo**: elimina marcas, ajustes y PIN guardados en el navegador.
-- **Credenciales de Quanta**: `quanta-sync.cjs` pide la contraseña oculta y no la escribe en archivos; los datos personales quedan en `private/`, fuera de git.
+- **Integración con Quanta**: sin acceso automatizado; solo importación manual validada. Informe completo en `SECURITY.md`.
+- **Validación de datos**: todo lo que llega de archivos o del navegador se valida antes de mostrarse (`src/state/schema.js`).
 - El bloqueo protege la pantalla; el enlace publicado de la app es privado.
 
 ## Estudiante Pro

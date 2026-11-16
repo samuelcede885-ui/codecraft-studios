@@ -25,7 +25,7 @@ export function renderProfile() {
       ${student.school ? `<p class="sub">${esc(student.school)}</p>` : ''}
     </header>
     <div class="row between">
-      <span class="pill blue">${icon.sync} Quanta Sync Activo</span>
+      <span class="pill blue">${icon.sync} ${state.importedAt || state.fetchedAt ? 'Quanta · datos importados' : 'Datos de ejemplo'}</span>
       <button class="pill ${examMode ? 'on' : ''}" data-action="toggle-exam" aria-pressed="${examMode}">Modo Examen${examMode ? ' · On' : ''}</button>
     </div>
 
@@ -40,7 +40,9 @@ export function renderProfile() {
     </section>
 
     <h2 class="h2" style="margin-top:8px">Configuración</h2>
-    ${setting('sync', icon.link, 'Conexión con Quanta', state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))}` : state.lastSync ? 'Sincronizado hace un momento' : 'Toca para sincronizar')}
+    ${setting('sync', icon.link, 'Conexión con Quanta', state.importedAt
+      ? `Importado el ${esc(fetched(state.importedAt))}`
+      : state.fetchedAt ? `Datos del ${esc(fetched(state.fetchedAt))} · sincronización desactivada` : 'Importa tus tareas desde un archivo')}
     ${setting('prefs', icon.sliders, 'Preferencias de Estudio IA', 'Estudiante Pro: reglas y autoría')}
     ${setting('toggle-notif', icon.bell, 'Notificaciones de Exámenes', notifications ? 'Activadas' : 'Desactivadas')}
     ${setting('reset', icon.refresh, 'Reiniciar datos', 'Quita las marcas de «lista» de esta app')}

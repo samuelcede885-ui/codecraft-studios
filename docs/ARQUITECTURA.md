@@ -3,11 +3,11 @@
 ## Visión general
 
 ```
-┌──────────────┐   sync    ┌────────────────────┐   jobs   ┌──────────────────┐
+┌──────────────┐  import   ┌────────────────────┐   jobs   ┌──────────────────┐
 │ Plataforma   │ ────────▶ │ Backend Quanta AI  │ ───────▶ │ Motor de IA      │
-│ Quanta       │  (API o   │  · Conector Quanta │          │  · Resolución    │
-│ (tareas,     │  scraping │  · Normalizador    │ ◀─────── │  · Guías/resumen │
-│  adjuntos)   │  autoriz.)│  · Cola de trabajos│ borrador │  · Simulacros    │
+│ Quanta       │  (export. │  · Conector Quanta │          │  · Resolución    │
+│ (tareas,     │  archivo  │  · Normalizador    │ ◀─────── │  · Guías/resumen │
+│  adjuntos)   │  .ics)    │  · Cola de trabajos│ borrador │  · Simulacros    │
 └──────────────┘           │  · Base de datos   │          └──────────────────┘
                            └─────────┬──────────┘
                                      │ REST/JSON
@@ -19,12 +19,10 @@
 ```
 
 ## 1. Integración con Quanta
-- **Conector** (`src/services/quanta.js` en el frontend es el punto de entrada simulado).
-  En producción: OAuth/credenciales del estudiante guardadas cifradas en el backend, nunca en el cliente.
-  Si Quanta no ofrece API, se usa un sincronizador autorizado por el estudiante.
-- **Sincronización periódica** (p. ej. cada 30 min + bajo demanda): tareas, fechas, instrucciones y adjuntos.
-- **Normalización**: cada tarea → `{ id, subjectId, title, instructions, dueIn, attachments, weight }`.
-- **Clasificación**: materia (por curso de origen) y urgencia (alta ≤ 1 día, media ≤ 3, baja).
+- **Estado actual:** sin conexión automática. Quanta no ofrece una API oficial para terceros y no hay autorización del colegio, así que el acceso automatizado está desactivado (`SECURITY.md`, SEC-002).
+- **Ahora:** importación manual de un calendario `.ics` o una copia `.json` (`src/services/importer.js`), con validación de esquema (`src/state/schema.js`) y límites de tamaño.
+- **Futuro, solo con autorización:** API oficial con OAuth (authorization code + PKCE, RFC 9700/10017), permisos de solo lectura, tokens en el servidor y nunca en `localStorage`, y opciones de revocación y borrado.
+- **Clasificación:** materia (por nombre) y urgencia (alta ≤ 1 día, media ≤ 3, baja).
 
 ## 2. Motor de tareas (15 % de la nota)
 1. Extracción de texto de enunciado y adjuntos (PDF/DOCX/imágenes → OCR).
@@ -50,7 +48,7 @@
 ## 5. API prevista
 | Método | Ruta | Uso |
 |--------|------|-----|
-| POST | `/api/quanta/sync` | Sincronizar con Quanta |
+| POST | `/api/import` | Importar un archivo exportado por el alumno |
 | GET  | `/api/tasks` | Listado con filtros |
 | POST | `/api/tasks/:id/solve` | Generar borrador (asíncrono) |
 | POST | `/api/tasks/:id/approve` | Marcar como lista |

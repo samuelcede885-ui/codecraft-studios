@@ -1,6 +1,6 @@
 // Punto de entrada: router de pantallas y manejo de acciones (delegación de eventos).
 import { state, save, reset, taskById } from './state/store.js';
-import { syncQuanta } from './services/quanta.js';
+import { importFile } from './services/importer.js';
 import { solveTask, buildGuide } from './services/ai.js';
 import { toast, openSheet, setSheet, closeSheet, sheetIsOpen } from './components/ui.js';
 import { renderNav } from './components/nav.js';
@@ -9,7 +9,7 @@ import { renderTasks } from './screens/tasks.js';
 import { renderSubjects } from './screens/subjects.js';
 import { renderExams } from './screens/exams.js';
 import { renderProfile } from './screens/profile.js';
-import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet } from './screens/sheets.js';
+import { solvingSheet, draftSheet, guideSheet, newTaskSheet, principlesSheet, syncSheet } from './screens/sheets.js';
 import { renderLock, pinSheet, wipeSheet, tipsSheet } from './screens/lock.js';
 import * as guard from './services/lock.js';
 
@@ -135,12 +135,7 @@ const actions = {
 
   'new-task': () => openSheet(newTaskSheet()),
 
-  async sync() {
-    toast('Sincronizando con Quanta…');
-    const { total, fetchedAt } = await syncQuanta();
-    render();
-    toast(fetchedAt ? `${total} tareas de Quanta · pide a Claude actualizar los datos` : `Quanta sincronizado · ${total} tareas`);
-  },
+  sync: () => openSheet(syncSheet()),
   prefs: () => openSheet(principlesSheet()),
   check({ id, i }, el) {
     state.checks = state.checks || {};
@@ -176,6 +171,19 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'import-form') {
+    e.preventDefault();
+    const err = document.getElementById('import-error');
+    try {
+      const msg = await importFile(document.getElementById('import-file').files[0]);
+      closeSheet();
+      render();
+      toast(msg);
+    } catch (error) {
+      err.textContent = error.message;
+    }
+    return;
+  }
   if (e.target.id === 'pin-form' || e.target.id === 'pin-remove-form') {
     e.preventDefault();
     const val = (id) => document.getElementById(id)?.value.trim() || '';

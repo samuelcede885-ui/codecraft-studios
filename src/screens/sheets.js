@@ -104,3 +104,19 @@ export function newTaskSheet() {
       <button class="btn blue block" type="submit">Guardar tarea</button>
     </form>`;
 }
+
+export function syncSheet() {
+  const when = state.importedAt || state.fetchedAt;
+  return `
+    ${sheetHeader('Conexión con Quanta', 'Importar tareas')}
+    <p class="note">La sincronización automática está desactivada: Quanta no ofrece una API oficial para apps de terceros y no hay autorización del colegio. Tus datos se actualizan importando archivos tuyos o añadiendo tareas con el botón +.</p>
+    ${when ? `<p class="meta">Últimos datos: ${esc(new Date(when).toLocaleString('es-VE', { timeZone: 'America/Caracas' }))}</p>` : ''}
+    <form id="import-form" style="display:flex;flex-direction:column;gap:14px">
+      <label class="field">Archivo de calendario (.ics) o copia de esta app (.json), máximo 1 MB
+        <input id="import-file" name="file" type="file" accept=".ics,.json,text/calendar,application/json" required>
+      </label>
+      <p class="lock-msg" id="import-error" role="alert"></p>
+      <button class="btn blue block" type="submit">Importar</button>
+    </form>
+    <p class="meta">Si un archivo trae tareas que ya existen, no se duplican. Las tareas sin materia reconocible van a «Importadas».</p>`;
+}
